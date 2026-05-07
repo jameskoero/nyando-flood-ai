@@ -1,0 +1,30 @@
+{
+  "model": "nyando_xgb_v1",
+  "version": "1.0.0",
+  "trained_on": "2025-05-07",
+  "dataset": "nyando_training_v1.csv",
+  "n_samples": 5000,
+  "n_features": 6,
+  "features": ["elevation", "slope", "rainfall_3day", "distance_river", "clay_percent", "land_cover"],
+  "target": "flooded",
+  "class_balance_method": "SMOTE",
+  "cross_validation": "StratifiedKFold (k=5, spatial)",
+  "results": {
+    "auc_roc": "UPDATE_AFTER_TRAINING",
+    "f1_score": "UPDATE_AFTER_TRAINING",
+    "precision": "UPDATE_AFTER_TRAINING",
+    "recall": "UPDATE_AFTER_TRAINING",
+    "cv_auc_mean": "UPDATE_AFTER_TRAINING",
+    "cv_auc_std": "UPDATE_AFTER_TRAINING"
+  },
+  "hyperparameters": {
+    "n_estimators": 300,
+    "max_depth": 6,
+    "learning_rate": 0.05,
+    "subsample": 0.8,
+    "colsample_bytree": 0.8,
+    "eval_metric": "auc",
+    "random_state": 42
+  },
+  "notes": "Replace UPDATE_AFTER_TRAINING values after running notebooks/03_modelling.ipynb"
+}
