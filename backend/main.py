@@ -1,7 +1,7 @@
 """
 Nyando Basin Flood Risk Prediction API
 FastAPI backend — deploy on Render.com (free tier)
-Author: Bishop James Koero | github.com/jameskoero
+Author: James Koero | github.com/jameskoero
 """
 
 import os
@@ -26,7 +26,7 @@ app = FastAPI(
         "100% open data — Kenya DPA 2019 & GDPR compliant."
     ),
     version="1.0.0",
-    contact={"name": "Bishop James Koero", "url": "https://github.com/jameskoero"},
+    contact={"name": "James Koero", "url": "https://github.com/jameskoero"},
     license_info={"name": "MIT"},
 )
 
@@ -99,7 +99,7 @@ def root():
         "docs": "/docs",
         "health": "/health",
         "predict": "/predict",
-        "author": "Bishop James Koero — github.com/jameskoero",
+        "author": "James Koero — github.com/jameskoero",
     }
 
 @app.post("/predict", response_model=PredictResponse, tags=["Prediction"])
