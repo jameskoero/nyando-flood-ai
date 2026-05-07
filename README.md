@@ -416,7 +416,7 @@ This project targets international climate-AI funding:
 
 ## 👤 Author
 
-**Bishop James Koero**  
+**James Koero**  
 Junior ML Engineer | Kisumu, Kenya
 
 [![GitHub](https://img.shields.io/badge/GitHub-jameskoero-181717?style=flat-square&logo=github)](https://github.com/jameskoero)
