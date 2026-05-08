@@ -1,18 +1,1 @@
-{
-  "model": "nyando_xgb_v1",
-  "version": "1.0.0",
-  "auc_roc": 0.94,
-  "f1_score": 0.88,
-  "precision": 0.89,
-  "recall": 0.87,
-  "spatial_cv_std": 0.02,
-  "spatial_cv_folds": 5,
-  "cv_grouping": "sub-basin",
-  "train_period": "2014-2022",
-  "test_period": "2023-2024",
-  "temporal_leakage": false,
-  "smote_applied": true,
-  "training_points": 5000,
-  "date_trained": "2025-05-07",
-  "dataset": "nyando_training_v1.csv"
-}
+{"model":"nyando_xgb_v1","version":"1.0.0","auc_roc":0.94,"f1_score":0.88,"precision":0.89,"recall":0.87,"spatial_cv_std":0.02,"spatial_cv_folds":5,"cv_grouping":"sub-basin","train_period":"2014-2022","test_period":"2023-2024","temporal_leakage":false,"smote_applied":true,"training_points":5000,"date_trained":"2025-05-07","dataset":"nyando_training_v1.csv"}
