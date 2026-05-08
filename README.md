@@ -210,6 +210,8 @@ nyando-flood-ai/
 │   │   └── confusion_matrix.png
 │   └── Nyando_FloodRisk_2025.pdf   # QGIS ward risk map (for county officials)
 │
+├── src/                   # Modular ML source code
+├── tests/                 # pytest unit tests
 ├── docs/
 │   └── funding/
 │       └── concept_note_v1.md  # Funder-ready concept note
