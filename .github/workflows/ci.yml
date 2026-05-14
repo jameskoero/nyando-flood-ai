@@ -1,0 +1,43 @@
+name: CI - Nyando Flood AI Tests
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install
+        run: pip install scikit-learn pandas numpy joblib pytest
+      - name: Check data
+        shell: python
+        run: |
+          import pandas as pd
+          df = pd.read_csv('data/training/nyando_training_v1.csv')
+          assert len(df) >= 100, f'Only {len(df)} rows'
+          assert 'flooded' in df.columns
+          print('Data OK:', df.shape, 'flood rate:', round(df['flooded'].mean(),3))
+      - name: Check metrics
+        shell: python
+        run: |
+          import json
+          m = json.load(open('metrics.json'))
+          assert m['auc_roc'] >= 0.85, f'AUC too low: {m["auc_roc"]}'
+          assert 'real_data_note' in m
+          print('Metrics OK: AUC =', m['auc_roc'], 'F1 =', m['f1_score'])
+      - name: Check model
+        shell: python
+        run: |
+          import joblib, numpy as np
+          m = joblib.load('models/nyando_xgb_v1.pkl')
+          p = float(m.predict_proba([[1137, 0.7, 112, 847, 42, 30]])[0, 1])
+          assert 0 <= p <= 1
+          print('Model OK: SAR flood score =', round(p, 3))
+      - name: Run tests
+        run: pytest tests/ -v --tb=short
