@@ -3,11 +3,12 @@ import pandas as pd
 
 FEATURES = ['elevation', 'slope', 'rainfall_3day', 'distance_river', 'clay_percent', 'land_cover']
 TARGET = 'flooded'
+MIN_ELEVATION = 0.1
 
 
 def clean(df):
     out = df.dropna(subset=FEATURES + [TARGET]).copy()
-    out['elevation'] = out['elevation'].clip(lower=0.1)
+    out['elevation'] = out['elevation'].clip(lower=MIN_ELEVATION)
     out['rainfall_3day'] = out['rainfall_3day'].clip(lower=0)
     return out.reset_index(drop=True)
 
