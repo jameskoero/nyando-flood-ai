@@ -1,28 +1,3 @@
-lection crash
-
-3
-pytest.ini
-Repo root — proper test discovery
-
-4
-tests/__init__.py
-Create new file inside tests/ folder
-
-5
-tests/test_pipeline.py
-Replaces broken version — all 4 bad assertions fixed
-
-6
-.github/workflows/ci.yml
-Node 24 forced + asset verification step
-
-7
-requirements.txt
-Repo root — complete dependency list
-metrics.json
-Step 1 of 7 — Repo root — fixes missing key crash
-↓ DOWNLOAD
-COPY
 {
   "model":          "GradientBoostingClassifier",
   "version":        "v1.0.0",
