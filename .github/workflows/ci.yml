@@ -1,18 +1,25 @@
 name: CI — Nyando Flood AI Tests
+
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
           cache: "pip"
@@ -22,39 +29,42 @@ jobs:
           pip install --upgrade pip
           pip install scikit-learn imbalanced-learn \
                       pandas numpy matplotlib joblib \
-                      pytest pytest-cov
+                      pytest
 
-      - name: Verify training data
+      - name: Check training data
         run: |
-          python -c "
-          import pandas as pd
+          python - << 'EOF'
+          import pandas as pd, sys
           df = pd.read_csv('data/training/nyando_training_v1.csv')
-          assert len(df) >= 100, f'Only {len(df)} rows'
+          assert len(df) >= 100, f'Too few rows: {len(df)}'
           assert 'flooded' in df.columns, 'Missing target column'
-          assert df['flooded'].isin([0,1]).all(), 'Target not binary'
-          print(f'Data OK: {df.shape}  flood rate: {df[\"flooded\"].mean():.1%}')
-          "
+          assert df['flooded'].isin([0, 1]).all(), 'Target not binary'
+          assert df.isnull().sum().sum() == 0, 'Nulls found in data'
+          print(f'Data OK: {df.shape}  flood_rate={df["flooded"].mean():.1%}')
+          EOF
 
-      - name: Verify metrics
+      - name: Check metrics.json
         run: |
-          python -c "
-          import json
+          python - << 'EOF'
+          import json, sys
           m = json.load(open('metrics.json'))
-          assert m['auc_roc'] >= 0.85, f'AUC too low: {m[\"auc_roc\"]}'
-          assert m['f1_score'] >= 0.75, f'F1 too low: {m[\"f1_score\"]}'
-          print(f'Metrics OK: AUC={m[\"auc_roc\"]}  F1={m[\"f1_score\"]}')
-          "
+          auc = m.get('auc_roc', m.get('auc', 0))
+          f1  = m.get('f1_score', m.get('f1', 0))
+          assert auc >= 0.85, f'AUC too low: {auc}'
+          assert f1  >= 0.75, f'F1 too low:  {f1}'
+          print(f'Metrics OK: AUC={auc}  F1={f1}')
+          EOF
 
-      - name: Verify model loads
+      - name: Check model loads and predicts
         run: |
-          python -c "
+          python - << 'EOF'
           import joblib, numpy as np
           model = joblib.load('models/nyando_xgb_v1.pkl')
-          sample = np.array([[1200, 3.0, 60.0, 500, 35.0, 40]])
+          sample = np.array([[1200.0, 3.0, 60.0, 500.0, 35.0, 40]])
           prob = float(model.predict_proba(sample)[0, 1])
-          assert 0 <= prob <= 1
-          print(f'Model OK: risk_score={prob:.3f}')
-          "
+          assert 0.0 <= prob <= 1.0, f'Invalid probability: {prob}'
+          print(f'Model OK: risk_score={prob:.4f}')
+          EOF
 
-      - name: Run pytest
+      - name: Run pytest suite
         run: pytest tests/ -v --tb=short
