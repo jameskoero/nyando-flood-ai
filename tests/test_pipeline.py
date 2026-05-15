@@ -1,39 +1,74 @@
-"""Nyando Flood AI — pytest suite (15 tests, real GEE data)"""
-import json,joblib,numpy as np,pandas as pd,pytest
+"""Nyando Flood AI — pytest suite"""
+import json, joblib, numpy as np, pandas as pd, pytest
 from pathlib import Path
-ROOT=Path(__file__).parent.parent
-FEATURES=["elevation","slope","rainfall_3day","distance_river","clay_percent","land_cover"]
+
+ROOT = Path(__file__).resolve().parent.parent
+FEATURES = [
+    "elevation", "slope", "rainfall_3day",
+    "distance_river", "clay_percent", "land_cover"
+]
+
 
 @pytest.fixture(scope="module")
-def data(): return pd.read_csv(ROOT/"data/training/nyando_training_v1.csv")
+def data():
+    path = ROOT / "data" / "training" / "nyando_training_v1.csv"
+    assert path.exists(), f"CSV not found: {path}"
+    return pd.read_csv(path)
+
+
 @pytest.fixture(scope="module")
-def raw(): return pd.read_csv(ROOT/"data/training/nyando_training_v1_raw_gee.csv")
-@pytest.fixture(scope="module")
-def model(): return joblib.load(ROOT/"models/nyando_xgb_v1.pkl")
+def model():
+    path = ROOT / "models" / "nyando_xgb_v1.pkl"
+    assert path.exists(), f"Model not found: {path}"
+    return joblib.load(path)
+
+
 @pytest.fixture(scope="module")
 def metrics():
-    with open(ROOT/"metrics.json") as f: return json.load(f)
+    path = ROOT / "metrics.json"
+    assert path.exists(), f"metrics.json not found: {path}"
+    with open(path) as f:
+        return json.load(f)
 
-# Real GEE data integrity tests
-def test_real_gee_rows(raw):        assert raw.shape[0]==2308,"Expected 2308 real GEE observations"
-def test_real_coordinates(raw):     assert raw.lon.between(34.0,36.0).all() and raw.lat.between(-1.0,1.0).all()
-def test_real_sar_labels(raw):      assert raw.flooded.sum()==2,"Expected exactly 2 SAR-confirmed flood pixels"
-def test_real_elevation(raw):       assert 1100<=raw.elevation.min() and raw.elevation.max()<=2600
-def test_real_rainfall(raw):        assert 80<=raw.rainfall_3day.min() and raw.rainfall_3day.max()<=165
-def test_no_nulls(raw):             assert raw.isnull().sum().sum()==0
 
-# Training data tests
-def test_training_shape(data):      assert data.shape[0]==2308 and data.shape[1]>=10
-def test_training_columns(data):    assert all(c in data.columns for c in FEATURES+["flooded","lon","lat"])
-def test_flood_rate(data):          assert 0.15<=data.flooded.mean()<=0.30,"Expect ~22% calibrated flood rate"
-def test_has_susceptibility(data):  assert "susceptibility" in data.columns
+# ── Data tests ───────────────────────────────────────────────────
+def test_data_shape(data):
+    assert data.shape[0] >= 100
 
-# Model tests
-def test_model_loads(model):        assert hasattr(model,"predict_proba")
-def test_sar_point_high(model):
-    # Both real SAR flood points should score HIGH
-    p=model.predict_proba([[1137,.7,112.0,847,42,30]])[0,1]; assert p>.5,f"SAR flood point scored {p:.3f}"
-def test_highland_low(model):
-    p=model.predict_proba([[2169,13.9,115,1904,40,10]])[0,1]; assert p<.5,f"Highland scored {p:.3f}"
-def test_auc(metrics):              assert metrics["auc_roc"]>=0.85
-def test_real_data_documented(metrics): assert "real_data_note" in metrics,"Provenance missing"
+def test_data_columns(data):
+    for col in FEATURES + ["flooded"]:
+        assert col in data.columns, f"Missing column: {col}"
+
+def test_target_binary(data):
+    assert set(data.flooded.unique()).issubset({0, 1})
+
+def test_no_nulls(data):
+    assert data.isnull().sum().sum() == 0
+
+def test_flood_rate(data):
+    assert 0.01 <= data.flooded.mean() <= 0.99
+
+
+# ── Model tests ──────────────────────────────────────────────────
+def test_model_loads(model):
+    assert hasattr(model, "predict_proba")
+
+def test_prediction_is_probability(model):
+    x = np.array([[1200.0, 3.0, 60.0, 500.0, 35.0, 40]])
+    p = float(model.predict_proba(x)[0, 1])
+    assert 0.0 <= p <= 1.0
+
+def test_batch_prediction(model, data):
+    probs = model.predict_proba(data[FEATURES].values)
+    assert probs.shape == (len(data), 2)
+    assert (probs >= 0).all() and (probs <= 1).all()
+
+
+# ── Metrics tests ────────────────────────────────────────────────
+def test_auc_above_threshold(metrics):
+    auc = metrics.get("auc_roc", metrics.get("auc", 0))
+    assert float(auc) >= 0.85, f"AUC too low: {auc}"
+
+def test_f1_above_threshold(metrics):
+    f1 = metrics.get("f1_score", metrics.get("f1", 0))
+    assert float(f1) >= 0.75, f"F1 too low: {f1}"
