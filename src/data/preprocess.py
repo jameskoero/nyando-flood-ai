@@ -27,8 +27,6 @@ implementation handles single-class edge cases gracefully.
 
 import pandas as pd
 
-# Module-level constants so any downstream module can import these
-# without hardcoding column names. Single source of truth.
 FEATURES = [
     "elevation",
     "slope",
@@ -73,32 +71,25 @@ def apply_smote(X, y, random_state: int = 42):
 
     Returns:
         X_resampled (pd.DataFrame), y_resampled (np.array)
-
-    Implementation note:
-        For each minority-class sample needed, we pick a random existing
-        minority sample. No interpolation (nearest-neighbor style) because
-        with only 2 real flood examples, interpolation between them would
-        generate nearly identical synthetic samples anyway.
     """
-    # Normalise inputs to pandas with a clean 0-based index
     if isinstance(X, pd.DataFrame):
         x_df = X.reset_index(drop=True).copy()
     else:
         x_df = pd.DataFrame(X)
 
     y_series = pd.Series(y).astype(int).reset_index(drop=True)
-
     counts = y_series.value_counts()
 
-    # Edge case: only one class present — nothing to balance
+    # Edge case: only one class present
     if len(counts) < 2:
         present_class = int(counts.index[0]) if len(counts) else 0
         missing_class = 1 - present_class
-        # Return original data padded with one synthetic sample
-        # so downstream code doesn't crash on single-class arrays
-        x_resampled = pd.concat([x_df, x_df.iloc[[0]]], ignore_index=True)
+        n = len(x_df)
+        x_resampled = pd.concat(
+            [x_df, x_df.iloc[:n]], ignore_index=True
+        )
         y_resampled = pd.concat(
-            [y_series, pd.Series([missing_class])],
+            [y_series, pd.Series([missing_class] * n)],
             ignore_index=True,
         )
         return x_resampled, y_resampled.to_numpy()
@@ -110,7 +101,6 @@ def apply_smote(X, y, random_state: int = 42):
     if n_to_add <= 0:
         return x_df, y_series.to_numpy()
 
-    # Sample minority rows with replacement
     minority_idx = (
         y_series[y_series == minority_class]
         .sample(n=n_to_add, replace=True, random_state=random_state)
@@ -126,7 +116,6 @@ def apply_smote(X, y, random_state: int = 42):
     return x_resampled, y_resampled.to_numpy()
 
 
-# Backward-compatible aliases
 def clean(df: pd.DataFrame) -> pd.DataFrame:
     """Legacy alias. Prefer clean_features()."""
     return clean_features(df)
