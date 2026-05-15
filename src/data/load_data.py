@@ -3,10 +3,16 @@ FEATURES=['elevation','slope','rainfall_3day','distance_river','clay_percent','l
 TARGET='flooded'
 # Real GEE data — 2308 observations, coordinates lon 34.7-35.4°E, lat 0.4°S-0.1°N
 GITHUB_RAW='https://raw.githubusercontent.com/jameskoero/nyando-flood-ai/main/data/training/nyando_training_v1.csv'
+REQUIRED_COLUMNS={'lon','lat',TARGET,*FEATURES}
+def _validate(df):
+    cols={c.lstrip('\ufeff') for c in df.columns}
+    missing=sorted(REQUIRED_COLUMNS-cols)
+    if missing: raise ValueError(f'Missing required columns: {missing}')
+    return df
 def load_training_csv():
     local=Path(__file__).parent.parent.parent/'data/training/nyando_training_v1.csv'
-    if local.exists(): return pd.read_csv(local)
-    print('[load_data] Fetching from GitHub...'); return pd.read_csv(GITHUB_RAW)
+    if local.exists(): return _validate(pd.read_csv(local))
+    print('[load_data] Fetching from GitHub...'); return _validate(pd.read_csv(GITHUB_RAW))
 def load_raw_gee():
     local=Path(__file__).parent.parent.parent/'data/training/nyando_training_v1_raw_gee.csv'
     if local.exists(): return pd.read_csv(local)
