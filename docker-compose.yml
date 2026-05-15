@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+  api:
+    build: .
+    container_name: nyando-flood-api
+    ports: ["8000:8000"]
+    volumes:
+      - ./models:/app/models
+      - ./metrics.json:/app/metrics.json
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD","curl","-f","http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

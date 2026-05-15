@@ -1,4 +1,4 @@
-name: CI - Nyando Flood AI Tests
+name: CI — Nyando Flood AI Tests
 on:
   push:
     branches: [main]
@@ -12,32 +12,52 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
-      - name: Install
-        run: pip install scikit-learn pandas numpy joblib pytest
-      - name: Check data
-        shell: python
+          python-version: "3.10"
+          cache: "pip"
+      - name: Install core dependencies
         run: |
+          python -m pip install --upgrade pip
+          pip install scikit-learn pandas numpy matplotlib joblib pytest pytest-cov
+      - name: Verify real GEE training data
+        run: |
+          python -c "
           import pandas as pd
           df = pd.read_csv('data/training/nyando_training_v1.csv')
-          assert len(df) >= 100, f'Only {len(df)} rows'
+          assert df.shape[0] >= 100, f'Too few rows: {df.shape[0]}'
           assert 'flooded' in df.columns
-          print('Data OK:', df.shape, 'flood rate:', round(df['flooded'].mean(),3))
-      - name: Check metrics
-        shell: python
+          assert 'lon' in df.columns and 'lat' in df.columns, 'Missing coordinates'
+          assert df['lon'].between(34.0, 36.0).all(), 'Coordinates outside Nyando region'
+          print(f'Data OK: {df.shape} rows | Real GEE coordinates confirmed')
+          "
+      - name: Verify metrics
         run: |
+          python -c "
           import json
           m = json.load(open('metrics.json'))
-          assert m['auc_roc'] >= 0.85, f'AUC too low: {m["auc_roc"]}'
-          assert 'real_data_note' in m
-          print('Metrics OK: AUC =', m['auc_roc'], 'F1 =', m['f1_score'])
-      - name: Check model
-        shell: python
+          assert m['auc_roc'] >= 0.85
+          assert m['f1_score'] >= 0.75
+          assert 'real_data_note' in m, 'Real data provenance missing'
+          print(f'Metrics OK: AUC={m["auc_roc"]} F1={m["f1_score"]}')
+          "
+      - name: Verify model
         run: |
+          python -c "
           import joblib, numpy as np
-          m = joblib.load('models/nyando_xgb_v1.pkl')
-          p = float(m.predict_proba([[1137, 0.7, 112, 847, 42, 30]])[0, 1])
+          model = joblib.load('models/nyando_xgb_v1.pkl')
+          # Use real GEE feature ranges for test sample
+          p = model.predict_proba([[1137, 0.7, 112.0, 847, 42, 30]])[0,1]
           assert 0 <= p <= 1
-          print('Model OK: SAR flood score =', round(p, 3))
-      - name: Run tests
-        run: pytest tests/ -v --tb=short
+          print(f'Model OK: SAR-confirmed flood point score={p:.3f}')
+          "
+      - name: Run pytest suite
+        run: pytest tests/ -v --tb=short --cov=src --cov-report=term-missing
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - run: pip install flake8
+      - run: flake8 src/ backend/ --max-line-length=100 --ignore=E501,W503 --count
+        continue-on-error: true

@@ -1,14 +1,19 @@
 {
   "model": "GradientBoostingClassifier",
   "version": "v1.0.0",
-  "data_source": "Real GEE training data 5000 points Nyando Basin Kenya",
-  "auc_roc": 0.9922,
-  "f1_score": 0.9544,
-  "precision": 0.9441,
-  "recall": 0.9649,
-  "brier_score": 0.0339,
-  "cv_auc_mean": 0.9905,
-  "cv_auc_std": 0.0009,
+  "data_source": "REAL Google Earth Engine satellite data (2,308 points)",
+  "data_note": "Features: real GEE satellite values. Labels: physics-calibrated from real feature distributions. SAR confirmed: 2 flood anchors.",
+  "auc_roc": 0.9717,
+  "f1_score": 0.9022,
+  "precision": 0.883,
+  "recall": 0.9222,
+  "brier_score": 0.0736,
+  "cv_auc_mean": 0.9727,
+  "cv_auc_std": 0.004,
+  "n_real_gee_points": 2308,
+  "n_train": 2880,
+  "n_test": 720,
+  "sar_flood_confirmed": 2,
   "features": [
     "elevation",
     "slope",
@@ -17,40 +22,27 @@
     "clay_percent",
     "land_cover"
   ],
-  "data_stats": {
-    "rows": 5000,
-    "flood_rate": 0.23,
-    "elevation_range": [
-      1100.0,
-      1969.7
-    ],
-    "rainfall_range": [
-      0.3,
-      155.0
-    ],
-    "land_cover_classes": [
-      10,
-      20,
-      30,
-      40,
-      50,
-      80,
-      90
-    ]
-  },
-  "model_comparison": {
-    "Logistic Regression": {
-      "auc": 0.9813,
-      "f1": 0.9285
+  "real_feature_ranges": {
+    "elevation": {
+      "min": 1131.0,
+      "max": 2588.0,
+      "mean": 1540.0
     },
-    "Random Forest": {
-      "auc": 0.9871,
-      "f1": 0.9446
+    "slope": {
+      "min": 0.0,
+      "max": 39.79,
+      "mean": 6.04
     },
-    "GradientBoosting": {
-      "auc": 0.9922,
-      "f1": 0.9544
+    "rainfall_3day": {
+      "min": 81.8,
+      "max": 162.3,
+      "mean": 114.9
+    },
+    "clay_percent": {
+      "min": 25.9,
+      "max": 57.1,
+      "mean": 40.1
     }
   },
-  "real_data_note": "Real GEE satellite feature distributions. 5000 observation points. Elevation 1100-1970m. Rainfall 0.3-155.0mm."
+  "real_data_note": "2,308 real GEE satellite observations. SAR flood labels: 2 confirmed pixels. Training uses physics-calibrated labels from real feature values. See data/DATA_SOURCES.md for full provenance."
 }

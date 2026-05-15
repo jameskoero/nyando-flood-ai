@@ -1,37 +1,13 @@
-"""
-load_data.py — Data loading functions for Nyando Flood AI.
-"""
-import pandas as pd
-from pathlib import Path
-
-ROOT     = Path(__file__).resolve().parents[2]
-DATA_DIR = ROOT / "data"
-
-FEATURES = ["elevation","slope","rainfall_3day",
-            "distance_river","clay_percent","land_cover"]
-TARGET   = "flooded"
-
-
-def load_training_csv(version: str = "v1") -> pd.DataFrame:
-    path = DATA_DIR / "training" / f"nyando_training_{version}.csv"
-    if not path.exists():
-        raise FileNotFoundError(
-            f"Training file not found: {path}\n"
-            "Run notebooks/01_data_prep.ipynb to generate it first.")
-    df = pd.read_csv(path)
-    print(f"[load_data] Loaded {len(df):,} rows from {path.name}")
-    return df
-
-
-def load_raw_chirps(year: int) -> pd.DataFrame:
-    path = DATA_DIR / "raw" / f"chirps_nyando_{year}.csv"
-    if not path.exists():
-        raise FileNotFoundError(f"CHIRPS file not found: {path}")
-    return pd.read_csv(path)
-
-
-def load_external_source(name: str) -> pd.DataFrame:
-    path = DATA_DIR / "external" / f"{name}.csv"
-    if not path.exists():
-        raise FileNotFoundError(f"External source not found: {path}")
-    return pd.read_csv(path)
+import pandas as pd; from pathlib import Path
+FEATURES=['elevation','slope','rainfall_3day','distance_river','clay_percent','land_cover']
+TARGET='flooded'
+# Real GEE data — 2308 observations, coordinates lon 34.7-35.4°E, lat 0.4°S-0.1°N
+GITHUB_RAW='https://raw.githubusercontent.com/jameskoero/nyando-flood-ai/main/data/training/nyando_training_v1.csv'
+def load_training_csv():
+    local=Path(__file__).parent.parent.parent/'data/training/nyando_training_v1.csv'
+    if local.exists(): return pd.read_csv(local)
+    print('[load_data] Fetching from GitHub...'); return pd.read_csv(GITHUB_RAW)
+def load_raw_gee():
+    local=Path(__file__).parent.parent.parent/'data/training/nyando_training_v1_raw_gee.csv'
+    if local.exists(): return pd.read_csv(local)
+    raise FileNotFoundError('Raw GEE CSV not found. Run notebooks/01_gee_data_extraction.ipynb')

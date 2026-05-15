@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.env
+venv/
+.venv/
+*.tif
+*.nc
+*.hgt
+.DS_Store
+logs/
+*.log
+.config/earthengine/
+node_modules/
+dist/
+build/
+nyando_training_v1_raw_gee.csv
