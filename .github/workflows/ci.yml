@@ -1,15 +1,22 @@
-name: CI – Nyando Flood AI Tests
+# GitHub Actions CI for Nyando Flood AI
+#
+# Why actions/checkout@v5 and setup-python@v6?
+#   The previous versions (v4, v5) used Node.js 16 which GitHub deprecated.
+#   The deprecation warnings were showing up in CI logs and obscuring the
+#   real import errors. Updated to current LTS versions.
+#
+# Why the schema validation step before pytest?
+#   If nyando_training_v1.csv is missing or malformed, pytest collection
+#   would crash with exit code 2 (collection failure), not a test failure.
+#   The schema gate gives a clear error message instead.
+
+name: AI Tests
 
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
-
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-  PYTHONDONTWRITEBYTECODE: 1
-  PYTHONUNBUFFERED: 1
 
 jobs:
   test:
@@ -26,28 +33,12 @@ jobs:
           cache: "pip"
 
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install \
-            pandas \
-            numpy \
-            scikit-learn \
-            imbalanced-learn \
-            xgboost \
-            matplotlib \
-            joblib \
-            pytest \
-            requests
+        run: pip install -r requirements.txt
 
-      - name: Verify key assets exist
+      - name: Check model and data artifacts exist
         run: |
-          echo "=== Checking critical files ==="
-          test -f metrics.json            && echo "metrics.json       OK" || echo "metrics.json       MISSING"
-          test -f pytest.ini              && echo "pytest.ini         OK" || echo "pytest.ini         MISSING"
-          test -f conftest.py             && echo "conftest.py        OK" || echo "conftest.py        MISSING"
-          test -f tests/test_pipeline.py  && echo "test_pipeline.py   OK" || echo "test_pipeline.py   MISSING"
-          ls models/*.pkl 2>/dev/null     && echo "model pkl          OK" || echo "model pkl          MISSING"
-          ls data/training/*.csv 2>/dev/null && echo "training CSVs   OK" || echo "training CSVs      MISSING"
+          ls models/*.pkl 2>/dev/null  && echo "model pkl         OK" || echo "model pkl         MISSING"
+          ls data/training/*.csv 2>/dev/null && echo "training CSVs     OK" || echo "training CSVs     MISSING"
 
       - name: Validate canonical real-GEE training schema
         run: python src/data/validate_training_data.py
