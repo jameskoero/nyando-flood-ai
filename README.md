@@ -372,7 +372,7 @@ See full [MODEL_CARD.md](MODEL_CARD.md).
 - [x] Phase 1 — Real GEE data extraction (CHIRPS + DEM + SAR labels)
 - [x] Phase 2 — Model development (GradientBoosting + benchmarking + 9 charts)
 - [x] Phase 3 — FastAPI deployment (nyando-flood-api.onrender.com)
-- [x] Phase 3b — CI/CD pipeline (GitHub Actions, 15 tests)
+- [x] Phase 3b — CI/CD pipeline (GitHub Actions, 41 tests) 
 - [ ] Phase 4 — React dashboard (Leaflet.js choropleth map)
 - [ ] Phase 5 — Full UNOSAT multi-year SAR flood labels (2014–2024)
 - [ ] Phase 6 — WARMA gauge data integration (real-time)
