@@ -34,7 +34,7 @@ jobs:
           assert len(df) >= 100, f'Too few rows: {len(df)}';
           assert 'flooded' in df.columns;
           assert df['flooded'].isin([0,1]).all();
-          print(f'PASS: data {df.shape}, flood_rate={df[\"flooded\"].mean():.1%}')
+          print(f'PASS: data {df.shape}, flood_rate={df.flooded.mean():.1%}')
           "
 
       - name: Test 2 — metrics.json is valid
