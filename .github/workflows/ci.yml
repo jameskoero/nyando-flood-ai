@@ -8,6 +8,8 @@ on:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  PYTHONDONTWRITEBYTECODE: 1
+  PYTHONUNBUFFERED: 1
 
 jobs:
   test:
@@ -21,6 +23,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: "pip"
 
       - name: Install dependencies
         run: |
@@ -36,6 +39,15 @@ jobs:
             pytest \
             requests
 
+      - name: Verify key assets exist
+        run: |
+          echo "=== Checking critical files ==="
+          test -f metrics.json            && echo "metrics.json       OK" || echo "metrics.json       MISSING"
+          test -f pytest.ini              && echo "pytest.ini         OK" || echo "pytest.ini         MISSING"
+          test -f conftest.py             && echo "conftest.py        OK" || echo "conftest.py        MISSING"
+          test -f tests/test_pipeline.py  && echo "test_pipeline.py   OK" || echo "test_pipeline.py   MISSING"
+          ls models/*.pkl 2>/dev/null     && echo "model pkl          OK" || echo "model pkl          MISSING"
+          ls data/training/*.csv 2>/dev/null && echo "training CSVs   OK" || echo "training CSVs      MISSING"
+
       - name: Run tests
         run: pytest tests/ -v --tb=short
-        continue-on-error: false
