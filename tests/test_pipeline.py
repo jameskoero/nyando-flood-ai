@@ -43,10 +43,7 @@ REQUIRED_SCHEMA_COLS = {"lon", "lat", "elevation", "flooded", *FEATURE_COLS}
 def _find_csv() -> Path:
     if CANONICAL_CSV.exists():
         return CANONICAL_CSV
-    csvs = sorted(DATA_DIR.glob("*.csv"))
-    if not csvs:
-        pytest.skip(f"No CSV files in {DATA_DIR}")
-    return csvs[0]
+    pytest.fail(f"Canonical CSV missing: {CANONICAL_CSV}")
 
 
 def _assert_schema(df: pd.DataFrame):

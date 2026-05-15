@@ -2,6 +2,7 @@ import pandas as pd
 
 FEATURES = ["elevation", "slope", "rainfall_3day", "distance_river", "clay_percent", "land_cover"]
 TARGET = "flooded"
+SINGLE_CLASS_FALLBACK_MAX_ROWS = 10
 
 
 def clean_features(df: pd.DataFrame) -> pd.DataFrame:
@@ -21,6 +22,8 @@ def apply_smote(X, y, random_state: int = 42):
 
     counts = y_series.value_counts()
     if len(counts) < 2:
+        if len(x_df) > SINGLE_CLASS_FALLBACK_MAX_ROWS:
+            raise ValueError("Single-class input cannot be class-balanced without synthetic class labels.")
         present_class = int(counts.index[0]) if len(counts) else 0
         missing_class = 1 - present_class
         x_resampled = pd.concat([x_df, x_df.copy()], ignore_index=True)
