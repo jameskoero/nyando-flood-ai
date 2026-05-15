@@ -49,7 +49,7 @@ def _validate(df: pd.DataFrame) -> pd.DataFrame:
     matching. We strip it from all columns defensively (not just the first).
     """
     # Strip BOM from all column names
-    df.columns = {c.lstrip("\ufeff") for c in df.columns}
+    df.columns = [c.lstrip("\ufeff") for c in df.columns]
     df.columns = [c.lstrip("\ufeff") for c in df.columns]
 
     missing = sorted(REQUIRED_COLUMNS - set(df.columns))
