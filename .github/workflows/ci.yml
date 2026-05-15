@@ -17,10 +17,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python 3.11
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.11"
           cache: "pip"
@@ -48,6 +48,9 @@ jobs:
           test -f tests/test_pipeline.py  && echo "test_pipeline.py   OK" || echo "test_pipeline.py   MISSING"
           ls models/*.pkl 2>/dev/null     && echo "model pkl          OK" || echo "model pkl          MISSING"
           ls data/training/*.csv 2>/dev/null && echo "training CSVs   OK" || echo "training CSVs      MISSING"
+
+      - name: Validate canonical real-GEE training schema
+        run: python src/data/validate_training_data.py
 
       - name: Run tests
         run: pytest tests/ -v --tb=short

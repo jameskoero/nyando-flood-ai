@@ -21,6 +21,7 @@ import pytest
 # ── Repo root and asset paths ──────────────────────────────────────────────
 ROOT         = Path(__file__).resolve().parent.parent
 DATA_DIR     = ROOT / "data" / "training"
+CANONICAL_CSV = DATA_DIR / "nyando_training_v1.csv"
 MODEL_PATH   = ROOT / "models" / "nyando_xgb_v1.pkl"
 METRICS_PATH = ROOT / "metrics.json"
 
@@ -35,14 +36,20 @@ FEATURE_COLS = [
 
 LON_VARIANTS = {"lon", "longitude", "long", "x", "Longitude", "Lon"}
 LAT_VARIANTS = {"lat", "latitude", "y",    "Latitude",  "Lat"}
+REQUIRED_SCHEMA_COLS = {"lon", "lat", "elevation", "flooded", *FEATURE_COLS}
 
 
 # ── Helpers ────────────────────────────────────────────────────────────────
 def _find_csv() -> Path:
-    csvs = list(DATA_DIR.glob("*.csv"))
-    if not csvs:
-        pytest.skip(f"No CSV files in {DATA_DIR}")
-    return csvs[0]
+    if CANONICAL_CSV.exists():
+        return CANONICAL_CSV
+    pytest.fail(f"Canonical CSV missing: {CANONICAL_CSV}")
+
+
+def _assert_schema(df: pd.DataFrame):
+    columns = {c.lstrip("\ufeff") for c in df.columns}
+    missing = sorted(REQUIRED_SCHEMA_COLS - columns)
+    assert not missing, f"Missing required schema columns: {missing}"
 
 
 def _get_auc(m: dict):
@@ -62,7 +69,9 @@ def _get_f1(m: dict):
 # ── Fixtures ───────────────────────────────────────────────────────────────
 @pytest.fixture(scope="module")
 def raw_df():
-    return pd.read_csv(_find_csv())
+    df = pd.read_csv(_find_csv())
+    _assert_schema(df)
+    return df
 
 
 @pytest.fixture(scope="module")
@@ -86,8 +95,11 @@ def metrics():
 # ══════════════════════════════════════════════════════════════════════════
 
 def test_csv_file_exists():
-    csvs = list(DATA_DIR.glob("*.csv"))
-    assert len(csvs) > 0, f"No CSV files in {DATA_DIR}"
+    assert CANONICAL_CSV.exists(), f"Canonical dataset missing: {CANONICAL_CSV}"
+
+
+def test_canonical_csv_selected():
+    assert _find_csv().name == "nyando_training_v1.csv"
 
 
 def test_csv_has_rows(raw_df):
@@ -102,6 +114,10 @@ def test_csv_minimum_size(raw_df):
 def test_target_column_exists(raw_df):
     assert "flooded" in raw_df.columns, \
         f"'flooded' missing. Columns: {list(raw_df.columns)}"
+
+
+def test_required_schema_columns(raw_df):
+    _assert_schema(raw_df)
 
 
 def test_target_has_both_classes(raw_df):
