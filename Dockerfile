@@ -1,10 +1,9 @@
-FROM python:3.10-slim
+FROM python:3.11-slim
 WORKDIR /app
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-COPY models/ ./models/
-COPY metrics.json .
-COPY backend/main.py .
+COPY backend/ .
+RUN echo "=== /app contents ===" && ls -lh /app
+RUN echo "=== /app/models ===" && ls -lh /app/models/ 2>/dev/null || echo "models/ missing"
 EXPOSE 8000
-HEALTHCHECK --interval=30s --timeout=10s CMD curl -f http://localhost:8000/health || exit 1
-CMD ["uvicorn","main:app","--host","0.0.0.0","--port","8000"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
