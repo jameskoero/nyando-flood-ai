@@ -285,9 +285,9 @@ uvicorn main:app --reload --port 8000
 
 ## 🔌 API Reference
 
-**Base URL:** `https://nyando-flood-api.onrender.com`
+**Base URL:** [`https://nyando-flood-api.onrender.com`](https://nyando-flood-api.onrender.com/docs)
 
-### `GET /health`
+### [`GET /health`](https://nyando-flood-api.onrender.com/health)
 
 ```json
 { "status": "ok", "model": "nyando_xgb_v1", "version": "1.0.0" }
