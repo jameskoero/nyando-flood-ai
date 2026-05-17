@@ -1,9 +1,11 @@
 {
-  "model":          "GradientBoostingClassifier",
-  "version":        "v1.0.0",
-  "trained_date":   "2026-05-15",
-  "n_samples":      2308,
-  "n_features":     6,
+  "model": "GradientBoostingClassifier",
+  "sklearn_version": "1.6.1",
+  "auc_roc": 0.9717,
+  "f1_score": 0.9022,
+  "cv_mean": 0.9727,
+  "cv_std": 0.004,
+  "training_points": 2308,
   "features": [
     "elevation",
     "slope",
@@ -12,26 +14,5 @@
     "clay_percent",
     "land_cover"
   ],
-
-  "auc_roc":        0.9717,
-  "auc":            0.9717,
-  "roc_auc":        0.9717,
-
-  "f1":             0.9022,
-  "f1_score":       0.9022,
-
-  "accuracy":       0.9400,
-  "precision":      0.9100,
-  "recall":         0.8900,
-
-  "cv_mean":        0.9727,
-  "cv_std":         0.0040,
-  "cv_folds":       5,
-
-  "threshold":      0.5,
-
-  "data_source":    "Google Earth Engine — Nyando Basin, Kenya",
-  "region":         "Nyando Basin, Kisumu County, Kenya",
-  "target":         "flooded",
-  "notes":          "GradientBoostingClassifier trained on 2308 GEE-extracted points. AUC 0.9717 on hold-out test set."
+  "date_trained": "2026-05-17"
 }
