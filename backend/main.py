@@ -23,7 +23,7 @@ async def load_model():
     base = Path(__file__).parent
     candidates = [
         base / "models" / "nyando_xgb_v1.pkl",
-        Path("/app/models/nyando_xgb_v1.pkl"),
+        Path(__file__).parent / "models" / "nyando_xgb_v1.pkl"),
         base / "nyando_xgb_v1.pkl",
     ]
     for p in candidates:
