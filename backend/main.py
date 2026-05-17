@@ -1,62 +1,59 @@
-from fastapi import FastAPI, HTTPException
+import os
+import joblib
+from fastapi import FastAPI
 from pydantic import BaseModel
-from pathlib import Path
-import joblib, numpy as np, time
 
-app = FastAPI(title="Nyando Flood API", version="1.2.0")
+app = FastAPI(title="Nyando Flood Risk API", version="1.0.0")
 
-FEATURES = ["elevation","slope","rainfall_3day",
-            "distance_river","clay_percent","land_cover"]
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "models", "nyando_gb_v1.pkl")
 
-MODEL_PATH = Path(__file__).parent / "models" / "nyando_xgb_v1.pkl"
 model = None
-start_time = time.time()
+try:
+    model = joblib.load(MODEL_PATH)
+    print(f"✅ Model loaded successfully from {MODEL_PATH}")
+except Exception as e:
+    print(f"⚠️ Model load failed: {e}")
 
-@app.on_event("startup")
-def load_model():
-    global model
-    try:
-        model = joblib.load(MODEL_PATH)
-        print(f"Model loaded from {MODEL_PATH}")
-    except Exception as e:
-        print(f"ERROR loading model: {e}")
-
-class Req(BaseModel):
+class FloodInput(BaseModel):
     elevation: float
     slope: float
     rainfall_3day: float
     distance_river: float
     clay_percent: float
     land_cover: float
-    ward: str = "Unknown"
 
 @app.get("/health")
 def health():
     return {
         "status": "ok",
-        "model": "nyando_xgb_v1",
         "model_loaded": model is not None,
-        "uptime_s": round(time.time() - start_time)
+        "model": "nyando_gb_v1",
+        "version": "1.0.0"
     }
 
 @app.post("/predict")
-def predict(r: Req):
+def predict(data: FloodInput):
     if model is None:
-        raise HTTPException(503, "Model not loaded")
-    X = np.array([[getattr(r, f) for f in FEATURES]])
-    score = float(model.predict_proba(X)[0, 1])
-    if score < 0.35:   cls = "LOW"
-    elif score < 0.60: cls = "MEDIUM"
-    elif score < 0.80: cls = "HIGH"
-    else:              cls = "CRITICAL"
-    imp = model.feature_importances_
-    top3 = sorted(zip(FEATURES, imp), key=lambda x: -x[1])[:3]
+        return {"error": "Model not loaded"}
+    
+    X = [[data.elevation, data.slope, data.rainfall_3day,
+          data.distance_river, data.clay_percent, data.land_cover]]
+    
+    prob = float(model.predict_proba(X)[0][1])
+    pred = int(model.predict(X)[0])
+    
+    if prob < 0.35:
+        risk = "LOW"
+    elif prob < 0.60:
+        risk = "MEDIUM"
+    elif prob < 0.80:
+        risk = "HIGH"
+    else:
+        risk = "CRITICAL"
+    
     return {
-        "risk_score": round(score, 4),
-        "risk_class": cls,
-        "ward": r.ward,
-        "shap_top3": [{"feature": f, "contribution": round(v, 4)}
-                      for f, v in top3],
-        "model_version": "1.2.0",
-        "model_type": "GradientBoostingClassifier"
+        "risk_score": round(prob, 4),
+        "risk_class": risk,
+        "prediction": pred,
+        "model_version": "1.0.0"
     }
