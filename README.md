@@ -29,6 +29,7 @@ Ward-level flood susceptibility mapping at 100m resolution with 72-hour predicti
 - [Quick Start (Google Colab)](#-quick-start-google-colab)
 - [Local Setup](#-local-setup)
 - [API Reference](#-api-reference)
+- [Live Dashboard](#-live-dashboard)
 - [Funding & Impact](#-funding--impact)
 - [Data Ethics & Privacy](#-data-ethics--privacy)
 - [Roadmap](#-roadmap)
@@ -47,7 +48,7 @@ This project builds a machine-learning flood susceptibility model trained on **r
 |---|---|
 | 🗺️ **Flood Risk Map** | 100m-resolution ward-level susceptibility scores |
 | ⚡ **Prediction API** | FastAPI endpoint — submit rainfall data, receive risk score in <200ms |
-| 📊 **Web Dashboard** | Interactive React + Leaflet.js ward risk map (Q3 2026) |
+| 📊 **Web Dashboard** | Interactive React + Leaflet.js ward risk map — **[Live on Vercel →](https://nyando-flood-ai.vercel.app)** |
 | 🔍 **Feature Importance** | Full gradient-boosting feature attribution — no black-box decisions |
 | 📋 **Risk Scorecard** | Per-ward people-at-risk quantification |
 
@@ -335,6 +336,38 @@ uvicorn main:app --reload --port 8000
 
 ---
 
+## 🖥️ Live Dashboard
+
+**URL:** [https://nyando-flood-ai.vercel.app](https://nyando-flood-ai.vercel.app)
+
+A React-powered interactive flood risk dashboard built for county officials, NGO field teams, and international funders — designed to communicate risk clearly without requiring a data science background.
+
+### Dashboard Features
+
+| Feature | Description |
+|---|---|
+| 🗺️ **Ward Risk Map** | Leaflet.js choropleth — all 42 Nyando wards colour-coded by flood risk |
+| 📊 **Risk Score Panel** | Submit coordinates or select a ward to get live risk score from the API |
+| 🔍 **Feature Breakdown** | Top-3 flood drivers per prediction (elevation, rainfall, river distance) |
+| 📋 **Risk Class Badges** | LOW / MEDIUM / HIGH / CRITICAL — colour-coded for instant field decisions |
+| 📁 **Exportable Reports** | Download ward risk summary as PDF for funder and government submissions |
+| 📡 **Live API Connection** | Powered by `nyando-flood-api.onrender.com` — real-time predictions |
+
+### Stack
+
+```
+Frontend  : React 18 + Vite + Tailwind CSS
+Maps      : Leaflet.js + react-leaflet
+Charts    : Recharts
+Hosting   : Vercel (auto-deploy from GitHub main branch)
+API       : nyando-flood-api.onrender.com (Docker, Render)
+```
+
+> **For funders and government partners:** No technical setup required.
+> Open the dashboard, select a ward, and receive a flood risk score with full explainability in under 200ms.
+
+---
+
 ## 🌐 Funding & Impact
 
 | Funder | Programme | Grant Range |
@@ -373,7 +406,7 @@ See full [MODEL_CARD.md](MODEL_CARD.md).
 - [x] Phase 2 — Model development (GradientBoosting + benchmarking + 9 charts)
 - [x] Phase 3 — FastAPI deployment (nyando-flood-api.onrender.com)
 - [x] Phase 3b — CI/CD pipeline (GitHub Actions, 41 tests) 
-- [ ] Phase 4 — React dashboard (Leaflet.js choropleth map)
+- [x] Phase 4 — React dashboard (Leaflet.js choropleth map) — **[Live →](https://nyando-flood-ai.vercel.app)**
 - [ ] Phase 5 — Full UNOSAT multi-year SAR flood labels (2014–2024)
 - [ ] Phase 6 — WARMA gauge data integration (real-time)
 - [ ] Phase 7 — SMS early warning integration (Africa's Talking API)
