@@ -5,7 +5,12 @@ from pydantic import BaseModel
 
 app = FastAPI(title="Nyando Flood Risk API", version="1.0.0")
 
-MODEL_PATH = os.path.join(os.path.dirname(__file__), "models", "nyando_gb_v1.pkl")
+# Try xgb first, fallback to gb
+_dir = os.path.dirname(__file__)
+_xgb = os.path.join(_dir, "models", "nyando_xgb_v1.pkl")
+_gb  = os.path.join(_dir, "models", "nyando_gb_v1.pkl")
+MODEL_PATH = _xgb if os.path.exists(_xgb) else _gb
+print(f"Using model: {MODEL_PATH}")
 
 model = None
 try:
