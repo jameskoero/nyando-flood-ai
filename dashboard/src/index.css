@@ -1,0 +1,10 @@
+@tailwind base;@tailwind components;@tailwind utilities;
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0A1628;color:#e2e8f0;font-family:'DM Sans',sans-serif}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(201,168,76,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+.section{position:relative;z-index:1}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes pgold{0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,.4)}50%{box-shadow:0 0 0 12px rgba(201,168,76,0)}}
+.fade-up{animation:fadeUp .7s ease both}.delay-1{animation-delay:.15s}.delay-2{animation-delay:.3s}.delay-3{animation-delay:.45s}
+.blink{animation:blink 1.4s infinite}.pulse-dot{animation:pgold 2s infinite}
