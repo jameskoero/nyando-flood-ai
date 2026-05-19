@@ -10,6 +10,7 @@
 [![CI](https://github.com/jameskoero/nyando-flood-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/jameskoero/nyando-flood-ai/actions/workflows/ci.yml)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/jameskoero/nyando-flood-ai/blob/main/notebooks/03_modelling.ipynb)
 [![Live API](https://img.shields.io/badge/Live%20API-Render-46E3B7?style=flat-square&logo=render)](https://nyando-flood-api.onrender.com/docs)
+[![Model Loaded](https://img.shields.io/badge/Model-Loaded%20✅-2ECC71?style=flat-square)](https://nyando-flood-api.onrender.com/health)
 [![Dashboard](https://img.shields.io/badge/Dashboard-Live%20on%20Vercel-000000?style=flat-square&logo=vercel)](https://nyando-flood-ai.vercel.app)
 
 **An open-source, AI-powered flood early warning system for Nyando River Basin, Kisumu County, Kenya.**
@@ -23,10 +24,22 @@ Ward-level flood susceptibility mapping at 100m resolution with 72-hour predicti
 
 | Service | URL | Status |
 |---|---|---|
-| **Prediction API** | [nyando-flood-api.onrender.com/docs](https://nyando-flood-api.onrender.com/docs) | ✅ Live — Docker on Render |
+| **Prediction API** | [nyando-flood-api.onrender.com/docs](https://nyando-flood-api.onrender.com/docs) | ✅ Live — Python on Render |
+| **Health Check** | [nyando-flood-api.onrender.com/health](https://nyando-flood-api.onrender.com/health) | ✅ `model_loaded: true` |
 | **Donor Dashboard** | [nyando-flood-ai.vercel.app](https://nyando-flood-ai.vercel.app) | ✅ Live — React + Vite on Vercel |
 
 > ⚠️ The API runs on Render's free tier — first request after idle may take 30–60s to cold-start. Subsequent requests return in <200ms.
+
+**Confirmed health response (May 19, 2026):**
+```json
+{
+  "status": "ok",
+  "model": "nyando_xgb_v1",
+  "model_loaded": true,
+  "model_path": "/app/backend/models/nyando_xgb_v1.pkl",
+  "version": "1.0.0"
+}
+```
 
 ---
 
@@ -188,15 +201,16 @@ nyando-flood-ai/
 │   └── 04_shap_analysis.ipynb        # Feature importance + bias audit
 │
 ├── models/
-│   ├── nyando_xgb_v1.pkl             # Trained GradientBoosting model
+│   ├── nyando_xgb_v1.pkl             # Trained GradientBoosting model (✅ loaded in prod)
 │   └── metrics.json                  # AUC, F1, CV results (real GEE data)
 │
 ├── backend/
+│   ├── __init__.py                   # Python package marker
 │   ├── main.py                       # FastAPI — /predict + /health + /metrics
-│   ├── Dockerfile                    # Docker deployment (Render)
-│   └── requirements.txt
+│   └── models/
+│       └── nyando_xgb_v1.pkl         # Model served in production
 │
-├── frontend/                         # Phase 4 — React donor dashboard
+├── frontend/                         # React donor dashboard
 │   ├── src/
 │   │   └── App.jsx                   # Full dashboard — sliders, map, risk gauge
 │   ├── index.html
@@ -295,7 +309,6 @@ pytest tests/ -v
 
 # 4. Start the API
 cd backend
-pip install -r requirements.txt
 uvicorn main:app --reload --port 8000
 # Docs: http://localhost:8000/docs
 
@@ -315,7 +328,13 @@ npm run dev
 ### [`GET /health`](https://nyando-flood-api.onrender.com/health)
 
 ```json
-{ "status": "ok", "model": "nyando_xgb_v1", "version": "1.0.0" }
+{
+  "status": "ok",
+  "model": "nyando_xgb_v1",
+  "model_loaded": true,
+  "model_path": "/app/backend/models/nyando_xgb_v1.pkl",
+  "version": "1.0.0"
+}
 ```
 
 ### `POST /predict`
@@ -381,7 +400,7 @@ Styling   : Pure inline styles — navy (#0A1628) + gold (#C9A84C)
 Map       : Custom SVG (Lake Victoria, Nyando River, 5 ward dots)
 Fonts     : Playfair Display + Lato (Google Fonts)
 Hosting   : Vercel (auto-deploy from GitHub main branch)
-API       : nyando-flood-api.onrender.com (Docker on Render)
+API       : nyando-flood-api.onrender.com (Python on Render)
 CI        : GitHub Actions — 41 tests, all green ✅
 ```
 
@@ -426,7 +445,7 @@ See full [MODEL_CARD.md](MODEL_CARD.md).
 
 - [x] Phase 1 — Real GEE data extraction (CHIRPS + DEM + SAR labels)
 - [x] Phase 2 — Model development (GradientBoosting + benchmarking + 9 evaluation charts)
-- [x] Phase 3 — FastAPI deployment on Render (Docker, live at nyando-flood-api.onrender.com)
+- [x] Phase 3 — FastAPI deployment on Render (**`model_loaded: true` ✅ confirmed May 19, 2026**)
 - [x] Phase 3b — CI/CD pipeline (GitHub Actions, **41 tests passing** ✅)
 - [x] Phase 4 — React donor dashboard (Vite, SVG basin map, live risk prediction) — **[Live →](https://nyando-flood-ai.vercel.app)**
 - [ ] Phase 5 — Full UNOSAT multi-year SAR flood labels (2014–2024)
