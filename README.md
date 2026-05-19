@@ -10,12 +10,23 @@
 [![CI](https://github.com/jameskoero/nyando-flood-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/jameskoero/nyando-flood-ai/actions/workflows/ci.yml)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/jameskoero/nyando-flood-ai/blob/main/notebooks/03_modelling.ipynb)
 [![Live API](https://img.shields.io/badge/Live%20API-Render-46E3B7?style=flat-square&logo=render)](https://nyando-flood-api.onrender.com/docs)
-[![Dashboard](https://img.shields.io/badge/Dashboard-Vercel-000000?style=flat-square&logo=vercel)](https://nyando-flood-ai.vercel.app)
+[![Dashboard](https://img.shields.io/badge/Dashboard-Live%20on%20Vercel-000000?style=flat-square&logo=vercel)](https://nyando-flood-ai.vercel.app)
 
 **An open-source, AI-powered flood early warning system for Nyando River Basin, Kisumu County, Kenya.**
 Ward-level flood susceptibility mapping at 100m resolution with 72-hour prediction lead time.
 
 > Trained on **real Google Earth Engine satellite data** — NASA NASADEM, CHIRPS v2, Sentinel-1 SAR, SoilGrids, HydroSHEDS, ESA WorldCover.
+
+---
+
+## 🔴 Live Deployments
+
+| Service | URL | Status |
+|---|---|---|
+| **Prediction API** | [nyando-flood-api.onrender.com/docs](https://nyando-flood-api.onrender.com/docs) | ✅ Live — Docker on Render |
+| **Donor Dashboard** | [nyando-flood-ai.vercel.app](https://nyando-flood-ai.vercel.app) | ✅ Live — React + Vite on Vercel |
+
+> ⚠️ The API runs on Render's free tier — first request after idle may take 30–60s to cold-start. Subsequent requests return in <200ms.
 
 ---
 
@@ -48,11 +59,11 @@ This project builds a machine-learning flood susceptibility model trained on **r
 |---|---|
 | 🗺️ **Flood Risk Map** | 100m-resolution ward-level susceptibility scores |
 | ⚡ **Prediction API** | FastAPI endpoint — submit rainfall data, receive risk score in <200ms |
-| 📊 **Web Dashboard** | Interactive React + Leaflet.js ward risk map — **[Live on Vercel →](https://nyando-flood-ai.vercel.app)** |
+| 📊 **Donor Dashboard** | Interactive React app — live ward risk display with sliders, SVG basin map, and colour-coded risk gauge — **[Live →](https://nyando-flood-ai.vercel.app)** |
 | 🔍 **Feature Importance** | Full gradient-boosting feature attribution — no black-box decisions |
 | 📋 **Risk Scorecard** | Per-ward people-at-risk quantification |
 
-**Target Geography:** Nyando sub-county — 42 wards — 500,000+ residents
+**Target Geography:** Nyando sub-county — 5 electoral wards — ~50,000 residents directly covered
 
 ---
 
@@ -72,6 +83,7 @@ This project builds a machine-learning flood susceptibility model trained on **r
 | **CV AUC (5-fold)** | 0.9727 ± 0.0040 | Stable — generalises well across spatial folds |
 | **Training points** | 2,308 real GEE | Real satellite feature values from Nyando Basin |
 | **Resolution** | 100m grid | Ward-level mapping |
+| **CI Tests** | 41 passing ✅ | GitHub Actions — all green |
 
 ### Model Comparison
 
@@ -105,23 +117,20 @@ All data is **100% open, non-personal, and satellite-derived**. No individual or
 | `rainfall_3day` | CHIRPS Daily (GEE) | ~5km | 3-day accumulated rainfall (mm) — real: 81.8–162.3mm |
 | `distance_river` | OpenStreetMap (GEE) | — | Distance to nearest river (m) |
 | `clay_percent` | ISRIC SoilGrids (GEE) | 250m | Soil clay fraction 0–5cm (%) — real: 25.9–57.1% |
-| `land_cover` | ESA WorldCover 10m | 10m | Land use class |
+| `land_cover` | ESA WorldCover 10m | 10m | Land use class (0=Open Water … 5=Built-up) |
 | `flooded` | Sentinel-1 SAR (GEE) | 30m | Flood label: 0=dry, 1=flooded (physics-calibrated, 2 SAR anchors) |
 
-### Download the Training CSV
+### Nyando Electoral Wards (5 Wards Covered)
 
-```bash
-# Download from GitHub Releases
-wget https://github.com/jameskoero/nyando-flood-ai/releases/download/v1.0/nyando_training_v1.csv
+| Ward | Administrative Note |
+|---|---|
+| Ahero | Nyando Constituency |
+| Awasi/Onjiko | Nyando Constituency |
+| East Kano/Wawidhi | Nyando Constituency |
+| Kabonyo/Kanyagwal | Now under Kadibo Sub-County (admin split) |
+| Kobura | Now under Kadibo Sub-County (admin split) |
 
-# Or load directly in Python
-import pandas as pd
-df = pd.read_csv(
-  "https://raw.githubusercontent.com/jameskoero/nyando-flood-ai/main/data/training/nyando_training_v1.csv"
-)
-print(df.shape)   # (5000, 9)
-print(df['flooded'].mean())  # ~0.23 flood rate
-```
+> Note: Kabonyo/Kanyagwal and Kobura were part of Nyando under the former larger sub-county boundary used in GEE data extraction. All 5 wards are covered in the dashboard and model.
 
 ---
 
@@ -146,7 +155,7 @@ Real Satellite Data (Google Earth Engine)
         │
         ▼
 ┌──────────────────────────────────────────────────┐
-│   GradientBoostingClassifier (scikit-learn)      │
+│   GradientBoostingClassifier (scikit-learn 1.6.1)│
 │   n_estimators  = 300                            │
 │   max_depth     = 6                              │
 │   learning_rate = 0.05                           │
@@ -156,8 +165,8 @@ Real Satellite Data (Google Earth Engine)
 └──────────────────────────────────────────────────┘
         │
         ├──► Risk Score (0.0 – 1.0)
-        ├──► Risk Class (LOW / MEDIUM / HIGH / CRITICAL)
-        └──► Feature Importances (top-3 flood drivers per ward)
+        ├──► Risk Class (LOW / MEDIUM / HIGH)
+        └──► Feature Importances (top drivers per prediction)
 ```
 
 ---
@@ -184,7 +193,15 @@ nyando-flood-ai/
 │
 ├── backend/
 │   ├── main.py                       # FastAPI — /predict + /health + /metrics
+│   ├── Dockerfile                    # Docker deployment (Render)
 │   └── requirements.txt
+│
+├── frontend/                         # Phase 4 — React donor dashboard
+│   ├── src/
+│   │   └── App.jsx                   # Full dashboard — sliders, map, risk gauge
+│   ├── index.html
+│   ├── vite.config.js
+│   └── package.json
 │
 ├── reports/
 │   └── figures/                      # 9 evaluation charts (navy/gold)
@@ -205,18 +222,19 @@ nyando-flood-ai/
 │   └── visualization/ (shap_plots.py)
 │
 ├── tests/
-│   └── test_pipeline.py              # 15 automated tests
+│   └── test_pipeline.py              # 41 automated tests — all passing ✅
 │
 ├── docs/
 │   └── funding/
 │       └── concept_note_v1.md        # Funder-ready concept note
 │
-├── .github/workflows/ci.yml          # GitHub Actions CI
-├── MODEL_CARD.md                     # Model transparency card
+├── .github/workflows/ci.yml          # GitHub Actions CI — 41 tests green
+├── vercel.json                       # Vercel deploy config (root=frontend)
+├── MODEL_CARD.md
 ├── CONTRIBUTING.md
-├── gee_extract_nyando.py             # GEE data extraction script
+├── gee_extract_nyando.py
 ├── .gitignore
-├── LICENSE                           # MIT
+├── LICENSE
 ├── requirements.txt
 └── README.md
 ```
@@ -272,7 +290,7 @@ cd nyando-flood-ai
 # 2. Install Python dependencies
 pip install -r requirements.txt
 
-# 3. Run tests (all 15 should pass)
+# 3. Run tests (all 41 should pass)
 pytest tests/ -v
 
 # 4. Start the API
@@ -280,6 +298,12 @@ cd backend
 pip install -r requirements.txt
 uvicorn main:app --reload --port 8000
 # Docs: http://localhost:8000/docs
+
+# 5. Run the dashboard locally
+cd frontend
+npm install
+npm run dev
+# Dashboard: http://localhost:5173
 ```
 
 ---
@@ -304,8 +328,8 @@ uvicorn main:app --reload --port 8000
   "rainfall_3day": 87.4,
   "distance_river": 320.0,
   "clay_percent": 42.1,
-  "land_cover": 40,
-  "ward": "Nyando Central"
+  "land_cover": 1,
+  "ward": "Ahero"
 }
 ```
 
@@ -315,24 +339,18 @@ uvicorn main:app --reload --port 8000
   "risk_score": 0.87,
   "risk_class": "HIGH",
   "risk_label": "Prepare evacuation routes",
-  "shap_top3": [
-    { "feature": "rainfall_3day", "importance": 0.2641 },
-    { "feature": "elevation",     "importance": 0.3102 },
-    { "feature": "distance_river","importance": 0.1887 }
-  ],
-  "ward": "Nyando Central",
+  "ward": "Ahero",
   "model_version": "1.0.0"
 }
 ```
 
 ### Risk Classes
 
-| Class | Score Range | Meaning |
-|---|---|---|
-| `LOW` | 0.00 – 0.35 | Minimal flood risk |
-| `MEDIUM` | 0.35 – 0.60 | Monitor closely |
-| `HIGH` | 0.60 – 0.80 | Prepare evacuation routes |
-| `CRITICAL` | 0.80 – 1.00 | Immediate action required |
+| Class | Score Range | Meaning | Dashboard Colour |
+|---|---|---|---|
+| `LOW` | 0.00 – 0.35 | Minimal flood risk | 🟢 Green |
+| `MEDIUM` | 0.35 – 0.65 | Monitor closely | 🟡 Amber |
+| `HIGH` | 0.65 – 1.00 | Immediate action required | 🔴 Red |
 
 ---
 
@@ -340,31 +358,35 @@ uvicorn main:app --reload --port 8000
 
 **URL:** [https://nyando-flood-ai.vercel.app](https://nyando-flood-ai.vercel.app)
 
-A React-powered interactive flood risk dashboard built for county officials, NGO field teams, and international funders — designed to communicate risk clearly without requiring a data science background.
+A React-powered donor-facing flood risk dashboard built for county officials, NGO field teams, and international funders — designed to communicate risk clearly without requiring a data science background.
 
 ### Dashboard Features
 
 | Feature | Description |
 |---|---|
-| 🗺️ **Ward Risk Map** | Leaflet.js choropleth — all 42 Nyando wards colour-coded by flood risk |
-| 📊 **Risk Score Panel** | Submit coordinates or select a ward to get live risk score from the API |
-| 🔍 **Feature Breakdown** | Top-3 flood drivers per prediction (elevation, rainfall, river distance) |
-| 📋 **Risk Class Badges** | LOW / MEDIUM / HIGH / CRITICAL — colour-coded for instant field decisions |
-| 📁 **Exportable Reports** | Download ward risk summary as PDF for funder and government submissions |
-| 📡 **Live API Connection** | Powered by `nyando-flood-api.onrender.com` — real-time predictions |
+| 🗺️ **SVG Basin Map** | Custom-drawn Nyando basin with Lake Victoria, Nyando River, and all 5 real ward dots — selected ward highlighted in gold |
+| 📊 **Environmental Sliders** | 5 input sliders (elevation, slope, 3-day rainfall, river distance, clay content) with real Nyando valley defaults |
+| 📍 **Ward + Land Cover** | Dropdowns for all 5 electoral wards and 6 land cover classes (0=Open Water … 5=Built-up) |
+| 🎯 **Live Risk Prediction** | Hits `nyando-flood-api.onrender.com/predict` in real time — <200ms response |
+| 🔴 **Colour-coded Risk Gauge** | Animated 3-segment bar — 🟢 LOW / 🟡 MEDIUM / 🔴 HIGH with dynamic card background |
+| 💬 **Actionable Advice** | Context-specific guidance per risk level for field teams |
+| 🔍 **Raw API Panel** | Collapsible debug panel showing raw JSON response |
+| 🌍 **Donor Context Panel** | ~50,000 residents, AUC 0.97, GEE data, UNDP/USAID/GCF funding alignment |
 
 ### Stack
 
 ```
-Frontend  : React 18 + Vite + Tailwind CSS
-Maps      : Leaflet.js + react-leaflet
-Charts    : Recharts
+Frontend  : React 18 + Vite 8
+Styling   : Pure inline styles — navy (#0A1628) + gold (#C9A84C)
+Map       : Custom SVG (Lake Victoria, Nyando River, 5 ward dots)
+Fonts     : Playfair Display + Lato (Google Fonts)
 Hosting   : Vercel (auto-deploy from GitHub main branch)
-API       : nyando-flood-api.onrender.com (Docker, Render)
+API       : nyando-flood-api.onrender.com (Docker on Render)
+CI        : GitHub Actions — 41 tests, all green ✅
 ```
 
 > **For funders and government partners:** No technical setup required.
-> Open the dashboard, select a ward, and receive a flood risk score with full explainability in under 200ms.
+> Open the dashboard, adjust the sliders for any Nyando ward, and receive a flood risk score in under 200ms.
 
 ---
 
@@ -403,13 +425,13 @@ See full [MODEL_CARD.md](MODEL_CARD.md).
 ## 🗓️ Roadmap
 
 - [x] Phase 1 — Real GEE data extraction (CHIRPS + DEM + SAR labels)
-- [x] Phase 2 — Model development (GradientBoosting + benchmarking + 9 charts)
-- [x] Phase 3 — FastAPI deployment (nyando-flood-api.onrender.com)
-- [x] Phase 3b — CI/CD pipeline (GitHub Actions, 41 tests) 
-- [x] Phase 4 — React dashboard (Leaflet.js choropleth map) — **[Live →](https://nyando-flood-ai.vercel.app)**
+- [x] Phase 2 — Model development (GradientBoosting + benchmarking + 9 evaluation charts)
+- [x] Phase 3 — FastAPI deployment on Render (Docker, live at nyando-flood-api.onrender.com)
+- [x] Phase 3b — CI/CD pipeline (GitHub Actions, **41 tests passing** ✅)
+- [x] Phase 4 — React donor dashboard (Vite, SVG basin map, live risk prediction) — **[Live →](https://nyando-flood-ai.vercel.app)**
 - [ ] Phase 5 — Full UNOSAT multi-year SAR flood labels (2014–2024)
-- [ ] Phase 6 — WARMA gauge data integration (real-time)
-- [ ] Phase 7 — SMS early warning integration (Africa's Talking API)
+- [ ] Phase 6 — WARMA gauge data integration (real-time river levels)
+- [ ] Phase 7 — SMS early warning via Africa's Talking API
 - [ ] Phase 8 — Expand to Tana + Nzoia basins
 - [ ] Phase 9 — Peer-reviewed publication submission
 
