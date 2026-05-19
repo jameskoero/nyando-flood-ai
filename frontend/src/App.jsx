@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 
 const API_URL = "https://nyando-flood-api.onrender.com/predict";
 
