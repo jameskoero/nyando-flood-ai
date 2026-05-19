@@ -20,10 +20,10 @@ jobs:
           python-version: "3.11"
           cache: "pip"
 
-      - name: Install dependencies
+      - name: Install all dependencies
         run: |
+          pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest pytest-cov
 
       - name: Check model and data files
         run: |
