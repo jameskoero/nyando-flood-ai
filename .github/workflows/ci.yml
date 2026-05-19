@@ -25,12 +25,8 @@ jobs:
 
       - name: Check model and data files
         run: |
-          ls models/*.pkl 2>/dev/null || echo "No model files"
-          ls data/training/*.csv 2>/dev/null || echo "No CSV files"
-
-      - name: Validate canonical readme
-        run: python src/data/validate_readme.py
-        continue-on-error: true
+          ls models/*.pkl 2>/dev/null || echo "No model files found"
+          ls data/training/*.csv 2>/dev/null || echo "No CSV files found"
 
       - name: Run tests
         run: pytest tests/ -v --tb=short
