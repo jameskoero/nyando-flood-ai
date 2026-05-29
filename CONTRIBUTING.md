@@ -1,26 +1,15 @@
-# Contributing to Nyando Flood AI
+# Contributing
 
-## Setup
-```bash
-git clone https://github.com/jameskoero/nyando-flood-ai.git
-cd nyando-flood-ai && pip install -r requirements.txt
-pytest tests/ -v   # 15 tests should pass
-```
+Thank you for your interest in this project.
 
-## Real Data
-The training data uses real GEE satellite features (2,308 observation points).
-To refresh with new satellite data: run `notebooks/01_gee_data_extraction.ipynb` in Colab.
+**To contribute:**
+1. Fork the repo and create a branch: `git checkout -b fix/your-fix`
+2. Make your changes and write or update tests
+3. Open a pull request against `main` with a clear description
 
-## Priority Contributions
-1. Extend GEE flood label extraction (improve SAR threshold)
-2. Add UNOSAT historical flood polygons for multi-year labels
-3. React dashboard (Leaflet.js choropleth)
-4. SMS alerts via Africa's Talking
-5. Temporal validation (train 2014-2022, test 2023-2024)
+**Code style:** Python — PEP 8, max line 100 chars. React — functional components, hooks only.
 
-## Commit Style
-```
-feat: add Tana Basin real GEE data
-fix: improve SAR flood detection threshold
-data: add UNOSAT 2020 flood polygon labels
-```
+**Reporting bugs:** Open a GitHub Issue with steps to reproduce,
+expected vs actual behaviour, and your environment details.
+
+**Questions:** Email jameskoero@gmail.com
