@@ -435,7 +435,7 @@ See [docs/funding/concept_note_v1.md](docs/funding/concept_note_v1.md) for the f
 - ✅ **Feature transparency** — gradient boosting importances, no opaque black-box
 - ✅ **Bias audit** — model performance compared across elevation zones
 - ✅ **Creative Commons CC-BY-4.0** — all outputs openly published
-- ✅ **Zenodo archive** — dataset DOI for academic citation (planned v2.0.0 release)
+- ✅ **Zenodo archive** — https://doi.org/10.5281/zenodo.20088663
 
 See full [MODEL_CARD.md](MODEL_CARD.md).
 
