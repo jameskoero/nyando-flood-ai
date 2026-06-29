@@ -342,7 +342,7 @@ export default function NyandoFloodDashboard() {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
             {[
               { icon: "🛰️", text: "2,308 GEE satellite points" },
-              { icon: "🏘️", text: "~50,000 residents covered" },
+              { icon: "🏘️", text: "161,000+ residents covered" },
               { icon: "📊", text: "GradientBoosting, AUC 0.97" },
               { icon: "🏛️", text: "UNDP/USAID/GCF eligible" },
             ].map(d => (

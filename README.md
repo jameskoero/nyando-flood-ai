@@ -64,7 +64,7 @@ Ward-level flood susceptibility mapping at 100m resolution with 72-hour predicti
 
 ## 🌍 Project Overview
 
-The **Nyando River Basin** floods almost every April–May rainy season, displacing **50,000–200,000 people** annually and destroying crops worth **KES 500M+** in Kisumu, Kericho, and Nandi Counties. Current early warnings arrive fewer than 6 hours before flooding — insufficient for safe evacuation of vulnerable communities.
+The **Nyando River Basin** floods almost every April–May rainy season, displacing **161,000+ people** annually and destroying crops worth **KES 500M+** in Kisumu, Kericho, and Nandi Counties. Current early warnings arrive fewer than 6 hours before flooding — insufficient for safe evacuation of vulnerable communities.
 
 This project builds a machine-learning flood susceptibility model trained on **real, open, non-personal satellite data** extracted via Google Earth Engine, producing:
 
@@ -76,7 +76,7 @@ This project builds a machine-learning flood susceptibility model trained on **r
 | 🔍 **Feature Importance** | Full gradient-boosting feature attribution — no black-box decisions |
 | 📋 **Risk Scorecard** | Per-ward people-at-risk quantification |
 
-**Target Geography:** Nyando sub-county — 5 electoral wards — ~50,000 residents directly covered
+**Target Geography:** Nyando sub-county — 5 electoral wards — 161,000+ residents directly covered
 
 ---
 
@@ -390,7 +390,7 @@ A React-powered donor-facing flood risk dashboard built for county officials, NG
 | 🔴 **Colour-coded Risk Gauge** | Animated 3-segment bar — 🟢 LOW / 🟡 MEDIUM / 🔴 HIGH with dynamic card background |
 | 💬 **Actionable Advice** | Context-specific guidance per risk level for field teams |
 | 🔍 **Raw API Panel** | Collapsible debug panel showing raw JSON response |
-| 🌍 **Donor Context Panel** | ~50,000 residents, AUC 0.97, GEE data, UNDP/USAID/GCF funding alignment |
+| 🌍 **Donor Context Panel** | 161,000+ residents, AUC 0.97, GEE data, UNDP/USAID/GCF funding alignment |
 
 ### Stack
 
@@ -459,7 +459,7 @@ See full [MODEL_CARD.md](MODEL_CARD.md).
 ## 👤 Author
 
 **James Koero**
-Junior ML Engineer | Kisumu, Kenya
+ML Engineer | Kisumu, Kenya
 
 [![GitHub](https://img.shields.io/badge/GitHub-jameskoero-181717?style=flat-square&logo=github)](https://github.com/jameskoero)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-jameskoero-0A66C2?style=flat-square&logo=linkedin)](https://linkedin.com/in/jameskoero)

@@ -15,7 +15,7 @@
 
 ## 1. Problem Statement
 
-The Nyando River Basin floods almost every April–May rainy season, affecting **50,000–200,000 people** annually across Kisumu, Kericho, and Nandi Counties. Floods destroy crops worth **KES 500M+** per year.
+The Nyando River Basin floods almost every April–May rainy season, affecting **161,000+ people** annually across Kisumu, Kericho, and Nandi Counties. Floods destroy crops worth **KES 500M+** per year.
 
 Current early warnings arrive fewer than **6 hours** before flooding — insufficient for safe evacuation. No open, locally-trained AI system exists for this basin.
 
