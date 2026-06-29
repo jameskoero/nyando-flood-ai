@@ -74,7 +74,7 @@ Fully compliant with **Kenya Data Protection Act 2019** and **GDPR**.
 |---|---|---|
 | Lead time | 72 hours | 120 hours (WARMA gauges) |
 | Wards covered | 42 (Nyando sub-county) | All Kisumu County (7 sub-counties) |
-| Population protected | 50,000+ | 500,000+ |
+| Population protected | 161,000+ | 500,000+ |
 | Alert channels | API + Dashboard | + SMS 10,000 households |
 | Basins | Nyando | + Tana + Nzoia (Kenya) |
 

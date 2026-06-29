@@ -255,7 +255,7 @@ export default function NyandoFloodDashboard() {
         {/* Donor context bar */}
         <div style={{ marginTop: "14px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px" }}>
           {[
-            { val: "~50,000", label: "Residents Protected" },
+            { val: "161,000+", label: "Residents Protected" },
             { val: "AUC 0.97", label: "Model Accuracy" },
             { val: "5 Wards", label: "Coverage Area" },
           ].map(s => (
