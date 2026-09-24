@@ -17,7 +17,13 @@
 Ward-level flood susceptibility mapping at 100m resolution with 72-hour prediction lead time.
 
 > Trained on **real Google Earth Engine satellite data** — NASA NASADEM, CHIRPS v2, Sentinel-1 SAR, SoilGrids, HydroSHEDS, ESA WorldCover.
-
+> 
+> ⚠️ **v3 Correction In Progress (Sept 2026):** The metrics below (AUC 0.9717,
+> F1 0.9022, CV 0.9727) were computed on a training set whose flood labels were
+> calibrated from only 2 Sentinel-1 SAR-confirmed anchors — insufficient
+> independent evidence to support the reported performance. A rebuild using
+> real, multi-event SAR-observed flood data is underway. See `CHANGES.md`.
+> **Do not cite the figures below until this notice is removed.**
 ---
 
 ## 🔴 Live Deployments
