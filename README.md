@@ -91,6 +91,9 @@ This project builds a machine-learning flood susceptibility model trained on **r
 > Model: **GradientBoostingClassifier** trained on 2,308 real GEE satellite observations.
 > Features: 6 real satellite variables. Labels: physics-calibrated with 2 Sentinel-1 SAR-confirmed flood anchors.
 > Evaluation: stratified 80/20 split + 5-fold spatial cross-validation.
+> > Note: the deployed model file is named `nyando_xgb_v1.pkl` for historical
+> reasons. The algorithm is GradientBoostingClassifier, not XGBoost — this will
+> be corrected to `nyando_gb_v3.pkl` in the v3 release.
 
 | Metric | Score | Interpretation |
 |---|---|---|
