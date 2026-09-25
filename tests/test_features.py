@@ -22,7 +22,7 @@ def test_rainfall_cat_added(sample_df):
     assert "rainfall_cat" in add_rainfall_categories(sample_df).columns
 
 def test_rainfall_cat_range(sample_df):
-    assert add_rainfall_categories(sample_df)["rainfall_cat"].between(0,4).all()
+    assert add_rainfall_categories(sample_df)["rainfall_cat"].between(0, 4).all()
 
 def test_fpi_added(sample_df):
     assert "flood_plain_index" in add_flood_plain_index(sample_df).columns
@@ -30,11 +30,20 @@ def test_fpi_added(sample_df):
 def test_fpi_positive(sample_df):
     assert (add_flood_plain_index(sample_df)["flood_plain_index"] > 0).all()
 
+def test_fpi_direction_lower_elevation_higher_index(sample_df):
+    """Holding slope fixed, lower elevation should give a higher index."""
+    low = sample_df.iloc[[0]].copy()
+    high = low.copy()
+    high["elevation"] += 500
+    fpi_low = add_flood_plain_index(low)["flood_plain_index"].iloc[0]
+    fpi_high = add_flood_plain_index(high)["flood_plain_index"].iloc[0]
+    assert fpi_low > fpi_high, "lower elevation should produce a higher flood plain index"
+
 def test_soil_perm_added(sample_df):
     assert "soil_permeability" in add_soil_permeability(sample_df).columns
 
 def test_soil_perm_range(sample_df):
-    assert add_soil_permeability(sample_df)["soil_permeability"].isin([0,1,2]).all()
+    assert add_soil_permeability(sample_df)["soil_permeability"].isin([0, 1, 2]).all()
 
 def test_build_all_adds_columns(sample_df):
     assert len(build_all_features(sample_df).columns) > len(sample_df.columns)
