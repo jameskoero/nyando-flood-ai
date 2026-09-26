@@ -18,3 +18,4 @@ pystac-client>=0.8.0
 rioxarray>=0.15.0
 geopandas>=0.14.0
 shapely>=2.0.0
+slowapi>=0.1.9
