@@ -1,22 +1,28 @@
-"""
-Shared pytest configuration for this test suite.
-
-Earth Engine requires ee.Initialize() to run inside the SAME process that
-executes ee.* calls. A notebook cell's ee.Initialize() does not propagate
-to a `!pytest` subprocess — this fixture initializes EE once, in the
-pytest process itself, for every test that needs it.
-
-Requires ee.Authenticate() to have been run at least once in this
-container (persists a credential to disk); this fixture does not
-perform interactive auth, only ee.Initialize() against that credential.
-"""
-
+import os
+import json
 import pytest
 import ee
 
-GEE_PROJECT_ID = "nyando-flood-ai"
-
 
 @pytest.fixture(scope="session", autouse=True)
-def _initialize_earth_engine():
-    ee.Initialize(project=GEE_PROJECT_ID)
+def ee_session():
+    """Initialize Earth Engine once per test session.
+
+    In CI (GitHub Actions): authenticate via a service account whose
+    JSON key is stored in the GEE_SERVICE_ACCOUNT_KEY secret.
+    Locally: use the interactive persistent credentials from
+    `earthengine authenticate`.
+    """
+    if os.environ.get("GITHUB_ACTIONS") == "true":
+        key_json = os.environ["GEE_SERVICE_ACCOUNT_KEY"]
+        key_dict = json.loads(key_json)
+        credentials = ee.ServiceAccountCredentials(
+            email=key_dict["client_email"],
+            key_data=key_json,
+        )
+        ee.Initialize(credentials)
+    else:
+        ee.Authenticate()
+        ee.Initialize()
+
+    yield

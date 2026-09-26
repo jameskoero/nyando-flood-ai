@@ -1,4 +1,4 @@
-name: AI Tests
+name: CI
 
 on:
   push:
@@ -9,26 +9,20 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
+      - uses: actions/checkout@v4
 
-      - name: Set up Python 3.11
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-          cache: "pip"
+          python-version: "3.10"
 
-      - name: Install all dependencies
+      - name: Install dependencies
         run: |
-          pip install --upgrade pip
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Check model and data files
-        run: |
-          ls models/*.pkl 2>/dev/null || echo "No model files found"
-          ls data/training/*.csv 2>/dev/null || echo "No CSV files found"
-
       - name: Run tests
-        run: pytest tests/ -v --tb=short
+        env:
+          GEE_SERVICE_ACCOUNT_KEY: ${{ secrets.GEE_SERVICE_ACCOUNT_KEY }}
+        run: pytest -v
