@@ -18,7 +18,8 @@ RUN pip install --no-cache-dir \
     fastapi==0.110.0 \
     uvicorn==0.29.0 \
     pydantic==2.7.1 \
-    python-multipart==0.0.9
+    python-multipart==0.0.9 \
+    slowapi==0.1.9
 
 COPY . .
 
