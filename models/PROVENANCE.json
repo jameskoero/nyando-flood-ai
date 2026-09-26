@@ -1,0 +1,6 @@
+{
+  "model_file": "nyando_xgb_v1.pkl",
+  "model_sha256": "de0e721c808b72730658880337f5f40cb88172f01186eb9e3908e527d6e31bb5",
+  "training_data_file": "nyando_training_v1.csv",
+  "training_data_sha256": "5f2cc8e856c9e747adbf160ee17cb96b3be8ddcc64189179cbc7715814ce1a60"
+}
