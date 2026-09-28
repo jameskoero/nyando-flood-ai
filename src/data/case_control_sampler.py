@@ -37,18 +37,28 @@ class SamplePoint:
 
 
 def _pixel_centers_to_lonlat(mask, aoi_crs: str) -> tuple[np.ndarray, np.ndarray]:
-    """Return (lons, lats) for every True pixel in `mask`, reprojected to EPSG:4326 if needed."""
+    """
+    Return (lons, lats) for every True pixel in `mask`, in EPSG:4326.
+
+    The source CRS is the RASTER's own (mask.rio.crs), never the AOI's. GFM
+    rasters sit on Equi7 projected grids (metres), so their x/y are not
+    lon/lat even when the AOI is. `aoi_crs` is kept only so the call signature
+    stays unchanged. If the mask carries no CRS we raise rather than guess.
+    """
+    import pyproj
+
     ys, xs = np.where(mask.values)
     x_coords = mask.x.values[xs]
     y_coords = mask.y.values[ys]
 
-    if aoi_crs != "EPSG:4326":
-        import pyproj
-        transformer = pyproj.Transformer.from_crs(aoi_crs, "EPSG:4326", always_xy=True)
-        lons, lats = transformer.transform(x_coords, y_coords)
-    else:
-        lons, lats = x_coords, y_coords
+    raster_crs = mask.rio.crs
+    if raster_crs is None:
+        raise ValueError("Flood mask carries no CRS; refusing to guess coordinates.")
 
+    transformer = pyproj.Transformer.from_crs(
+        pyproj.CRS.from_wkt(raster_crs.to_wkt()), "EPSG:4326", always_xy=True
+    )
+    lons, lats = transformer.transform(x_coords, y_coords)
     return np.asarray(lons), np.asarray(lats)
 
 
