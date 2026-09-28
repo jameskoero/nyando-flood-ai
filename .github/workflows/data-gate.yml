@@ -1,0 +1,24 @@
+name: data-gate
+
+# Runs on EVERY pull request, not only on data changes. A required status check that is
+# skipped by a path filter never reports, and the PR then waits forever. The gate is cheap.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  data-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install gate dependencies
+        run: python -m pip install --quiet pandas numpy scipy scikit-learn pytest
+      - name: A-Gate
+        run: python -m pytest tests/test_data_gate.py -q --noconftest -p no:cacheprovider -rx
