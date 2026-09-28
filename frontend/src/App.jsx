@@ -247,7 +247,7 @@ export default function NyandoFloodDashboard() {
               Nyando Flood AI
             </div>
             <div style={{ fontSize: "11px", color: "#5B7A9A", letterSpacing: "0.06em", marginTop: "2px", fontFamily: "'Lato', sans-serif" }}>
-              EARLY WARNING SYSTEM · KISUMU COUNTY, KENYA
+              FLOOD SUSCEPTIBILITY · KISUMU COUNTY, KENYA
             </div>
           </div>
         </div>
@@ -255,8 +255,8 @@ export default function NyandoFloodDashboard() {
         {/* Donor context bar */}
         <div style={{ marginTop: "14px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px" }}>
           {[
-            { val: "161,000+", label: "Residents Protected" },
-            { val: "AUC 0.97", label: "Model Accuracy" },
+            { val: "161,000+", label: "Residents in 5 wards" },
+            { val: "V2 rebuild", label: "Model under re-validation" },
             { val: "5 Wards", label: "Coverage Area" },
           ].map(s => (
             <div key={s.label} style={{ background: "rgba(201,168,76,0.07)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: "8px", padding: "8px 10px", textAlign: "center" }}>
@@ -343,7 +343,7 @@ export default function NyandoFloodDashboard() {
             {[
               { icon: "🛰️", text: "2,308 GEE satellite points" },
               { icon: "🏘️", text: "161,000+ residents covered" },
-              { icon: "📊", text: "GradientBoosting, AUC 0.97" },
+              { icon: "📊", text: "Legacy model, under re-validation" },
               { icon: "🏛️", text: "UNDP/USAID/GCF eligible" },
             ].map(d => (
               <div key={d.text} style={{ display: "flex", gap: "6px", alignItems: "center", fontSize: "11px", color: "#7A9AB0", fontFamily: "'Lato', sans-serif" }}>
@@ -356,7 +356,7 @@ export default function NyandoFloodDashboard() {
         {/* Footer */}
         <div style={{ textAlign: "center", fontSize: "10px", color: "#2A4A6A", fontFamily: "monospace", paddingBottom: "24px", lineHeight: 1.8 }}>
           Built by James Koero · github.com/jameskoero/nyando-flood-ai<br />
-          Model: GradientBoostingClassifier · F1=0.90 · CV=0.97±0.004<br />
+          Model: legacy GradientBoostingClassifier · metrics retracted, V2 rebuild in progress<br />
           API: nyando-flood-api.onrender.com
         </div>
       </div>
