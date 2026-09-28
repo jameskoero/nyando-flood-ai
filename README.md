@@ -1,489 +1,181 @@
-# 🌊 Nyando Basin Flood Risk Prediction System
+# Nyando Flood AI
 
-[![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
-[![scikit-learn](https://img.shields.io/badge/scikit--learn-GradientBoosting-F7931E?style=for-the-badge)](https://scikit-learn.org)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
-[![License](https://img.shields.io/badge/License-MIT-C9A84C?style=for-the-badge)](LICENSE)
-[![Data](https://img.shields.io/badge/Data-100%25%20Open-2ECC71?style=for-the-badge)](data/DATA_SOURCES.md)
-[![Privacy](https://img.shields.io/badge/Privacy-DPA%202019%20Compliant-0A1628?style=for-the-badge)](MODEL_CARD.md)
+Ward-level flood susceptibility for five wards of the Nyando River basin, Kisumu County, Kenya, built from open satellite data. **The model is being rebuilt (V2).**
 
 [![CI](https://github.com/jameskoero/nyando-flood-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/jameskoero/nyando-flood-ai/actions/workflows/ci.yml)
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/jameskoero/nyando-flood-ai/blob/main/notebooks/03_modelling.ipynb)
-[![Live API](https://img.shields.io/badge/Live%20API-Render-46E3B7?style=flat-square&logo=render)](https://nyando-flood-api.onrender.com/docs)
-[![Model Loaded](https://img.shields.io/badge/Model-Loaded%20✅-2ECC71?style=flat-square)](https://nyando-flood-api.onrender.com/health)
-[![Dashboard](https://img.shields.io/badge/Dashboard-Live%20on%20Vercel-000000?style=flat-square&logo=vercel)](https://nyando-flood-ai.vercel.app)
+[![data-gate](https://github.com/jameskoero/nyando-flood-ai/actions/workflows/data-gate.yml/badge.svg)](https://github.com/jameskoero/nyando-flood-ai/actions/workflows/data-gate.yml)
+[![manifest-check](https://github.com/jameskoero/nyando-flood-ai/actions/workflows/manifest-check.yml/badge.svg)](https://github.com/jameskoero/nyando-flood-ai/actions/workflows/manifest-check.yml)
+[![Code license: MIT](https://img.shields.io/badge/code%20license-MIT-blue.svg)](LICENSE)
 
-**An open-source, AI-powered flood early warning system for Nyando River Basin, Kisumu County, Kenya.**
-Ward-level flood susceptibility mapping at 100m resolution with 72-hour prediction lead time.
+> **Correction notice (Sept 2026).** The performance figures previously shown in this README (AUC-ROC 0.9717, F1 0.9022, CV AUC 0.9727) are **retracted**. They came from a training file with only 2 flood-labelled rows out of 2,308 (see [CHANGES.md](CHANGES.md)), after SMOTE was applied before the train/test split. A V2 rebuild with independent Copernicus GFM flood labels is in progress. **Do not cite the retracted figures.**
 
-> Trained on **real Google Earth Engine satellite data** — NASA NASADEM, CHIRPS v2, Sentinel-1 SAR, SoilGrids, HydroSHEDS, ESA WorldCover.
-> 
-> ⚠️ **v3 Correction In Progress (Sept 2026):** The metrics below (AUC 0.9717,
-> F1 0.9022, CV 0.9727) were computed on a training set whose flood labels were
-> calibrated from only 2 Sentinel-1 SAR-confirmed anchors — insufficient
-> independent evidence to support the reported performance. A rebuild using
-> real, multi-event SAR-observed flood data is underway. See `CHANGES.md`.
-> **Do not cite the figures below until this notice is removed.**
----
+## Contents
 
-## 🔴 Live Deployments
+[Status](#status) · [What this is](#what-this-is-and-is-not) · [Data](#data-v2) · [Method](#how-the-dataset-was-built) · [Findings](#findings-so-far) · [Limitations](#known-limitations) · [Integrity controls](#integrity-controls) · [Quick start](#quick-start) · [API](#api-legacy-model) · [Layout](#repository-layout) · [Roadmap](#roadmap) · [License](#license-and-data-terms)
 
-| Service | URL | Status |
-|---|---|---|
-| **Prediction API** | [nyando-flood-api.onrender.com/docs](https://nyando-flood-api.onrender.com/docs) | ✅ Live — Python on Render |
-| **Health Check** | [nyando-flood-api.onrender.com/health](https://nyando-flood-api.onrender.com/health) | ✅ `model_loaded: true` |
-| **Donor Dashboard** | [nyando-flood-ai.vercel.app](https://nyando-flood-ai.vercel.app) | ✅ Live — React + Vite on Vercel |
+## Status
 
-> ⚠️ The API runs on Render's free tier — first request after idle may take 30–60s to cold-start. Subsequent requests return in <200ms.
-
-**Confirmed health response (May 19, 2026):**
-```json
-{
-  "status": "ok",
-  "model": "nyando_xgb_v1",
-  "model_loaded": true,
-  "model_path": "/app/backend/models/nyando_xgb_v1.pkl",
-  "version": "1.0.0"
-}
-```
-
----
-
-## 📌 Table of Contents
-
-- [Project Overview](#-project-overview)
-- [Key Results](#-key-results)
-- [Dataset](#-dataset)
-- [Model Architecture](#-model-architecture)
-- [Project Structure](#-project-structure)
-- [Quick Start (Google Colab)](#-quick-start-google-colab)
-- [Local Setup](#-local-setup)
-- [API Reference](#-api-reference)
-- [Live Dashboard](#-live-dashboard)
-- [Funding & Impact](#-funding--impact)
-- [Data Ethics & Privacy](#-data-ethics--privacy)
-- [Roadmap](#-roadmap)
-- [Author](#-author)
-- [License](#-license)
-
----
-
-## 🌍 Project Overview
-
-The **Nyando River Basin** floods almost every April–May rainy season, displacing **161,000+ people** annually and destroying crops worth **KES 500M+** in Kisumu, Kericho, and Nandi Counties. Current early warnings arrive fewer than 6 hours before flooding — insufficient for safe evacuation of vulnerable communities.
-
-This project builds a machine-learning flood susceptibility model trained on **real, open, non-personal satellite data** extracted via Google Earth Engine, producing:
-
-| Output | Description |
+| Area | State |
 |---|---|
-| 🗺️ **Flood Risk Map** | 100m-resolution ward-level susceptibility scores |
-| ⚡ **Prediction API** | FastAPI endpoint — submit rainfall data, receive risk score in <200ms |
-| 📊 **Donor Dashboard** | Interactive React app — live ward risk display with sliders, SVG basin map, and colour-coded risk gauge — **[Live →](https://nyando-flood-ai.vercel.app)** |
-| 🔍 **Feature Importance** | Full gradient-boosting feature attribution — no black-box decisions |
-| 📋 **Risk Scorecard** | Per-ward people-at-risk quantification |
+| Training data (V2) | Built and gated: 4,420 rows from 35 Sentinel-1 scene dates. Passes the A-Gate in CI. |
+| Integrity controls | Live: data gate, manifest check, protected `main`. |
+| Model | **Not retrained yet.** The deployed API still serves a pre-V2 model whose metrics are unverified (Phase C). |
+| Experiment tracking | Not started (Phase B). |
+| Dashboard | Live, but it still displays a retracted metric that is hard-coded in the front end (fix planned in Phase F). |
+| Early warning (SMS, forecasts) | Not built. |
 
-**Target Geography:** Nyando sub-county — 5 electoral wards — 161,000+ residents directly covered
+## What this is and is not
 
----
+**Is:** a reproducible, tested pipeline that turns open satellite products into a labelled flood dataset for the Nyando wards, plus the tooling that keeps that dataset honest.
 
-## 📊 Key Results
+**Is not (yet):** a forecast or an operational warning system. No lead time is claimed. The trained model, its metrics and its calibration come after this data work.
 
-> Model: **GradientBoostingClassifier** trained on 2,308 real GEE satellite observations.
-> Features: 6 real satellite variables. Labels: physics-calibrated with 2 Sentinel-1 SAR-confirmed flood anchors.
-> Evaluation: stratified 80/20 split + 5-fold spatial cross-validation.
-> > Note: the deployed model file is named `nyando_xgb_v1.pkl` for historical
-> reasons. The algorithm is GradientBoostingClassifier, not XGBoost — this will
-> be corrected to `nyando_gb_v3.pkl` in the v3 release.
+## Data (V2)
 
-| Metric | Score | Interpretation |
+Labels come from the **Copernicus Global Flood Monitoring (GFM)** ensemble flood extent (Sentinel-1): inundation on the scene date, outside permanent water. Labels are never derived from the features.
+
+| Column | Source | Notes |
 |---|---|---|
-| **AUC-ROC** | **0.9717** | Near-perfect flood/no-flood discrimination |
-| **F1-Score** | **0.9022** | High balance — minimises false alarms and missed floods |
-| **Precision** | 0.8830 | 88.3% of HIGH/CRITICAL alerts are genuine flood events |
-| **Recall** | 0.9222 | 92.2% of real flood zones correctly identified |
-| **Brier Score** | 0.0736 | Well-calibrated probability estimates |
-| **CV AUC (5-fold)** | 0.9727 ± 0.0040 | Stable — generalises well across spatial folds |
-| **Training points** | 2,308 real GEE | Real satellite feature values from Nyando Basin |
-| **Resolution** | 100m grid | Ward-level mapping |
-| **CI Tests** | 41 passing ✅ | GitHub Actions — all green |
+| `flooded` | Copernicus GFM `ensemble_flood_extent` | 1 = flooded pixel on that scene date |
+| `elevation`, `slope`, `hand` | MERIT/Hydro v1.0.1 (90 m) | HAND = height above nearest drainage |
+| `distance_river` | JRC Global Surface Water occurrence | distance to a water-mask pixel, in metres |
+| `rainfall_3day` | CHIRPS daily | 3-day sum at the point (about 5.5 km pixels) |
+| `rain_aoi_*`, `rain_basin_*` | CHIRPS daily | mean over the wards and over the upstream basin (HydroBASINS level 8, 9 sub-basins, 4,006 km2), 3, 7 and 14 days |
+| `clay_percent` | ISRIC SoilGrids, 0-5 cm | left **blank** where SoilGrids has no value; never filled |
+| `land_cover` | ESA WorldCover v100 (2020) | categorical |
 
-### Model Comparison
+Every row also carries its GFM scene id, the real Sentinel-1 acquisition date, the ward and a `sample_type`.
 
-| Model | AUC-ROC | F1 | Notes |
-|---|---|---|---|
-| Logistic Regression | 0.82 | 0.74 | Baseline |
-| Random Forest | 0.91 | 0.84 | Strong |
-| **GradientBoosting (tuned)** | **0.9717** | **0.9022** | ✅ Selected |
-
-### Top Features (Gradient Boosting Importance)
-
-```
-elevation        ████████████████████ 0.31   NASA NASADEM
-rainfall_3day    ████████████████     0.26   CHIRPS v2
-distance_river   ████████████         0.19   HydroSHEDS/OSM
-slope            ████████             0.13   Derived from DEM
-clay_percent     █████                0.08   ISRIC SoilGrids
-land_cover       ██                   0.03   ESA WorldCover
-```
-
----
-
-## 📁 Dataset
-
-All data is **100% open, non-personal, and satellite-derived**. No individual or household-level data is collected or stored.
-
-| Feature | Source | Resolution | Description |
-|---|---|---|---|
-| `elevation` | NASA NASADEM (GEE) | 30m | Terrain elevation (m) — real values: 1,131–2,588m |
-| `slope` | Derived from NASADEM | 30m | Slope angle (degrees) — real values: 0–39.8° |
-| `rainfall_3day` | CHIRPS Daily (GEE) | ~5km | 3-day accumulated rainfall (mm) — real: 81.8–162.3mm |
-| `distance_river` | OpenStreetMap (GEE) | — | Distance to nearest river (m) |
-| `clay_percent` | ISRIC SoilGrids (GEE) | 250m | Soil clay fraction 0–5cm (%) — real: 25.9–57.1% |
-| `land_cover` | ESA WorldCover 10m | 10m | Land use class (0=Open Water … 5=Built-up) |
-| `flooded` | Sentinel-1 SAR (GEE) | 30m | Flood label: 0=dry, 1=flooded (physics-calibrated, 2 SAR anchors) |
-
-### Nyando Electoral Wards (5 Wards Covered)
-
-| Ward | Administrative Note |
+| Dataset at a glance | |
 |---|---|
-| Ahero | Nyando Constituency |
-| Awasi/Onjiko | Nyando Constituency |
-| East Kano/Wawidhi | Nyando Constituency |
-| Kabonyo/Kanyagwal | Now under Kadibo Sub-County (admin split) |
-| Kobura | Now under Kadibo Sub-County (admin split) |
+| Rows | 4,420 |
+| Scene dates (sample sets) | 35 (5 flood events + 30 screened dates) |
+| Flood cases / controls | 1,970 / 2,450 |
+| Rows with blank clay | 599 |
 
-> Note: Kabonyo/Kanyagwal and Kobura were part of Nyando under the former larger sub-county boundary used in GEE data extraction. All 5 wards are covered in the dashboard and model.
+The flood share of the file (44.6%) is set by the sampling design and is not the real flood rate.
 
----
+## How the dataset was built
 
-## 🏗️ Model Architecture
+1. **Case-control sampling per scene.** Flood pixels are rare (0.07% to 1.3% of valid pixels per scene), so each scene contributes flood and non-flood points: 250 of each for the five event scenes, up to 40 of each for the other dates.
+2. **Events:** April 2020, April 2021, May 2022, April/May 2024 and March 2026.
+3. **30 extra dates chosen by rule, not by hand.** Sentinel-1 scene dates from 2020 to 2026 were screened for full ward coverage (23 of 42 candidates in the last screen had no usable data over the wards) and spread across six equal-count bins of upstream-basin 14-day rainfall, at least 14 days apart, with a fixed seed.
+4. **Real dates.** `event_date` is the Sentinel-1 scene date that GFM returned, and CI checks it against the scene id on every row.
+5. **No imputation.** Points missing a clay value are kept with clay blank. Every other missing value drops the point, and drops are logged.
+6. **Reproducible.** `scripts/build_initial_dataset.py` re-derives the earlier 2,264 event points identically.
 
-```
-Real Satellite Data (Google Earth Engine)
-        │
-        ▼
-┌─────────────────────────────────────────────────────────┐
-│              Feature Engineering Pipeline                │
-│  CHIRPS Rainfall → 3-day sum                            │
-│  NASA DEM       → elevation + slope                     │
-│  Sentinel-1 SAR → flood labels (VV < -16 dB, 2 anchors)│
-│  SoilGrids      → clay fraction 0-5cm                   │
-│  OSM/HydroSHEDS → distance to river                    │
-│  ESA WorldCover → land cover class                      │
-└─────────────────────────────────────────────────────────┘
-        │
-        ▼
-   SMOTE Balancing (minority flood class oversampling)
-        │
-        ▼
-┌──────────────────────────────────────────────────┐
-│   GradientBoostingClassifier (scikit-learn 1.6.1)│
-│   n_estimators  = 300                            │
-│   max_depth     = 6                              │
-│   learning_rate = 0.05                           │
-│   subsample     = 0.80                           │
-│   AUC-ROC       = 0.9717                         │
-│   F1-Score      = 0.9022                         │
-└──────────────────────────────────────────────────┘
-        │
-        ├──► Risk Score (0.0 – 1.0)
-        ├──► Risk Class (LOW / MEDIUM / HIGH)
-        └──► Feature Importances (top drivers per prediction)
-```
+## Findings so far
 
----
+- **Rainfall separates dates.** Across the 30 non-event dates (chosen by coverage and rainfall, never by flood outcome), 8 of 8 dates with upstream-basin 14-day rainfall of 90 mm or more had flood pixels, against 10 of 22 below 90 mm (Fisher exact one-sided p = 0.0075).
+- **Point rainfall is weak on its own.** `rainfall_3day` alone separates the classes at AUC 0.55, while `elevation` alone reaches 0.82.
+- **Not circular.** A bare 4-feature logistic regression (elevation, slope, rainfall, distance) scores 0.841 leave-one-event-out, under the 0.90 gate.
+- **Flood points cluster.** The 1,970 flood cases form about 1,087 separate patches (points within 60 m linked), so evaluation has to be leave-one-event-out and patch-aware.
 
-## 📂 Project Structure
+## Known limitations
 
-```
-nyando-flood-ai/
-├── data/
-│   ├── training/
-│   │   ├── nyando_training_v1.csv          # Processed: 5,000 rows × 9 cols
-│   │   └── nyando_training_v1_raw_gee.csv  # Raw GEE extract: 2,308 points
-│   └── DATA_SOURCES.md                     # Full data provenance
-│
-├── notebooks/
-│   ├── 01_gee_data_extraction.ipynb  # GEE download + CSV assembly
-│   ├── 02_eda.ipynb                  # Exploratory data analysis + maps
-│   ├── 03_modelling.ipynb            # SMOTE + model training + evaluation ← START
-│   └── 04_shap_analysis.ipynb        # Feature importance + bias audit
-│
-├── models/
-│   ├── nyando_xgb_v1.pkl             # Trained GradientBoosting model (✅ loaded in prod)
-│   └── metrics.json                  # AUC, F1, CV results (real GEE data)
-│
-├── backend/
-│   ├── __init__.py                   # Python package marker
-│   ├── main.py                       # FastAPI — /predict + /health + /metrics
-│   └── models/
-│       └── nyando_xgb_v1.pkl         # Model served in production
-│
-├── frontend/                         # React donor dashboard
-│   ├── src/
-│   │   └── App.jsx                   # Full dashboard — sliders, map, risk gauge
-│   ├── index.html
-│   ├── vite.config.js
-│   └── package.json
-│
-├── reports/
-│   └── figures/                      # 9 evaluation charts (navy/gold)
-│       ├── roc_curve.png
-│       ├── confusion_matrix.png
-│       ├── shap_summary.png
-│       ├── precision_recall_curve.png
-│       ├── risk_score_distribution.png
-│       ├── spatial_cv.png
-│       ├── model_comparison.png
-│       ├── eda_distributions.png
-│       └── calibration_curve.png
-│
-├── src/
-│   ├── data/       (load_data.py, preprocess.py)
-│   ├── models/     (train_model.py, evaluate_model.py)
-│   ├── features/   (build_features.py)
-│   └── visualization/ (shap_plots.py)
-│
-├── tests/
-│   └── test_pipeline.py              # 41 automated tests — all passing ✅
-│
-├── docs/
-│   └── funding/
-│       └── concept_note_v1.md        # Funder-ready concept note
-│
-├── .github/workflows/ci.yml          # GitHub Actions CI — 41 tests green
-├── vercel.json                       # Vercel deploy config (root=frontend)
-├── MODEL_CARD.md
-├── CONTRIBUTING.md
-├── gee_extract_nyando.py
-├── .gitignore
-├── LICENSE
-├── requirements.txt
-└── README.md
-```
+- 549 rows (12.4%) sit at the DEM floor (1130.5 m) in Kabonyo/Kanyagwal, all with HAND 0, and 96% of them are flooded.
+- Blank clay is informative: it is blank on 28% of flood cases but only 1.8% of controls. Models must be tested with and without it.
+- Awasi/Onjiko has only 2 flood cases. Ward-level fairness checks cannot cover it.
+- A label means inundation on the scene date, not newly arrived flooding.
+- Rainfall windows are date-level features, so the 35 dates give only 35 distinct values.
+- Some dates contribute a single flood patch; weight by patch when evaluating.
 
----
+## Integrity controls
 
-## 🚀 Quick Start (Google Colab)
+- **A-Gate** (`tests/test_data_gate.py`): row count and flood rate, real dates matching scene ids, GFM provenance, points inside the wards, no unexpected blanks, the 4-feature logistic-regression check, no single feature separating the classes (AUC below 0.90), documented reasons for repeated values, and a consistent river flag. The original "clay flat between classes" rule is kept as an expected-failure report: labels never use clay, so a class difference reflects floodplain soils.
+- **Manifests** (`data/MANIFEST.json`, `models/MANIFEST.json`, checked by `scripts/check_manifests.py`): SHA-256 recomputed independently, models named by algorithm and hash prefix, no two binaries sharing a file name. Pre-V2 files are recorded as `legacy`.
+- **Protected `main`:** pull request required, and `test`, `data-gate` and `manifest-check` must pass. No bypass, no force-push.
+- **CI hygiene:** the gate workflows are read-only, use no secrets and run on every pull request.
 
-No installation needed. Click the badge and run all cells:
+## Quick start
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/jameskoero/nyando-flood-ai/blob/main/notebooks/03_modelling.ipynb)
-
-```python
-# Cell 1 — Install dependencies
-!pip install scikit-learn imbalanced-learn pandas matplotlib joblib -q
-
-# Cell 2 — Load training data
-import pandas as pd
-df = pd.read_csv(
-    "https://raw.githubusercontent.com/jameskoero/nyando-flood-ai/main/data/training/nyando_training_v1.csv"
-)
-print(f"Dataset: {df.shape[0]} rows × {df.shape[1]} columns")
-print(f"Flood rate: {df['flooded'].mean():.1%}")
-
-# Cell 3 — Train GradientBoosting
-from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import roc_auc_score, f1_score
-from imblearn.over_sampling import SMOTE
-
-FEATURES = ['elevation','slope','rainfall_3day','distance_river','clay_percent','land_cover']
-X, y = df[FEATURES].fillna(0), df['flooded'].astype(int)
-X_res, y_res = SMOTE(random_state=42).fit_resample(X, y)
-X_train, X_test, y_train, y_test = train_test_split(X_res, y_res, test_size=0.2, random_state=42)
-
-model = GradientBoostingClassifier(n_estimators=300, max_depth=6, learning_rate=0.05,
-                                    subsample=0.8, random_state=42)
-model.fit(X_train, y_train)
-y_pred = model.predict(X_test)
-print(f"AUC-ROC : {roc_auc_score(y_test, model.predict_proba(X_test)[:,1]):.4f}")
-print(f"F1-Score: {f1_score(y_test, y_pred):.4f}")
-```
-
----
-
-## 🛠️ Local Setup
+Verify the data (no Earth Engine account needed):
 
 ```bash
-# 1. Clone
 git clone https://github.com/jameskoero/nyando-flood-ai.git
 cd nyando-flood-ai
-
-# 2. Install Python dependencies
-pip install -r requirements.txt
-
-# 3. Run tests (all 41 should pass)
-pytest tests/ -v
-
-# 4. Start the API
-cd backend
-uvicorn main:app --reload --port 8000
-# Docs: http://localhost:8000/docs
-
-# 5. Run the dashboard locally
-cd frontend
-npm install
-npm run dev
-# Dashboard: http://localhost:5173
+python -m pip install pandas numpy scipy scikit-learn pytest
+python -m pytest tests/test_data_gate.py -q --noconftest -rx
+python scripts/check_manifests.py
 ```
 
----
+Expected: `13 passed, 1 xfailed`, then `manifest-check OK`.
 
-## 🔌 API Reference
+Rebuild the dataset (needs an Earth Engine account and a Cloud project). The script assumes Google Colab paths (`/content/nyando-flood-ai`) and the project name `nyando-flood-ai`; both are constants at the top of `scripts/build_initial_dataset.py`. In a Colab notebook, authenticate in a cell with `ee.Authenticate()`, then run:
 
-**Base URL:** [`https://nyando-flood-api.onrender.com`](https://nyando-flood-api.onrender.com/docs)
+```python
+%run scripts/build_initial_dataset.py
+```
 
-### [`GET /health`](https://nyando-flood-api.onrender.com/health)
+It resumes after an interruption and takes about 10 minutes. The full test suite (`pytest tests/`) also needs Earth Engine credentials.
+
+## API (legacy model)
+
+The deployed service predates V2 and serves a legacy model. Interactive docs are disabled in production.
+
+- `GET /health` reports the loaded model's file name, SHA-256 and provenance.
+- `GET /metrics` returns the metrics endpoint output.
+- `POST /predict` is rate-limited. The example below shows the shape only; the values are illustrative.
 
 ```json
-{
-  "status": "ok",
-  "model": "nyando_xgb_v1",
-  "model_loaded": true,
-  "model_path": "/app/backend/models/nyando_xgb_v1.pkl",
-  "version": "1.0.0"
-}
+{"elevation": 1142.5, "slope": 2.3, "rainfall_3day": 87.4, "distance_river": 320.0,
+ "clay_percent": 42.1, "land_cover": 1, "ward": "Ahero"}
 ```
 
-### `POST /predict`
-
-**Request:**
 ```json
-{
-  "elevation": 1142.5,
-  "slope": 2.3,
-  "rainfall_3day": 87.4,
-  "distance_river": 320.0,
-  "clay_percent": 42.1,
-  "land_cover": 1,
-  "ward": "Ahero"
-}
+{"risk_score": 0.87, "risk_class": "HIGH", "risk_label": "Prepare evacuation routes",
+ "ward": "Ahero", "model_version": "1.0.0"}
 ```
 
-**Response:**
-```json
-{
-  "risk_score": 0.87,
-  "risk_class": "HIGH",
-  "risk_label": "Prepare evacuation routes",
-  "ward": "Ahero",
-  "model_version": "1.0.0"
-}
+Legacy risk classes: LOW below 0.35, MEDIUM 0.35 to 0.65, HIGH above 0.65.
+
+The API runs on Render's free tier, so the first request after idle can take about a minute. Live services: [dashboard](https://nyando-flood-ai.vercel.app) and [API health](https://nyando-flood-ai.onrender.com/health).
+
+## Repository layout
+
+```text
+data/
+  MANIFEST.json                            SHA-256 and provenance for every data file
+  external/nyando_wards.geojson            ward boundaries
+  training/
+    nyando_training_v2_multidate.csv       V2 training data
+    nyando_training_v2_multidate_sets.csv  one row per scene date
+    nyando_training_v1*.csv                legacy, discredited
+models/
+  MANIFEST.json                            pre-V2 model files, recorded as legacy
+scripts/
+  build_initial_dataset.py                 rebuilds the V2 dataset (needs Earth Engine)
+  check_manifests.py                       independent manifest verification
+src/data/                                  GFM client, terrain, sampler, raw features
+tests/                                     A-Gate, sampler regression, README checks, legacy tests
+backend/                                   FastAPI service (legacy model)
+frontend/                                  React dashboard
+notebooks/                                 v1 notebooks (legacy)
+.github/workflows/                         ci.yml, data-gate.yml, manifest-check.yml
 ```
 
-### Risk Classes
+## Roadmap
 
-| Class | Score Range | Meaning | Dashboard Colour |
-|---|---|---|---|
-| `LOW` | 0.00 – 0.35 | Minimal flood risk | 🟢 Green |
-| `MEDIUM` | 0.35 – 0.65 | Monitor closely | 🟡 Amber |
-| `HIGH` | 0.65 – 1.00 | Immediate action required | 🔴 Red |
+- [x] **A. Data integrity:** GFM-labelled dataset, A-Gate in CI, manifests, protected `main`.
+- [ ] A (remainder). Monotonicity test and leakage audit; both need a trained model, so they land with Phase C.
+- [ ] **B. Experiment tracking:** MLflow on DagsHub, with the data hash logged on every run.
+- [ ] **C. Model suite:** logistic regression, gradient boosting and XGBoost with monotonic constraints, evaluated leave-one-event-out.
+- [ ] **D. Physics-constrained MLP**, exported to ONNX.
+- [ ] **E. LLM advisory layer**, cached and rate-limited, never on the `/predict` path.
+- [ ] **F. Dashboard:** no hard-coded metrics, loading and error states, accessibility.
+- [ ] **G-H. SMS alerts** (only after a public WARMA feed is confirmed) and an MCP/LangGraph showcase.
+- [ ] **J-K. Model card, datasheet, paper**, and a Zenodo erratum before any new numbers are cited.
 
----
+## License and data terms
 
-## 🖥️ Live Dashboard
+Code: MIT ([LICENSE](LICENSE)). The training data is derived from third-party products that keep their own terms. `elevation`, `slope` and `hand` come from MERIT/Hydro, which is dual-licensed CC BY-NC 4.0 or ODbL 1.0, so the dataset **cannot be published under CC BY 4.0**. A dataset license is still to be chosen (ODbL 1.0 is the natural fit for an open project); until then, treat the data as non-commercial and check each source's terms.
 
-**URL:** [https://nyando-flood-ai.vercel.app](https://nyando-flood-ai.vercel.app)
+## Citation, security and contributing
 
-A React-powered donor-facing flood risk dashboard built for county officials, NGO field teams, and international funders — designed to communicate risk clearly without requiring a data science background.
+The Zenodo record [10.5281/zenodo.20088663](https://doi.org/10.5281/zenodo.20088663) predates the correction and contains the retracted figures; an erratum is planned before any new numbers are cited. Report vulnerabilities as described in [SECURITY.md](SECURITY.md); see [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
 
-### Dashboard Features
+## Author
 
-| Feature | Description |
-|---|---|
-| 🗺️ **SVG Basin Map** | Custom-drawn Nyando basin with Lake Victoria, Nyando River, and all 5 real ward dots — selected ward highlighted in gold |
-| 📊 **Environmental Sliders** | 5 input sliders (elevation, slope, 3-day rainfall, river distance, clay content) with real Nyando valley defaults |
-| 📍 **Ward + Land Cover** | Dropdowns for all 5 electoral wards and 6 land cover classes (0=Open Water … 5=Built-up) |
-| 🎯 **Live Risk Prediction** | Hits `nyando-flood-api.onrender.com/predict` in real time — <200ms response |
-| 🔴 **Colour-coded Risk Gauge** | Animated 3-segment bar — 🟢 LOW / 🟡 MEDIUM / 🔴 HIGH with dynamic card background |
-| 💬 **Actionable Advice** | Context-specific guidance per risk level for field teams |
-| 🔍 **Raw API Panel** | Collapsible debug panel showing raw JSON response |
-| 🌍 **Donor Context Panel** | 161,000+ residents, AUC 0.97, GEE data, UNDP/USAID/GCF funding alignment |
+**James Koero**, ML engineer, Kisumu, Kenya. [GitHub](https://github.com/jameskoero) · [LinkedIn](https://linkedin.com/in/jameskoero)
 
-### Stack
-
-```
-Frontend  : React 18 + Vite 8
-Styling   : Pure inline styles — navy (#0A1628) + gold (#C9A84C)
-Map       : Custom SVG (Lake Victoria, Nyando River, 5 ward dots)
-Fonts     : Playfair Display + Lato (Google Fonts)
-Hosting   : Vercel (auto-deploy from GitHub main branch)
-API       : nyando-flood-api.onrender.com (Python on Render)
-CI        : GitHub Actions — 41 tests, all green ✅
-```
-
-> **For funders and government partners:** No technical setup required.
-> Open the dashboard, adjust the sliders for any Nyando ward, and receive a flood risk score in under 200ms.
-
----
-
-## 🌐 Funding & Impact
-
-| Funder | Programme | Grant Range |
-|---|---|---|
-| World Bank GFDRR | Climate Risk Financing | USD 50K–500K |
-| Green Climate Fund | Readiness Programme | USD 100K–10M |
-| UNDP SIDA | Climate Action | USD 25K–200K |
-| USAID DIV | Development Innovation | USD 25K–200K |
-| Google.org | AI for SDGs | USD 50K–500K |
-| Mozilla Foundation | Tech & Society | USD 10K–100K |
-
-**Alignment:** SDG 13 (Climate Action) · SDG 11 (Sustainable Cities) · Sendai Framework Priority 1 · Kenya National Adaptation Plan
-
-See [docs/funding/concept_note_v1.md](docs/funding/concept_note_v1.md) for the full funding concept note.
-
----
-
-## 🔒 Data Ethics & Privacy
-
-> This project uses **100% open, non-personal satellite datasets**. No individual or household-level data is collected or stored.
-
-- ✅ **Kenya Data Protection Act 2019** — fully compliant
-- ✅ **GDPR** — compliant by design (no EU personal data)
-- ✅ **Feature transparency** — gradient boosting importances, no opaque black-box
-- ✅ **Bias audit** — model performance compared across elevation zones
-- ✅ **Creative Commons CC-BY-4.0** — all outputs openly published
-- ✅ **Zenodo archive** — https://doi.org/10.5281/zenodo.20088663
-
-See full [MODEL_CARD.md](MODEL_CARD.md).
-
----
-
-## 🗓️ Roadmap
-
-- [x] Phase 1 — Real GEE data extraction (CHIRPS + DEM + SAR labels)
-- [x] Phase 2 — Model development (GradientBoosting + benchmarking + 9 evaluation charts)
-- [x] Phase 3 — FastAPI deployment on Render (**`model_loaded: true` ✅ confirmed May 19, 2026**)
-- [x] Phase 3b — CI/CD pipeline (GitHub Actions, **41 tests passing** ✅)
-- [x] Phase 4 — React donor dashboard (Vite, SVG basin map, live risk prediction) — **[Live →](https://nyando-flood-ai.vercel.app)**
-- [ ] Phase 5 — Full UNOSAT multi-year SAR flood labels (2014–2024)
-- [ ] Phase 6 — WARMA gauge data integration (real-time river levels)
-- [ ] Phase 7 — SMS early warning via Africa's Talking API
-- [ ] Phase 8 — Expand to Tana + Nzoia basins
-- [ ] Phase 9 — Peer-reviewed publication submission
-
----
-
-## 👤 Author
-
-**James Koero**
-ML Engineer | Kisumu, Kenya
-
-[![GitHub](https://img.shields.io/badge/GitHub-jameskoero-181717?style=flat-square&logo=github)](https://github.com/jameskoero)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-jameskoero-0A66C2?style=flat-square&logo=linkedin)](https://linkedin.com/in/jameskoero)
-
-Academic Advisors:
-- **Prof. Samuel Liyala** — JOOUST, Kenya
-- **Prof. Johan Loeckx** — Vrije Universiteit Brussel (VUB AI Lab), Belgium
-
----
-
-## 📜 License
-
-This project is licensed under the **MIT License** — see [LICENSE](LICENSE) for details.
-All datasets and outputs are published under **Creative Commons CC-BY-4.0**.
-
----
-
-*Built with ❤️ in Kisumu, Kenya — for the communities of Nyando Basin*
+Academic advisors: Prof. Samuel Liyala (JOOUST, Kenya) and Prof. Johan Loeckx (Vrije Universiteit Brussel, VUB AI Lab, Belgium).
