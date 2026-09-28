@@ -12,7 +12,9 @@ from pathlib import Path
 import pytest
 
 REPO = Path(__file__).resolve().parents[1]
-BANNED_TEXT = ("early warning system", "residents protected", "model accuracy")
+BANNED_TEXT = ("early warning system", "residents protected", "model accuracy", "immediate alert recommended",
+               "conditions stable", "routine monitoring", "early warning broadcast", "undp/usaid/gcf",
+               "floods annually", "displacing thousands", "ward-level flood risk predictions", "2,308 gee")
 HARDCODED_METRIC = re.compile(r"\b(AUC(-ROC)?|F1|CV)\b\s*[=:]?\s*\d\.\d+")
 
 
@@ -37,3 +39,8 @@ def test_dashboard_has_no_banned_claims():
 def test_dashboard_has_no_hardcoded_model_metrics():
     hits = [(p.name, m.group(0)) for p, s in _sources().items() for m in HARDCODED_METRIC.finditer(s)]
     assert not hits, f"hard-coded model metrics in the dashboard (read them from /metrics): {hits}"
+
+
+def test_dashboard_says_the_model_is_not_validated():
+    n = sum(s.lower().count("not validated") for s in _sources().values())
+    assert n >= 2, "the dashboard must say, in the header and in each result message, that the legacy model is not validated"

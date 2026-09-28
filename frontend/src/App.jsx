@@ -154,7 +154,7 @@ function RiskGauge({ risk, loading }) {
           </div>
           {risk.prob !== null && (
             <div style={{ fontSize: "13px", color: "#aaa", marginBottom: "16px" }}>
-              Flood probability: <span style={{ color: risk.color, fontWeight: "700" }}>{(risk.prob * 100).toFixed(1)}%</span>
+              Model score: <span style={{ color: risk.color, fontWeight: "700" }}>{(risk.prob * 100).toFixed(1)}%</span>
             </div>
           )}
           <div style={{ display: "flex", gap: "6px", justifyContent: "center", margin: "12px 0" }}>
@@ -168,9 +168,9 @@ function RiskGauge({ risk, loading }) {
           </div>
           <div style={{ fontSize: "10px", color: "#5B7A9A", letterSpacing: "0.08em" }}>LOW · MEDIUM · HIGH</div>
           <div style={{ marginTop: "16px", padding: "10px 14px", background: "rgba(201,168,76,0.08)", borderRadius: "8px", border: `1px solid ${risk.color}33`, fontSize: "12px", color: "#C0C0C0", lineHeight: 1.5 }}>
-            {risk.level === "HIGH" && "⚠️ Immediate alert recommended. Coordinate with Nyando Sub-County emergency office."}
-            {risk.level === "MEDIUM" && "⚡ Monitor conditions closely. Consider early warning broadcast to at-risk households."}
-            {risk.level === "LOW" && "✅ Conditions stable. Continue routine monitoring via GEE satellite feed."}
+            {risk.level === "HIGH" && "Legacy model output, not validated. Do not use for safety decisions."}
+            {risk.level === "MEDIUM" && "Legacy model output, not validated. Do not use for safety decisions."}
+            {risk.level === "LOW" && "Legacy model output, not validated. Do not use for safety decisions."}
           </div>
         </>
       ) : (
@@ -247,7 +247,7 @@ export default function NyandoFloodDashboard() {
               Nyando Flood AI
             </div>
             <div style={{ fontSize: "11px", color: "#5B7A9A", letterSpacing: "0.06em", marginTop: "2px", fontFamily: "'Lato', sans-serif" }}>
-              FLOOD SUSCEPTIBILITY · KISUMU COUNTY, KENYA
+              FLOOD SUSCEPTIBILITY · KISUMU COUNTY, KENYA<br />DEMONSTRATION ONLY · LEGACY MODEL · NOT VALIDATED
             </div>
           </div>
         </div>
@@ -337,14 +337,14 @@ export default function NyandoFloodDashboard() {
         <div className="card" style={{ background: "linear-gradient(135deg, #0A1628, #0D2010)", border: "1px solid rgba(201,168,76,0.25)", borderRadius: "12px", padding: "16px", marginBottom: "16px" }}>
           <div style={{ fontSize: "11px", color: "#C9A84C", letterSpacing: "0.1em", marginBottom: "10px", fontFamily: "'Lato', sans-serif", fontWeight: "700" }}>🌍 ABOUT THIS PROJECT</div>
           <p style={{ fontSize: "12px", color: "#A0B0C0", lineHeight: 1.7, margin: "0 0 10px", fontFamily: "'Lato', sans-serif" }}>
-            The Nyando River basin floods annually, displacing thousands of farming families. This AI system was built to provide <strong style={{ color: "#C9A84C" }}>ward-level flood risk predictions</strong> using satellite-derived terrain, soil, and rainfall data from Google Earth Engine.
+            The Nyando River basin is flood-prone. This project is working towards <strong style={{ color: "#C9A84C" }}>ward-level flood susceptibility estimates</strong> using satellite-derived terrain, soil, and rainfall data from Google Earth Engine.
           </p>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
             {[
-              { icon: "🛰️", text: "2,308 GEE satellite points" },
+              { icon: "🛰️", text: "Open satellite data (V2 dataset in progress)" },
               { icon: "🏘️", text: "161,000+ residents covered" },
               { icon: "📊", text: "Legacy model, under re-validation" },
-              { icon: "🏛️", text: "UNDP/USAID/GCF eligible" },
+              { icon: "🏛️", text: "Open-source code, MIT license" },
             ].map(d => (
               <div key={d.text} style={{ display: "flex", gap: "6px", alignItems: "center", fontSize: "11px", color: "#7A9AB0", fontFamily: "'Lato', sans-serif" }}>
                 <span>{d.icon}</span><span>{d.text}</span>

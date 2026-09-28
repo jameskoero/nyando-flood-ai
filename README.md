@@ -129,7 +129,7 @@ The deployed service predates V2 and serves a legacy model. Interactive docs are
 
 Legacy risk classes: LOW below 0.35, MEDIUM 0.35 to 0.65, HIGH above 0.65.
 
-The API runs on Render's free tier, so the first request after idle can take about a minute. Live services: [dashboard](https://nyando-flood-ai.vercel.app) and [API health](https://nyando-flood-ai.onrender.com/health).
+The API runs on Render's free tier, so the first request after idle can take about a minute. Live services: [dashboard](https://nyando-flood-ai.vercel.app) and [API health](https://nyando-flood-api.onrender.com/health).
 
 ## Repository layout
 
