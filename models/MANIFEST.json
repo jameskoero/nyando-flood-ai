@@ -1,0 +1,29 @@
+{
+  "backend/models/nyando_gb_v1.pkl": {
+    "algorithm": "unverified",
+    "date_added": "2026-09-28",
+    "note": "pre-V2 artifact with no recorded training-data hash; kept until a V2 model replaces it",
+    "sha256": "e024d9db92b79fee8f11967b991281b537183fb7cede08f95c5191db8fff537e",
+    "size_bytes": 143256,
+    "status": "legacy",
+    "trained_on": null
+  },
+  "backend/models/nyando_xgb_v1.pkl": {
+    "algorithm": "unverified",
+    "date_added": "2026-09-28",
+    "note": "pre-V2 artifact with no recorded training-data hash; kept until a V2 model replaces it",
+    "sha256": "de0e721c808b72730658880337f5f40cb88172f01186eb9e3908e527d6e31bb5",
+    "size_bytes": 2312718,
+    "status": "legacy",
+    "trained_on": null
+  },
+  "models/nyando_xgb_v1.pkl": {
+    "algorithm": "unverified",
+    "date_added": "2026-09-28",
+    "note": "pre-V2 artifact with no recorded training-data hash; kept until a V2 model replaces it",
+    "sha256": "de0e721c808b72730658880337f5f40cb88172f01186eb9e3908e527d6e31bb5",
+    "size_bytes": 2312718,
+    "status": "legacy",
+    "trained_on": null
+  }
+}

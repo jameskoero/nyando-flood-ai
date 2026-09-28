@@ -1,0 +1,69 @@
+{
+  "data/training/nyando_training_v1.csv": {
+    "date_added": "2026-09-28",
+    "note": "pre-V2 training file kept for history only; not used for V2 training (see CHANGES.md)",
+    "sha256": "5f2cc8e856c9e747adbf160ee17cb96b3be8ddcc64189179cbc7715814ce1a60",
+    "status": "legacy-discredited"
+  },
+  "data/training/nyando_training_v1_raw_gee.csv": {
+    "date_added": "2026-09-28",
+    "note": "pre-V2 training file kept for history only; not used for V2 training (see CHANGES.md)",
+    "sha256": "406618b81a8ffb5896975f37ff8cf7c350c1b51b427caf2ded4fdd6bd0b5297d",
+    "status": "legacy-discredited"
+  },
+  "data/training/nyando_training_v2_multidate.csv": {
+    "candidate_rainfall_features": [
+      "rain_aoi_3d",
+      "rain_aoi_7d",
+      "rain_aoi_14d",
+      "rain_basin_3d",
+      "rain_basin_7d",
+      "rain_basin_14d"
+    ],
+    "clay_policy": "keep_blank",
+    "date_added": "2026-09-28",
+    "date_set_selection": "GFM scene-date scan; basin 14-day rainfall in six equal-count bins, 5 dates per bin, seed 42, at least 14 days apart and from the events",
+    "dropped_flood_labelled": 0,
+    "dropped_log": "data/training/nyando_training_v2_multidate_dropped.csv",
+    "dropped_points": 0,
+    "features": [
+      "elevation",
+      "slope",
+      "hand",
+      "distance_river",
+      "rainfall_3day",
+      "clay_percent",
+      "land_cover"
+    ],
+    "flood_patches_total": 1087,
+    "flood_rate": 0.4457,
+    "generated_by": "scripts/build_initial_dataset.py (Stage 4b, build 4)",
+    "label_source": "Copernicus GFM ensemble_flood_extent (Sentinel-1); inundation on the scene date, outside permanent water",
+    "min_valid_pixels": 997936,
+    "rainfall_basin": {
+      "area_km2": 4006,
+      "hydrobasins_level": 8,
+      "sub_basins": 9,
+      "upstream_of_hybas_id": 1081149980
+    },
+    "row_count": 4420,
+    "sample_modes": {
+      "date_mosaic": 1920,
+      "event_peak": 2500
+    },
+    "sample_sets": 35,
+    "sample_types": {
+      "flood_case": 1970,
+      "flood_control": 2450
+    },
+    "sets_table": "data/training/nyando_training_v2_multidate_sets.csv",
+    "sha256": "0b9283540d91154c0dda55b0d92cae7aa3cae6aeffad0390bbf77e028dd2063a",
+    "wards_without_flood_labels": []
+  },
+  "data/training/nyando_training_v2_multidate_sets.csv": {
+    "companion_of": "data/training/nyando_training_v2_multidate.csv",
+    "date_added": "2026-09-28",
+    "sha256": "a9650d445b7eb66b7d61ba7ed9133ae7c4c0a7f602f4f5516350b07bd6edc891",
+    "status": "companion"
+  }
+}

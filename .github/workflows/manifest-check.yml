@@ -1,0 +1,21 @@
+name: manifest-check
+
+# Runs on every pull request (see data-gate.yml for why). Standard library only, no secrets.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  manifest-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Verify manifests independently
+        run: python scripts/check_manifests.py
