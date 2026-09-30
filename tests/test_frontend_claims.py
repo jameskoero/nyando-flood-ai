@@ -25,9 +25,9 @@ def ee_session():
 
 
 def _sources():
-    src = REPO / "frontend" / "src"
-    files = [p for ext in ("*.js", "*.jsx", "*.ts", "*.tsx") for p in src.rglob(ext)]
-    assert files, "no frontend sources found under frontend/src"
+    roots = [p.parent / "src" for p in REPO.glob("*/package.json") if (p.parent / "src").is_dir()]
+    files = [f for src in roots for ext in ("*.js", "*.jsx", "*.ts", "*.tsx") for f in src.rglob(ext)]
+    assert files, "no frontend sources found under any */src folder"
     return {p: p.read_text(encoding="utf-8") for p in files}
 
 
@@ -44,3 +44,7 @@ def test_dashboard_has_no_hardcoded_model_metrics():
 def test_dashboard_says_the_model_is_not_validated():
     n = sum(s.lower().count("not validated") for s in _sources().values())
     assert n >= 2, "the dashboard must say, in the header and in each result message, that the legacy model is not validated"
+
+
+def test_no_legacy_dashboard_folder():
+    assert not (REPO / 'dashboard').exists(), 'legacy dashboard/ held retracted claims; do not restore'
