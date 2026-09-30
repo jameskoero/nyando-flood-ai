@@ -77,18 +77,8 @@ def _assert_schema(df: pd.DataFrame):
     assert not missing, f"Missing required schema columns: {missing}"
 
 
-def _get_auc(m: dict):
-    for key in ("auc_roc", "auc", "roc_auc", "AUC", "AUC_ROC"):
-        if key in m:
-            return m[key]
-    return 0
 
 
-def _get_f1(m: dict):
-    for key in ("f1", "f1_score", "F1"):
-        if key in m:
-            return m[key]
-    return 0
 
 
 # ── Fixtures ─────────────────────────────────────────────────
@@ -103,12 +93,6 @@ def raw_df():
     return df
 
 
-@pytest.fixture(scope="module")
-def metrics():
-    if not METRICS_PATH.exists():
-        pytest.skip("metrics.json not found")
-    with open(METRICS_PATH) as f:
-        return json.load(f)
 
 
 # ── Data tests ───────────────────────────────────────────────
@@ -198,17 +182,7 @@ def test_model_has_predict(raw_df):
 
 # ── Metrics tests ────────────────────────────────────────────
 
-def test_metrics_file_exists():
-    assert METRICS_PATH.exists(), "metrics.json not found"
 
 
-def test_auc_above_threshold(metrics):
-    """AUC must be above 0.85 to justify production deployment."""
-    auc = _get_auc(metrics)
-    assert auc > 0.85, f"AUC too low: {auc:.3f} (threshold: 0.85)"
 
 
-def test_f1_above_threshold(metrics):
-    """F1 must be above 0.75 for flood early warning use case."""
-    f1 = _get_f1(metrics)
-    assert f1 > 0.75, f"F1 too low: {f1:.3f} (threshold: 0.75)"

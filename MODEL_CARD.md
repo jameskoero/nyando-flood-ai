@@ -1,4 +1,7 @@
 # Model Card — Nyando Flood Risk AI v1.0
+
+> **Status: legacy model, not validated.** The performance figures previously published here are retracted (circular evaluation; see the README correction notice and CHANGES.md). A V2 rebuild is in progress, and a full model card will accompany the validated V2 model.
+
 ## Developed by James Koero · Kisumu, Kenya · May 2026
 
 ---
@@ -29,16 +32,9 @@ n_estimators=300, max_depth=6, learning_rate=0.05, subsample=0.80, random_state=
 - **Flood labels:** Physics-calibrated; 2 Sentinel-1 SAR-confirmed flood anchors
 - **Flood rate:** 22% calibrated
 
-## Performance (Real GEE Data)
+## Performance
 
-| Metric | Score |
-|---|---|
-| AUC-ROC | 0.9717 |
-| F1-Score | 0.9022 |
-| Precision | 0.8830 |
-| Recall | 0.9222 |
-| Brier Score | 0.0736 |
-| CV AUC (5-fold) | 0.9727 ± 0.0040 |
+No validated performance figures are published for this model. The figures previously listed here are retracted. The only V2 figure is the data gate's leakage check (bare 4-feature leave-one-event-out AUC 0.841, required to stay below 0.90), which tests the data, not a model.
 
 ## Feature Importance
 
@@ -84,7 +80,7 @@ All zones AUC > 0.85. No significant spatial bias detected.
 
 ## Compliance
 
-Kenya DPA 2019 ✅ · GDPR ✅ · FAIR data ✅
+No personal or household data is used (open, satellite-derived data only). No data-protection compliance determination is documented in this repository.
 
 ## Citation
 

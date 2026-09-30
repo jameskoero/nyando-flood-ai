@@ -1,6 +1,6 @@
 # Data Sources — Nyando Flood AI (Real GEE Data)
 
-**All sources: open, non-personal, CC-BY-4.0 / Public Domain. Kenya DPA 2019 + GDPR compliant.**
+**All sources are open and non-personal; licences differ by source (see the table). No personal data is used; no data-protection compliance determination is documented.**
 
 | Feature | Source | GEE ID | License |
 |---|---|---|---|

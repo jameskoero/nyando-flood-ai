@@ -11,4 +11,4 @@
 | 7 | ESA WorldCover | ESA | GEE: ESA/WorldCover/v200/2021 | CC-BY 4.0 |
 | 8 | WorldPop Kenya 2020 | Univ. Southampton | https://hub.worldpop.org | CC-BY 4.0 |
 
-*No personal or household data used. Kenya DPA 2019 + GDPR compliant.*
+*No personal or household data used. No data-protection compliance determination is documented.*
