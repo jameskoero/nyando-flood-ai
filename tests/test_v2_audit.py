@@ -131,3 +131,13 @@ def test_openapi_schema_is_not_served(api):
     api.limiter.reset()
     r = TestClient(api.app).get('/openapi.json')
     assert r.status_code == 404
+
+
+def test_predict_has_a_global_cap_across_client_addresses(api):
+    api.limiter.reset()
+    codes = []
+    for i in range(api.GLOBAL_PREDICT_LIMIT + 10):
+        c = TestClient(api.app, client=('198.51.100.' + str(i % 250 + 1), 50000))
+        codes.append(c.post('/predict', json=BODY).status_code)
+    assert codes.count(200) == api.GLOBAL_PREDICT_LIMIT, codes
+    assert set(codes) <= {200, 429}, codes

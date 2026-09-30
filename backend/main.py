@@ -14,6 +14,13 @@ from slowapi.errors import RateLimitExceeded
 
 limiter = Limiter(key_func=get_remote_address)
 
+# One shared counter for /predict, independent of client address and of any header a client sets.
+GLOBAL_PREDICT_LIMIT = 15
+
+
+def _global_key(request):
+    return 'global'
+
 app = FastAPI(
     title="Nyando Flood Risk API",
     version="1.0.0",
@@ -129,6 +136,7 @@ def metrics():
 
 @app.post("/predict")
 @limiter.limit("10/minute")
+@limiter.limit(str(GLOBAL_PREDICT_LIMIT) + "/minute", key_func=_global_key)
 def predict(request: Request, data: FloodInput):
     if model is None:
         return JSONResponse(status_code=503, content={"error": "Model not loaded", "model_loaded": False})
