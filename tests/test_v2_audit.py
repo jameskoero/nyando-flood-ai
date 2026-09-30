@@ -125,3 +125,18 @@ def test_env_file_variants_are_gitignored():
     import subprocess
     for f in (".env", ".env.local", ".env.production", "backend/.env.local"):
         assert subprocess.run(["git", "check-ignore", "-q", f], cwd=REPO).returncode == 0, f
+
+
+def test_openapi_schema_is_not_served(api):
+    api.limiter.reset()
+    r = TestClient(api.app).get('/openapi.json')
+    assert r.status_code == 404
+
+
+def test_frontend_sends_security_headers():
+    cfg = json.loads((REPO / 'frontend' / 'vercel.json').read_text())
+    rules = [h for r in cfg['headers'] if r['source'] == '/(.*)' for h in r['headers']]
+    got = {h['key']: h['value'] for h in rules}
+    assert got.get('X-Content-Type-Options') == 'nosniff'
+    assert got.get('X-Frame-Options') == 'SAMEORIGIN'
+    assert got.get('Referrer-Policy') == 'strict-origin-when-cross-origin'
