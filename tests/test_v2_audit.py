@@ -105,3 +105,23 @@ def test_readme_reports_the_three_cv_figures():
     readme = (REPO / "README.md").read_text()
     for name, v in (("pooled", pooled), ("per-event mean", per_event), ("location-excluded", located)):
         assert format(v, ".3f") in readme, name + " " + format(v, ".3f") + " missing from README"
+
+
+def test_predict_returns_503_when_the_model_is_not_loaded(api, monkeypatch):
+    api.limiter.reset()
+    monkeypatch.setattr(api, "model", None)
+    r = TestClient(api.app).post("/predict", json=BODY)
+    assert r.status_code == 503 and r.json().get("model_loaded") is False
+
+
+def test_ward_length_is_capped(api):
+    api.limiter.reset()
+    c = TestClient(api.app)
+    assert c.post("/predict", json=dict(BODY, ward="A" * 64)).status_code == 200
+    assert c.post("/predict", json=dict(BODY, ward="A" * 65)).status_code == 422
+
+
+def test_env_file_variants_are_gitignored():
+    import subprocess
+    for f in (".env", ".env.local", ".env.production", "backend/.env.local"):
+        assert subprocess.run(["git", "check-ignore", "-q", f], cwd=REPO).returncode == 0, f

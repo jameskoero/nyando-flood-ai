@@ -14,3 +14,7 @@ node_modules/
 dist/
 build/
 nyando_training_v1_raw_gee.csv
+
+# local environment files (keep any .env.example)
+.env.*
+!.env.example

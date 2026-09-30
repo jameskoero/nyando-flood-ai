@@ -102,7 +102,7 @@ class FloodInput(BaseModel):
     distance_river: float = Field(allow_inf_nan=False)
     clay_percent: float = Field(allow_inf_nan=False)
     land_cover: float = Field(allow_inf_nan=False)
-    ward: str = "Unknown"
+    ward: str = Field(default="Unknown", max_length=64)
 
 @app.get("/health")
 def health():
@@ -130,7 +130,7 @@ def metrics():
 @limiter.limit("10/minute")
 def predict(request: Request, data: FloodInput):
     if model is None:
-        return {"error": "Model not loaded", "model_loaded": False}
+        return JSONResponse(status_code=503, content={"error": "Model not loaded", "model_loaded": False})
     X = [[data.elevation, data.slope, data.rainfall_3day,
           data.distance_river, data.clay_percent, data.land_cover]]
     prob = float(model.predict_proba(X)[0][1])
