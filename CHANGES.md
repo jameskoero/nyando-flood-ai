@@ -143,3 +143,10 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 4. **Class imbalance in flood labels needs investigation.** 2/2308 is not a
    real flood rate for the Nyando basin. The GEE label generation step needs
    to be re-examined before the next model retraining.
+
+## 2026-10-01: Retraction cleanup
+
+- Removed the legacy metrics files (metrics.json, models/metrics.json).
+- Replaced the metric-threshold tests, which asserted the retracted scores, with tests/test_retracted_claims.py.
+- Removed the retracted performance tables and the unverified compliance wording from MODEL_CARD.md and the data-source notes; corrected a licence line in data/DATA_SOURCES.md that contradicted its own table.
+- Replaced the May 2026 concept note with a superseded notice (original text in git history at commit 93aa6c0) and removed the stale concept-note PDF: their performance figures and their lead-time, ward-count and compliance statements are not supported by anything in this repository.
