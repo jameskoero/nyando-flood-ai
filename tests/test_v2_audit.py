@@ -125,3 +125,9 @@ def test_env_file_variants_are_gitignored():
     import subprocess
     for f in (".env", ".env.local", ".env.production", "backend/.env.local"):
         assert subprocess.run(["git", "check-ignore", "-q", f], cwd=REPO).returncode == 0, f
+
+
+def test_openapi_schema_is_not_served(api):
+    api.limiter.reset()
+    r = TestClient(api.app).get('/openapi.json')
+    assert r.status_code == 404
