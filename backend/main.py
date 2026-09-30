@@ -4,8 +4,10 @@ import time
 import hashlib
 import joblib
 from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
@@ -20,6 +22,14 @@ app = FastAPI(
 )
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+
+@app.exception_handler(RequestValidationError)
+async def _validation_error_handler(request: Request, exc: RequestValidationError):
+    # Report where and why validation failed, never the submitted value.
+    # A NaN cannot be serialised to JSON, and echoing user input back is unnecessary.
+    errors = [{'loc': [str(x) for x in e.get('loc', ())], 'msg': str(e.get('msg', '')), 'type': str(e.get('type', ''))} for e in exc.errors()]
+    return JSONResponse(status_code=422, content={'detail': errors})
 
 app.add_middleware(
     CORSMiddleware,
@@ -80,20 +90,19 @@ def _load_metrics():
     if metrics_path and os.path.exists(metrics_path):
         with open(metrics_path) as f:
             data = json.load(f)
-    else:
-        data = {"error": "metrics.json not found"}
-    _metrics_cache["data"] = data
-    _metrics_cache["loaded_at"] = now
-    return data
+        _metrics_cache["data"] = data
+        _metrics_cache["loaded_at"] = now
+        return data
+    return None
 
 class FloodInput(BaseModel):
-    elevation: float
-    slope: float
-    rainfall_3day: float
-    distance_river: float
-    clay_percent: float
-    land_cover: float
-    ward: str = "Unknown"
+    elevation: float = Field(allow_inf_nan=False)
+    slope: float = Field(allow_inf_nan=False)
+    rainfall_3day: float = Field(allow_inf_nan=False)
+    distance_river: float = Field(allow_inf_nan=False)
+    clay_percent: float = Field(allow_inf_nan=False)
+    land_cover: float = Field(allow_inf_nan=False)
+    ward: str = Field(default="Unknown", max_length=64)
 
 @app.get("/health")
 def health():
@@ -110,15 +119,18 @@ def health():
 @app.get("/metrics")
 def metrics():
     data = _load_metrics()
-    data["model_sha256"] = MODEL_SHA256
-    data["cache_ttl_seconds"] = _METRICS_TTL
-    return data
+    if data is None:
+        return JSONResponse(status_code=503, content={"available": False, "reason": "No validated metrics are published for the served model.", "model_sha256": MODEL_SHA256})
+    out = dict(data)
+    out["model_sha256"] = MODEL_SHA256
+    out["cache_ttl_seconds"] = _METRICS_TTL
+    return out
 
 @app.post("/predict")
 @limiter.limit("10/minute")
 def predict(request: Request, data: FloodInput):
     if model is None:
-        return {"error": "Model not loaded", "model_loaded": False}
+        return JSONResponse(status_code=503, content={"error": "Model not loaded", "model_loaded": False})
     X = [[data.elevation, data.slope, data.rainfall_3day,
           data.distance_river, data.clay_percent, data.land_cover]]
     prob = float(model.predict_proba(X)[0][1])
@@ -133,5 +145,6 @@ def predict(request: Request, data: FloodInput):
         "risk_class": risk,
         "prediction": pred,
         "ward": data.ward,
-        "model_version": "1.0.0"
+        "model_version": "1.0.0",
+        "notice": "Legacy model, not validated. Do not use for safety decisions."
     }

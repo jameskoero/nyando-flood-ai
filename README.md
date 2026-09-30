@@ -79,6 +79,7 @@ The flood share of the file (44.6%) is set by the sampling design and is not the
 - A label means inundation on the scene date, not newly arrived flooding.
 - Rainfall windows are date-level features, so the 35 dates give only 35 distinct values.
 - Some dates contribute a single flood patch; weight by patch when evaluating.
+- Cross-validation of the bare 4-feature logistic baseline, leave-one-event-out (recomputed by `tests/test_v2_audit.py`): pooled AUC 0.841 (all held-out predictions together; the A-Gate limit of 0.90 applies to this figure), mean per-event AUC 0.910 (mean over held-out events that contain both classes), and pooled AUC 0.826 when training also excludes every location that appears in the held-out event. The location-excluded figure is the more conservative estimate of generalisation.
 
 ## Integrity controls
 
@@ -114,7 +115,7 @@ It resumes after an interruption and takes about 10 minutes. The full test suite
 The deployed service predates V2 and serves a legacy model. Interactive docs are disabled in production.
 
 - `GET /health` reports the loaded model's file name, SHA-256 and provenance.
-- `GET /metrics` returns the metrics endpoint output.
+- `GET /metrics` returns validated metrics, or HTTP 503 when none are published for the served model.
 - `POST /predict` is rate-limited. The example below shows the shape only; the values are illustrative.
 
 ```json
@@ -123,11 +124,12 @@ The deployed service predates V2 and serves a legacy model. Interactive docs are
 ```
 
 ```json
-{"risk_score": 0.87, "risk_class": "HIGH", "risk_label": "Prepare evacuation routes",
- "ward": "Ahero", "model_version": "1.0.0"}
+{"flood_probability": 0.87, "risk_score": 0.87, "risk_class": "CRITICAL", "prediction": 1,
+ "ward": "Ahero", "model_version": "1.0.0",
+ "notice": "Legacy model, not validated. Do not use for safety decisions."}
 ```
 
-Legacy risk classes: LOW below 0.35, MEDIUM 0.35 to 0.65, HIGH above 0.65.
+Legacy risk classes (from the code): LOW below 0.35, MEDIUM 0.35 to 0.60, HIGH 0.60 to 0.80, CRITICAL 0.80 and above. The score is a legacy-model output, not a validated flood probability.
 
 The API runs on Render's free tier, so the first request after idle can take about a minute. Live services: [dashboard](https://nyando-flood-ai.vercel.app) and [API health](https://nyando-flood-api.onrender.com/health).
 
