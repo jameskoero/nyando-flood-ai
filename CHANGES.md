@@ -156,3 +156,8 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 - Aligned CI: Python 3.11, pinned runner image, and action versions only where the latest release declares Node 24.
 - Renamed the misnamed pytest config to pytest.ini (the collected test set is unchanged).
 - Added docs/PHASE_CLOSURE.md, the roadmap conformance record for the Hotfix, Phase A, Phase B and gates stages.
+
+## 2026-10-01: Phase C protocol
+
+- Added docs/PHASE_C_PROTOCOL.md, the evaluation protocol fixed before any Phase C model result exists.
+- Added src/models/cv.py (grouped splits, metrics, paired bootstrap, label-shuffle null) and tests/test_cv_harness.py, which also ties the protocol's numbers to the training file.
