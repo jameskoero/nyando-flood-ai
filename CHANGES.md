@@ -150,3 +150,9 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 - Replaced the metric-threshold tests, which asserted the retracted scores, with tests/test_retracted_claims.py.
 - Removed the retracted performance tables and the unverified compliance wording from MODEL_CARD.md and the data-source notes; corrected a licence line in data/DATA_SOURCES.md that contradicted its own table.
 - Replaced the May 2026 concept note with a superseded notice (original text in git history at commit 93aa6c0) and removed the stale concept-note PDF: their performance figures and their lead-time, ward-count and compliance statements are not supported by anything in this repository.
+
+## 2026-10-01: V2 foundation closure
+
+- Aligned CI: Python 3.11, pinned runner image, and action versions only where the latest release declares Node 24.
+- Renamed the misnamed pytest config to pytest.ini (the collected test set is unchanged).
+- Added docs/PHASE_CLOSURE.md, the roadmap conformance record for the Hotfix, Phase A, Phase B and gates stages.
