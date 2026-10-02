@@ -101,4 +101,53 @@ Seed 42 throughout. The training file is read through the manifest, and the harn
 
 Pre-result amendments (r2, after review, while no model result existed): H1 wording corrected; primary comparisons fixed at two with alpha 0.025 each; ablations made descriptive; reversal-under-sensitivity rule added; hash-before-unpickle requirement added for the deploy pull request.
 
-Deviations log after the first result: none yet.
+## 9. Findings from the baseline run (2026-10-02)
+
+Source: MLflow run 88e8f6a33fd540b89f4801a8f7fa50b7, logged from commit 95251ef0e897e03c2726636fe4ef937e6b42fdb3 on Colab, training file hash 0b9283540d91154c0dda55b0d92cae7aa3cae6aeffad0390bbf77e028dd2063a. Values in the first table are read back from that run. The reference arms, the land-cover lookup, the elevation AUC per land-cover class, the row counts in this section, and the six-feature selection-split and null values are recomputed from the data by tests/test_phase_c_amendment.py. The remaining values come from the read-only audit of 2026-10-02 and are not re-tested.
+
+Logistic arms, selection split (shared locations removed) and its single-seed shuffle null:
+
+| Arm | Pooled AUC | Per-event mean | Null pooled | Null per-event mean |
+|---|---|---|---|---|
+| bare4 | 0.8264 | 0.9104 | 0.4607 | 0.5010 |
+| six | 0.8988 | 0.9391 | 0.4573 | 0.5053 |
+| seven | 0.8989 | 0.9399 | 0.4555 | 0.5086 |
+| six_no_clay | 0.8861 | 0.9380 | 0.4565 | 0.5121 |
+| six_no_land_cover | 0.8361 | 0.9108 | 0.4613 | 0.4995 |
+| six_no_rainfall | 0.8907 | 0.9353 | 0.4288 | 0.5052 |
+
+Reference arms (no fitting; a lower raw value ranks more flood), pooled AUC and per-event mean over the 23 scorable events:
+
+| Reference | Pooled AUC | Per-event mean |
+|---|---|---|
+| elevation | 0.8239 | 0.9077 |
+| distance_river | 0.7988 | 0.8771 |
+| hand | 0.7871 | 0.8061 |
+| slope | 0.7276 | 0.7243 |
+| land-cover class lookup (leave-one-event-out, shared locations removed) | 0.7844 | 0.8687 |
+
+Observations:
+
+- The six-feature logistic exceeds elevation alone by 0.0314 in per-event mean (0.9391 against 0.9077). Without land_cover the arm scores 0.9108, so land_cover accounts for 0.0283 of that margin; clay_percent accounts for 0.0011 and rainfall_3day for 0.0038. The bare4 arm is 0.0027 above elevation alone.
+- Inside land-cover classes, pooled across events, the AUC of raw elevation is 0.930 (class 10), 0.814 (class 30), 0.453 (class 40), 0.594 (class 80) and 0.776 (class 90). For distance_river it is 0.934, 0.757, 0.539, 0.380 and 0.780. Classes 20 (4 floods), 50 (0 floods) and 60 (1 flood) cannot be scored.
+- Outside classes 10, 80 and 90 (3,195 rows, 1,010 floods, 17 events with both classes), adding land_cover raises per-event mean AUC from 0.8632 to 0.8893 when the model is trained on all rows and scored outside, and from 0.8310 to 0.8808 when it is trained and scored outside. Pooled AUC rises from 0.7897 to 0.8882 and from 0.7936 to 0.8841.
+- 549 rows sit at the minimum elevation (1130.5), all in Kabonyo/Kanyagwal. HAND is 0 on all of them and their median slope is 0. 529 are floods (26.9% of the 1,970 flood rows) and 20 are controls.
+- The single-seed null gives a pooled AUC of 0.4288 to 0.4613 in all six arms and a per-event mean of 0.4995 to 0.5121.
+- src/data/case_control_sampler.py draws cases inside the GFM flood extent and controls from the valid area outside it, and contains no reference to land cover. src/data/gfm_client.py (lines 92 to 140) reads only the ensemble flood extent asset, defines valid as not NODATA_VALUE and flooded as FLOOD_VALUE inside valid, and for each event keeps the scene in the search window (default plus or minus 15 days) with the most flood pixels inside the AOI. A search of that file finds no use of GFM's exclusion mask or reference water mask; the GFM documentation lists both as separate output layers, and the exclusion mask marks where Sentinel-1 flood delineation is hampered. In that file NODATA_VALUE is 255, FLOOD_VALUE is 1 and NO_FLOOD_VALUE is 0. The sampler draws both classes uniformly at random without replacement (seed 42) from the valid pixels of the chosen scene, with no distance buffer and no filter by land cover, water or exclusion. Not established: how the flood-extent layer encodes exclusion-mask and reference-water areas (as 255, 0 or 1).
+- Not established: the cause of the land_cover contribution, the cause of the below-chance pooled null, and the nature of the elevation-floor cluster.
+
+## 10. Amendments r3 (2026-10-02, after the baseline run)
+
+Each change has its basis in Section 9.
+
+1. Reference arms. Every comparison reports the five reference arms of Section 9, and a headline claim states its margin over elevation alone in per-event mean AUC. Basis: the six-feature logistic is 0.0314 above elevation alone.
+2. Stratified reporting. Every reported arm also gets the pooled AUC inside the non-floor rows and inside each land-cover class that has at least 30 rows of each label. The 549 floor rows cannot be scored on their own (20 controls). Basis: elevation separates classes very unevenly, and 26.9% of flood rows sit in the floor cluster.
+3. Claim limits. No statement that terrain explains a model's skill is made unless the six_no_land_cover arm and the non-floor stratum support it. Basis: land_cover accounts for 0.0283 of the 0.0314 margin over elevation alone.
+4. Null distribution and selection rule, fixed before the distribution is computed. The headline arm is shuffled within events under 100 seeds (seeds 42 to 141). The rule is implemented as selection_metric_rule in src/models/cv.py: pooled AUC stays the selection metric unless its 95% null interval excludes 0.5; then per-event mean is used if its own null interval does not; if both exclude 0.5 the metric is reported as unresolved. Until that run is logged, Section 5 stands. Basis: the single-seed pooled null is below 0.5 in all six arms.
+5. Exit criterion added. The winner is refit and re-scored under the production pins (Python 3.11, numpy 1.26.4, scikit-learn 1.6.1), and the logged run records that environment. Basis: the baseline run came from a Colab environment that differs from those pins.
+6. Unchanged. The primary feature set stays the six features of Section 4. No observation so far justifies removing one.
+7. Tracked, not blocking: whether controls include areas where GFM flood delineation is hampered (the sampler reads only the flood-extent layer, not the exclusion mask or the reference water mask); the cause of the land_cover contribution; the cause of the below-chance pooled null.
+
+Deviations log after the first result:
+
+- r3 (2026-10-02): Sections 9 and 10 added after the baseline run, with the amendments above. No earlier section was edited.

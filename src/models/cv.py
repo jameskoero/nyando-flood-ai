@@ -7,6 +7,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from joblib import Parallel, delayed
 from sklearn.base import clone
 from sklearn.metrics import roc_auc_score
 
@@ -141,3 +142,87 @@ def shuffle_labels_within_events(df, seed=SEED):
     for _, idx in df.groupby(EVENT).indices.items():
         out.iloc[idx, col] = rng.permutation(labels[idx])
     return out
+
+
+# ---- Phase C protocol r3 additions (docs/PHASE_C_PROTOCOL.md, Sections 9 and 10) ----
+REFERENCE_FEATURES = ["elevation", "hand", "distance_river", "slope"]
+
+
+def reference_scores(df):
+    """Raw single-feature rankings with no fitting (lower elevation, HAND, distance or slope = more flood).
+
+    Returns {feature: (pooled_auc, per_event_mean, n_events)}."""
+    out = {}
+    for name in REFERENCE_FEATURES:
+        s = -df[name].to_numpy(dtype=float)
+        pe = per_group_auc(df, s, EVENT, 1)
+        out[name] = (pooled_auc(df[LABEL], s), float(np.mean(list(pe.values()))), len(pe))
+    return out
+
+
+def land_cover_lookup_scores(df):
+    """Leave-one-event-out with shared locations removed: a row's score is the flood rate of its land-cover class
+    in the training rows (overall flood rate if the class is unseen)."""
+    scores = np.full(len(df), np.nan)
+    for _, train, test in loeo_splits(df, drop_shared_locations=True):
+        rate = df.iloc[train].groupby("land_cover")[LABEL].mean()
+        scores[test] = df.iloc[test]["land_cover"].map(rate).fillna(df.iloc[train][LABEL].mean()).to_numpy()
+    return scores
+
+
+def elevation_floor_mask(df):
+    """Rows at the minimum elevation of the frame (the 549-row cluster in the training file)."""
+    return (df["elevation"] == df["elevation"].min()).to_numpy()
+
+
+def stratified_pooled_auc(df, scores, min_class_n=MIN_CLASS_N):
+    """Pooled AUC inside each stratum: floor rows, non-floor rows, and each land-cover class.
+    A stratum with fewer than min_class_n rows of either class is omitted."""
+    scores = np.asarray(scores, dtype=float)
+    floor = elevation_floor_mask(df)
+    strata = {"elevation_floor": floor, "not_elevation_floor": ~floor}
+    for lc in sorted(df["land_cover"].unique()):
+        strata["land_cover_" + str(int(lc))] = (df["land_cover"] == lc).to_numpy()
+    y_all = df[LABEL].to_numpy()
+    out = {}
+    for name, m in strata.items():
+        y, s = y_all[m], scores[m]
+        ok = ~np.isnan(s)
+        y, s = y[ok], s[ok]
+        pos = int(y.sum())
+        if pos >= min_class_n and len(y) - pos >= min_class_n:
+            out[name] = float(roc_auc_score(y, s))
+    return out
+
+
+def _null_draw(estimator, df, features, seed, drop_shared_locations):
+    null = shuffle_labels_within_events(df, seed=seed)
+    sc = out_of_fold_scores(estimator, null, features, loeo_splits(null, drop_shared_locations=drop_shared_locations))
+    pe = per_group_auc(null, sc, EVENT, 1)
+    return pooled_auc(null[LABEL], sc), float(np.mean(list(pe.values())))
+
+
+def null_distribution(estimator, df, features, n_seeds, base_seed=SEED, drop_shared_locations=True, n_jobs=1):
+    """Selection-split AUCs under label shuffles within events, one draw per seed (seed base_seed + k).
+    Returns (pooled_auc_array, per_event_mean_array)."""
+    draws = Parallel(n_jobs=n_jobs)(delayed(_null_draw)(estimator, df, features, base_seed + k, drop_shared_locations)
+                                    for k in range(n_seeds))
+    arr = np.array(draws, dtype=float)
+    return arr[:, 0], arr[:, 1]
+
+
+def null_interval(values, alpha=0.05):
+    lo, hi = np.percentile(values, [100 * alpha / 2, 100 * (1 - alpha / 2)])
+    return {"mean": float(np.mean(values)), "low": float(lo), "high": float(hi),
+            "excludes_half": bool(lo > 0.5 or hi < 0.5)}
+
+
+def selection_metric_rule(pooled_null, per_event_null):
+    """Pre-declared rule (protocol Section 10.4): keep pooled AUC as the selection metric unless its null interval
+    excludes 0.5; then use per-event mean if that interval does not; otherwise report 'unresolved'."""
+    p, e = null_interval(pooled_null), null_interval(per_event_null)
+    if not p["excludes_half"]:
+        return "pooled_auc"
+    if not e["excludes_half"]:
+        return "per_event_mean"
+    return "unresolved"
