@@ -17,6 +17,19 @@
     "status": "legacy",
     "trained_on": null
   },
+  "models/nyando_logcon_7a909898d4f6.onnx": {
+    "algorithm": "logistic_constrained",
+    "date_added": "2026-10-02",
+    "format": "onnx opset 13, ir_version 8, float64 scoring",
+    "frame": "mappable",
+    "note": "Phase C registered model (rules R1 to R4); the slope coefficient is held at 0 by its sign bound; scores rank locations inside GFM-mappable areas and are not flood probabilities",
+    "protocol": "docs/PHASE_C_PROTOCOL.md Section 15",
+    "registration_run": "54afe7e812fd4c4985280283d52f3793",
+    "sha256": "7a909898d4f67efc3291f656d2aa9e7c2559418f5e421eaaa68a158838f1cf8d",
+    "size_bytes": 5082,
+    "status": "active",
+    "trained_on": "0b9283540d91154c0dda55b0d92cae7aa3cae6aeffad0390bbf77e028dd2063a"
+  },
   "models/nyando_xgb_v1.pkl": {
     "algorithm": "unverified",
     "date_added": "2026-09-28",
