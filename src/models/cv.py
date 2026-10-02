@@ -226,3 +226,32 @@ def selection_metric_rule(pooled_null, per_event_null):
     if not e["excludes_half"]:
         return "per_event_mean"
     return "unresolved"
+
+
+# ---- Phase C protocol r4 additions (docs/PHASE_C_PROTOCOL.md, Sections 11 and 12) ----
+FLAGS_PATH = ROOT / "data" / "derived" / "gfm_layer_flags.csv"
+
+
+def load_layer_flags(df, path=None):
+    """GFM exclusion-mask and reference-water-mask values at each training point, aligned with df by position.
+
+    Fails if the file does not describe exactly these rows."""
+    fl = pd.read_csv(path or FLAGS_PATH)
+    if len(fl) != len(df):
+        raise ValueError("layer-flag file and training file differ in length")
+    same = (np.allclose(fl["lon"], df["lon"], rtol=0, atol=1e-9) and np.allclose(fl["lat"], df["lat"], rtol=0, atol=1e-9)
+            and (fl["flooded"].to_numpy() == df[LABEL].to_numpy()).all())
+    if not same:
+        raise ValueError("layer-flag file is not aligned with the training file")
+    return fl
+
+
+def mappable_mask(df, flags=None):
+    """True for every flood row and for controls outside the GFM exclusion mask."""
+    fl = flags if flags is not None else load_layer_flags(df)
+    return (df[LABEL].to_numpy() == 1) | (fl["exclusion_mask"].to_numpy() == 0)
+
+
+def restrict_to_mappable(df, flags=None):
+    """The mappable frame: flood rows plus controls outside the exclusion mask, original order, fresh index."""
+    return df[mappable_mask(df, flags)].reset_index(drop=True)

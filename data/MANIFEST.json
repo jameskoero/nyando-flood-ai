@@ -1,4 +1,13 @@
 {
+  "data/derived/gfm_layer_flags.csv": {
+    "companion_of": "data/training/nyando_training_v2_multidate.csv",
+    "date_added": "2026-10-02",
+    "generated_by": "scripts/audit_gfm_layers.py",
+    "note": "GFM exclusion-mask and reference-water-mask values at the training points (protocol r4)",
+    "row_count": 4420,
+    "sha256": "01723237a4cc953d5f5dc6131911c7474d9a86d3b0cfc3adcb1639c79195b4b2",
+    "status": "companion"
+  },
   "data/training/nyando_training_v1.csv": {
     "date_added": "2026-09-28",
     "note": "pre-V2 training file kept for history only; not used for V2 training (see CHANGES.md)",
