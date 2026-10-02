@@ -161,3 +161,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 
 - Added docs/PHASE_C_PROTOCOL.md, the evaluation protocol fixed before any Phase C model result exists.
 - Added src/models/cv.py (grouped splits, metrics, paired bootstrap, label-shuffle null) and tests/test_cv_harness.py, which also ties the protocol's numbers to the training file.
+
+## 2026-10-01: Phase C baseline
+
+- Added the logistic baseline (src/models/baseline.py), its tests, and scripts/run_baseline.py, which logs the protocol's baseline run to MLflow.
