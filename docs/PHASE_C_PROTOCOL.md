@@ -148,6 +148,59 @@ Each change has its basis in Section 9.
 6. Unchanged. The primary feature set stays the six features of Section 4. No observation so far justifies removing one.
 7. Tracked, not blocking: whether controls include areas where GFM flood delineation is hampered (the sampler reads only the flood-extent layer, not the exclusion mask or the reference water mask); the cause of the land_cover contribution; the cause of the below-chance pooled null.
 
+## 11. Findings from the reference-and-null run and the GFM layer audit (2026-10-02)
+
+Sources. Reference-and-null run: MLflow run 3d3778ee609c42049fde93f166583833, commit c3da67794260799e35f6772a547f1a0e7d408bd1, training file hash 0b9283540d91154c0dda55b0d92cae7aa3cae6aeffad0390bbf77e028dd2063a. Layer audit: data/derived/gfm_layer_flags.csv, produced by scripts/audit_gfm_layers.py from the 35 id groups in gfm_item_id (67 component scenes, no failed lookups); scenes of one group are combined by the maximum value per point. The counts and arm values in this section are recomputed from that file and the training file by tests/test_mappable_frame.py. Values marked logged are read from the MLflow run and are not re-tested.
+
+Null distribution (logged; six-feature logistic, selection split, 100 label shuffles within events): pooled AUC mean 0.4601, 95% interval 0.4349 to 0.4830; per-event mean AUC 0.5012, interval 0.4721 to 0.5256. The pooled interval excludes 0.5 and the per-event one does not, so the rule of Section 10.4 selects per-event mean AUC.
+
+Stratified pooled AUC (logged; six against six_no_land_cover): class 10 0.8587 and 0.8767, class 30 0.8270 and 0.8317, class 40 0.6019 and 0.6060, class 80 0.3555 and 0.4140, class 90 0.7906 and 0.7935, non-floor rows 0.8755 and 0.7876. Inside every scored land-cover class the model with land_cover ranks no better than the one without it; across the non-floor rows it adds 0.0879.
+
+GFM layers at the sample points. The flood-extent value agrees with the label on all 4,420 rows (1 on the 1,970 flood rows, 0 on the 2,450 controls). No flood row lies inside the exclusion mask or the reference water mask. 945 of the 2,450 controls (38.6%) lie inside the exclusion mask and 8 (0.3%) inside the reference water mask. Controls inside the exclusion mask, by land-cover class:
+
+| Class | Controls | Inside the exclusion mask |
+|---|---|---|
+| 10 | 123 | 96 |
+| 20 | 399 | 319 |
+| 30 | 1,523 | 440 |
+| 40 | 252 | 17 |
+| 50 | 9 | 7 |
+| 60 | 2 | 1 |
+| 80 | 32 | 21 |
+| 90 | 110 | 44 |
+
+What the GFM Product User Manual says (fetched 2026-10-02): the observed flood extent leaves out pixels that are normally under water; a flood pixel inside the exclusion mask or the reference water mask is reset to no flood; the exclusion mask marks where SAR water mapping is not technically feasible (no sensitivity, as in urban areas and dense vegetation; water look-alikes such as flat impervious or sandy surfaces; strong topography; radar shadow; low Sentinel-1 coverage); the no-sensitivity part is applied only to pixels classified as non-flooded; the exclusion mask and topography (DEM, HAND index) are inputs to the flood algorithm.
+
+Two frames. The mappable frame holds every flood row and the controls outside the exclusion mask: 3,475 rows (1,970 floods, 1,505 controls), 23 events with both classes. Pooled AUC and per-event mean AUC on both frames (the arms use the selection split):
+
+| Arm | Full frame | Mappable frame |
+|---|---|---|
+| elevation only | 0.8239, 0.9077 | 0.7945, 0.8975 |
+| distance_river only | 0.7988, 0.8771 | 0.7827, 0.8749 |
+| hand only | 0.7871, 0.8061 | 0.7301, 0.7456 |
+| slope only | 0.7276, 0.7243 | 0.6654, 0.6726 |
+| bare4 logistic | 0.8264, 0.9104 | 0.8053, 0.9030 |
+| six logistic | 0.8988, 0.9391 | 0.8841, 0.9383 |
+| six_no_land_cover logistic | 0.8361, 0.9108 | 0.8105, 0.9067 |
+
+Observations: the per-event mean of the six-feature arm changes by -0.0008 between the frames, against -0.0605 for hand only, -0.0517 for slope only, -0.0102 for elevation only and -0.0022 for distance_river only. The per-event contribution of land_cover (six minus six_no_land_cover) is 0.0283 on the full frame and 0.0316 on the mappable frame. The margin over elevation only in per-event mean is 0.0314 (six), 0.0027 (bare4) and 0.0031 (six_no_land_cover) on the full frame, and 0.0408, 0.0055 and 0.0092 on the mappable frame.
+
+Not established: the cause of the land_cover contribution, of the class 80 result and of the below-chance pooled null.
+
+## 12. Amendments r4 (2026-10-02)
+
+Each change has its basis in Section 11.
+
+1. Two frames. Every reported arm is scored on the full frame and on the mappable frame. Basis: no flood row lies inside the exclusion mask, 38.6% of controls do, and the GFM flood layer resets flood pixels inside it to no flood, so on those controls the label records that GFM cannot map the pixel, not that it stayed dry.
+2. Headline frame. The headline is the selection split on the mappable frame. The shuffle null is recomputed on that frame (100 seeds, 42 to 141) and the rule of Section 10.4 decides the selection metric there. Until that run is logged, per-event mean AUC (the outcome of Section 10.4 on the full frame) stands. Basis: item 1, and the six-feature per-event mean differs by 0.0008 between the frames, so no earlier statement changes.
+3. Claim limit. Scores say nothing about locations inside the exclusion mask, or about flooding that GFM cannot detect. The README and the model card must say so before any model is deployed.
+4. Margins over elevation only are reported on both frames (Section 11 gives the baseline values).
+5. land_cover stays in the primary set. Its contribution does not come from the excluded controls (0.0283 on the full frame, 0.0316 on the mappable frame); its cause is not established and Section 10.3 stays in force.
+6. No data rebuild now. The mappable frame measures the effect without changing the training file whose hash every logged run cites. Resampling controls outside the exclusion mask changes that file and is decided after the Phase C results, starting from data/derived/gfm_layer_flags.csv.
+7. Resolved: the open question of Section 10 item 7 about the GFM valid mask. Controls do include pixels where GFM flood delineation is hampered (945 of 2,450).
+8. Tracked, not blocking: correct the docstring of src/data/case_control_sampler.py (controls are every valid pixel with value 0, which includes the exclusion mask) and add the limitation of item 3 to the README with its test; the cause of the land_cover contribution; the class 80 result; the below-chance pooled null.
+
 Deviations log after the first result:
 
 - r3 (2026-10-02): Sections 9 and 10 added after the baseline run, with the amendments above. No earlier section was edited.
+- r4 (2026-10-02): Sections 11 and 12 added after the reference-and-null run and the GFM layer audit. No earlier section was edited.

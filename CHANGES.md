@@ -169,3 +169,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-02: Phase C protocol r3
 
 - Added reference arms, stratified reporting, a multi-seed shuffle null with a pre-declared selection rule, and protocol Sections 9 and 10 (findings from the baseline run and the amendments they support), with tests that recompute the quoted numbers from the data.
+
+## 2026-10-02: Phase C protocol r4
+
+- Added the GFM layer audit (data/derived/gfm_layer_flags.csv with its manifest entry and regenerating script), the full and mappable evaluation frames, scripts/run_mappable.py, and protocol Sections 11 and 12, with tests that recompute the quoted numbers.
