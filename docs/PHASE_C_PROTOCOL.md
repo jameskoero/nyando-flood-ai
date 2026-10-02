@@ -200,7 +200,40 @@ Each change has its basis in Section 11.
 7. Resolved: the open question of Section 10 item 7 about the GFM valid mask. Controls do include pixels where GFM flood delineation is hampered (945 of 2,450).
 8. Tracked, not blocking: correct the docstring of src/data/case_control_sampler.py (controls are every valid pixel with value 0, which includes the exclusion mask) and add the limitation of item 3 to the README with its test; the cause of the land_cover contribution; the class 80 result; the below-chance pooled null.
 
+## 13. Booster protocol (2026-10-02, committed before any booster score exists)
+
+13.0 Result that closes Section 12 item 2. MLflow run 611bea17379241adb0576279bc7cebc3 (commit 2572fcedb7776c8f8aedd0cdadc182a473f0dedb, training file hash 0b9283540d91154c0dda55b0d92cae7aa3cae6aeffad0390bbf77e028dd2063a, layer flags hash 01723237a4cc953d5f5dc6131911c7474d9a86d3b0cfc3adcb1639c79195b4b2; 100 shuffles within events on the mappable frame): pooled AUC null mean 0.4537, 95% interval 0.4203 to 0.4874 (excludes 0.5); per-event mean AUC null mean 0.4998, interval 0.4730 to 0.5333 (includes 0.5). The rule of Section 10.4 selects per-event mean AUC on the mappable frame as it did on the full frame. The same run logged the mappable-frame land-cover lookup (pooled 0.7890, per-event mean 0.8843, recomputed by tests/test_boosters.py), and the other frame values of Section 11 were read back from it with no mismatch above 5e-4.
+
+13.1 Arms. Six features. hgb:con and xgb:con use the monotone constraints rainfall_3day +, elevation -, distance_river -, slope -; land_cover and clay_percent are unconstrained. hgb:free and xgb:free have no constraints and are diagnostic only. land_cover is a categorical column in both libraries (XGBoost with the fixed categories 10, 20, 30, 40, 50, 60, 80, 90); clay_percent stays blank in both.
+
+13.2 Grids and fixed settings, fixed before any score exists.
+
+- HistGradientBoosting: max_depth in {2, 4}; max_iter in {100, 300}; min_samples_leaf in {20, 100}
+- XGBoost: max_depth in {2, 4}; n_estimators in {100, 300}; min_child_weight in {1, 10}
+- Fixed, HistGradientBoosting: learning_rate = 0.05; l2_regularization = 1.0; early_stopping = False
+- Fixed, XGBoost: learning_rate = 0.05; reg_lambda = 1.0; subsample = 1.0; tree_method = hist
+
+Each grid has 8 points, ordered simplest first (the first parameter varies slowest). Seed 42 throughout; XGBoost runs with n_jobs = 1.
+
+13.3 Tuning. Nested: leave-one-event-out outside with shared locations removed (Section 5); inside each outer fold, 4 event-grouped folds over the outer training rows (events dealt round-robin in sorted order; training rows at any location present in the inner test fold dropped). The grid point with the highest inner per-event mean AUC (rounded to 4 decimals) is refit on all outer training rows; ties keep the earlier grid point.
+
+13.4 Decision rules.
+
+1. Primary comparisons, mappable frame, selection split: hgb:con against the six-feature logistic, and xgb:con against it (paired per-event AUC differences, 10,000 bootstrap resamples of events, seed 42, 97.5% interval). An arm beats the baseline only if the lower end of its interval is above 0 and its per-event mean AUC is higher.
+2. If both beat the baseline, the arm with the higher per-event mean wins, except that xgb:con also needs a paired interval against hgb:con whose lower end is above 0; otherwise hgb:con wins, because the production image installs scikit-learn and not xgboost. This tie-break is descriptive and is not a third primary comparison.
+3. If exactly one beats the baseline, it wins. If neither does, the logistic baseline is the Phase C winner, the exit criterion that the winner beats the baseline is recorded as not met, and no booster is described as better.
+4. A winner is described as adding value beyond elevation only if its paired interval against elevation only (same settings) has a lower end above 0 on the mappable frame; otherwise the claim limit of Section 10.3 stands.
+5. If a constrained arm beats the baseline, the registered model is a constrained model. The free arms measure the cost of the constraints (per-event mean of free minus constrained, with a paired interval) and never select.
+6. The full frame is run for the same arms and reported. If the verdict of item 1 differs between the frames, the result is reported as unresolved.
+7. Still required before Phase C closes: the sensitivity runs of Section 5 (without the 549 elevation-floor rows, without the 15 zero-distance rows, rows with clay_percent present), the buffered-neighbour split, the permutation audit, and the refit and load check under the production pins.
+8. Rules 1 to 6 are implemented as code in src/models/decision.py and tested with arithmetic vectors in tests/test_roadmap_conformance.py, so the verdict cannot depend on the scores seen. Every departure from the roadmap is listed, with its basis and its test, in docs/ROADMAP_DEVIATIONS.md.
+
+13.5 Monotonicity. tests/test_monotonicity.py trains each constrained arm (heaviest grid point) on the mappable frame and sweeps each constrained feature over its observed 1st to 99th percentile on 200 real rows with the other features fixed; the number of rows moving against the declared direction must be zero for every constrained feature. Each booster run also logs these counts for a model refit with the most frequently chosen grid point, for the constrained and the free arms.
+
+13.6 Facts behind these settings. On randomly generated test inputs (not data), both libraries accepted blank clay_percent, a categorical land_cover and the four constraints, and returned finite predictions for a land-cover class absent from the training rows. One fit on the 3,475-row mappable frame took: HistGradientBoosting 0.13 s (depth 2, 100 iterations) and 1.03 s (depth 4, 400 iterations); XGBoost 0.12 s (depth 2, 100 trees) and 0.62 s (depth 4, 400 trees), on 2 CPUs. Session versions: Python 3.13.15, scikit-learn 1.6.1 (the production pin), xgboost 3.4.1 (requirements.txt says only xgboost>=1.7.0).
+
 Deviations log after the first result:
 
 - r3 (2026-10-02): Sections 9 and 10 added after the baseline run, with the amendments above. No earlier section was edited.
 - r4 (2026-10-02): Sections 11 and 12 added after the reference-and-null run and the GFM layer audit. No earlier section was edited.
+- r5 (2026-10-02): Section 13 added after the mappable-frame run: the booster arms, grids, tuning protocol and decision rules, committed before any booster score exists, with every departure from the roadmap listed in docs/ROADMAP_DEVIATIONS.md. No earlier section was edited.

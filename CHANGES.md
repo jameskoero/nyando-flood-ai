@@ -181,3 +181,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-02: Source integrity guard
 
 - Repaired scripts/run_mappable.py (a duplicated notebook paste had left a stray directive and a second copy, so the file did not parse); added tests/test_source_integrity.py, which fails if a tracked Python file has a notebook directive or does not parse, and smoke-tests the metric set of scripts/run_mappable.py.
+
+## 2026-10-02: Phase C boosters, decision rules and the roadmap deviation register
+
+- Added the booster module with nested event-grouped tuning (src/models/boosters.py), scripts/run_boosters.py, the monotonicity and booster tests, the Section 13.4 decision rules as code (src/models/decision.py), docs/ROADMAP_DEVIATIONS.md, and protocol Section 13, all before any booster score exists.
