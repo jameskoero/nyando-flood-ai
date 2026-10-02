@@ -173,3 +173,11 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-02: Phase C protocol r4
 
 - Added the GFM layer audit (data/derived/gfm_layer_flags.csv with its manifest entry and regenerating script), the full and mappable evaluation frames, scripts/run_mappable.py, and protocol Sections 11 and 12, with tests that recompute the quoted numbers.
+
+## 2026-10-02: Source integrity guard
+
+- Repaired cripts/run_mappable.py (a duplicated notebook paste had left a stray directive and a second copy, so the file did not parse); added tests/test_source_integrity.py, which fails if a tracked Python file has a notebook directive or does not parse, and smoke-tests the metric set of scripts/run_mappable.py.
+
+## 2026-10-02: Source integrity guard
+
+- Repaired scripts/run_mappable.py (a duplicated notebook paste had left a stray directive and a second copy, so the file did not parse); added tests/test_source_integrity.py, which fails if a tracked Python file has a notebook directive or does not parse, and smoke-tests the metric set of scripts/run_mappable.py.
