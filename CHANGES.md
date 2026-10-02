@@ -165,3 +165,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-01: Phase C baseline
 
 - Added the logistic baseline (src/models/baseline.py), its tests, and scripts/run_baseline.py, which logs the protocol's baseline run to MLflow.
+
+## 2026-10-02: Phase C protocol r3
+
+- Added reference arms, stratified reporting, a multi-seed shuffle null with a pre-declared selection rule, and protocol Sections 9 and 10 (findings from the baseline run and the amendments they support), with tests that recompute the quoted numbers from the data.
