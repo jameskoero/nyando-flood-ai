@@ -185,3 +185,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-02: Phase C boosters, decision rules and the roadmap deviation register
 
 - Added the booster module with nested event-grouped tuning (src/models/boosters.py), scripts/run_boosters.py, the monotonicity and booster tests, the Section 13.4 decision rules as code (src/models/decision.py), docs/ROADMAP_DEVIATIONS.md, and protocol Section 13, all before any booster score exists.
+
+## 2026-10-02: Phase C registration protocol
+
+- Added the sign-constrained logistic (src/models/constrained.py), the registration rules as code (src/models/registration.py), scripts/run_constrained.py, their tests, protocol Section 14 and deviation-register rows D18 to D20, all before any logistic:con score exists.

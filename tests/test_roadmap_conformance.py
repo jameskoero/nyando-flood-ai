@@ -50,7 +50,8 @@ def test_register_rows_are_complete_and_traceable():
 
 def test_no_oversampling_in_the_v2_model_code():
     files = ["src/models/cv.py", "src/models/baseline.py", "src/models/boosters.py", "src/models/decision.py",
-             "scripts/run_baseline.py", "scripts/run_reference.py", "scripts/run_mappable.py", "scripts/run_boosters.py"]
+             "scripts/run_baseline.py", "scripts/run_reference.py", "scripts/run_mappable.py", "scripts/run_boosters.py",
+             "src/models/constrained.py", "src/models/registration.py", "scripts/run_constrained.py"]
     bad = []
     for rel in files:
         assert (ROOT / rel).exists(), rel
