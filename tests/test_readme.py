@@ -21,7 +21,7 @@ REQUIRED_SECTIONS = [
 ]
 RETRACTED = ("0.9717", "0.9022", "0.9727")
 FORBIDDEN = ("todo", "tbd", "lorem", "fully compliant", "gdpr", "72-hour", "100m resolution", "kes 500m")
-PATH_EXT = (".py", ".md", ".json", ".csv", ".yml", ".geojson", ".pkl")
+PATH_EXT = (".py", ".md", ".json", ".csv", ".yml", ".geojson", ".pkl", ".onnx")
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -112,10 +112,31 @@ def test_retracted_figures_appear_only_in_the_correction_notice():
 
 def test_status_matches_the_model_manifest():
     models = json.loads((REPO / "models" / "MANIFEST.json").read_text())
-    assert all(e.get("status") == "legacy" for e in models.values()), \
-        "a non-legacy model exists: update the README Status, API and Roadmap sections"
+    other = sorted(k for k, e in models.items() if e.get("status") not in ("legacy", "active"))
+    assert not other, "model statuses other than legacy and active need a README rule: %s" % other
+    active = {k: e for k, e in models.items() if e.get("status") == "active"}
+    text = _readme()
 
+    def section(title):
+        m = re.search(r"^## %s\s*$" % re.escape(title), text, re.M)
+        assert m, title
+        nxt = re.search(r"^## ", text[m.end():], re.M)
+        return text[m.end(): m.end() + nxt.start()] if nxt else text[m.end():]
 
+    status, api, roadmap = section("Status"), section("API (legacy model)"), section("Roadmap")
+    if active:
+        assert len(active) == 1, "README describes exactly one registered model"
+        rel, e = next(iter(active.items()))
+        name = Path(rel).name
+        assert e["sha256"].startswith(name.rsplit("_", 1)[1].split(".")[0]), name
+        assert name in status, "the README Status must name the registered model " + name
+        low = status.lower()
+        assert "exclusion mask" in low and "not flood probabilities" in low, "the README Status must carry the claim limit"
+        assert "not served" in api.lower(), "the README API section must say the registered model is not served yet"
+    c_done = re.search(r"^- \[x\] \*\*C\. ", roadmap, re.M) is not None
+    assert c_done == (REPO / "docs" / "PHASE_C_CLOSURE.md").exists(), "Roadmap item C is checked only with docs/PHASE_C_CLOSURE.md"
+    b_done = re.search(r"^- \[x\] \*\*B\. ", roadmap, re.M) is not None
+    assert b_done == (REPO / "src" / "tracking.py").exists(), "Roadmap item B is checked only with src/tracking.py"
 def test_numbers_match_the_data():
     rel, entry = _entry()
     rows = _rows()

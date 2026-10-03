@@ -19,9 +19,9 @@ Ward-level flood susceptibility for five wards of the Nyando River basin, Kisumu
 |---|---|
 | Training data (V2) | Built and gated: 4,420 rows from 35 Sentinel-1 scene dates. Passes the A-Gate in CI. |
 | Integrity controls | Live: data gate, manifest check, protected `main`. |
-| Model | **Not retrained yet.** The deployed API still serves a pre-V2 model whose metrics are unverified (Phase C). |
-| Experiment tracking | Not started (Phase B). |
-| Dashboard | Live, but it still displays a retracted metric that is hard-coded in the front end (fix planned in Phase F). |
+| Model | **Registered, not deployed (Phase C in progress).** `logistic:con`, a sign-constrained logistic regression trained on the mappable frame, is registered as `models/nyando_logcon_7a909898d4f6.onnx` (ONNX, SHA-256 prefix `7a909898d4f6`). Its scores rank locations inside the areas GFM can map. They are not flood probabilities, and they say nothing about locations inside the GFM exclusion mask or about floods GFM cannot detect. The deployed API still serves a pre-V2 model whose metrics are unverified. Rules and results: [Phase C protocol](docs/PHASE_C_PROTOCOL.md). |
+| Experiment tracking | Live (Phase B): MLflow runs on DagsHub log the training-data SHA-256, the git commit and the origin (Colab or Termux). |
+| Dashboard | Live and labelled demonstration only: the retracted metrics were removed (`tests/test_frontend_claims.py` guards this) and every score carries a not-validated notice. It still shows legacy-model output; the live metrics panel, loading and error states are Phase F. |
 | Early warning (SMS, forecasts) | Not built. |
 
 ## What this is and is not
@@ -79,6 +79,8 @@ The flood share of the file (44.6%) is set by the sampling design and is not the
 - A label means inundation on the scene date, not newly arrived flooding.
 - Rainfall windows are date-level features, so the 35 dates give only 35 distinct values.
 - Some dates contribute a single flood patch; weight by patch when evaluating.
+- GFM cannot map everywhere: 945 of the 2,450 controls (38.6%) lie inside its exclusion mask, where flood pixels are reset to no flood (`data/derived/gfm_layer_flags.csv`). Scores say nothing about locations inside that mask or about floods GFM cannot detect.
+- The Phase C model comparison is unresolved between evaluation frames, so the registered model is the simplest candidate that satisfies the declared monotonic constraints (`docs/PHASE_C_PROTOCOL.md`, Sections 13 to 15).
 - Cross-validation of the bare 4-feature logistic baseline, leave-one-event-out (recomputed by `tests/test_v2_audit.py`): pooled AUC 0.841 (all held-out predictions together; the A-Gate limit of 0.90 applies to this figure), mean per-event AUC 0.910 (mean over held-out events that contain both classes), and pooled AUC 0.826 when training also excludes every location that appears in the held-out event. The location-excluded figure is the more conservative estimate of generalisation.
 
 ## Integrity controls
@@ -86,7 +88,7 @@ The flood share of the file (44.6%) is set by the sampling design and is not the
 - **A-Gate** (`tests/test_data_gate.py`): row count and flood rate, real dates matching scene ids, GFM provenance, points inside the wards, no unexpected blanks, the 4-feature logistic-regression check, no single feature separating the classes (AUC below 0.90), documented reasons for repeated values, and a consistent river flag. The original "clay flat between classes" rule is kept as an expected-failure report: labels never use clay, so a class difference reflects floodplain soils.
 - **Manifests** (`data/MANIFEST.json`, `models/MANIFEST.json`, checked by `scripts/check_manifests.py`): SHA-256 recomputed independently, models named by algorithm and hash prefix, no two binaries sharing a file name. Pre-V2 files are recorded as `legacy`.
 - **Protected `main`:** pull request required, and `test`, `data-gate` and `manifest-check` must pass. No bypass, no force-push.
-- **CI hygiene:** the gate workflows are read-only, use no secrets and run on every pull request.
+- **CI hygiene:** the gate workflows are read-only, use no secrets, run on every pull request and install exact pinned versions (`requirements-gate.txt`) with a retried install.
 
 ## Quick start
 
@@ -95,7 +97,7 @@ Verify the data (no Earth Engine account needed):
 ```bash
 git clone https://github.com/jameskoero/nyando-flood-ai.git
 cd nyando-flood-ai
-python -m pip install pandas numpy scipy scikit-learn pytest
+python -m pip install -r requirements-gate.txt
 python -m pytest tests/test_data_gate.py -q --noconftest -rx
 python scripts/check_manifests.py
 ```
@@ -112,7 +114,7 @@ It resumes after an interruption and takes about 10 minutes. The full test suite
 
 ## API (legacy model)
 
-The deployed service predates V2 and serves a legacy model. Interactive docs are disabled in production.
+The deployed service predates V2 and serves a legacy model. Interactive docs are disabled in production. The registered V2 model is not served yet: serving it needs onnxruntime in the image, a SHA-256 check against `models/MANIFEST.json` before loading, and a new input contract (a separate pull request).
 
 - `GET /health` reports the loaded model's file name, SHA-256 and provenance.
 - `GET /metrics` returns validated metrics, or HTTP 503 when none are published for the served model.
@@ -159,9 +161,9 @@ notebooks/                                 v1 notebooks (legacy)
 ## Roadmap
 
 - [x] **A. Data integrity:** GFM-labelled dataset, A-Gate in CI, manifests, protected `main`.
-- [ ] A (remainder). Monotonicity test and leakage audit; both need a trained model, so they land with Phase C.
-- [ ] **B. Experiment tracking:** MLflow on DagsHub, with the data hash logged on every run.
-- [ ] **C. Model suite:** logistic regression, gradient boosting and XGBoost with monotonic constraints, evaluated leave-one-event-out.
+- [ ] A (remainder). Leakage audit (permutation audit and a temporal holdout) and the OSM check of the zero-distance rows. The monotonicity test is in CI.
+- [x] **B. Experiment tracking:** MLflow on DagsHub, with the data hash logged on every run.
+- [ ] **C. Model suite:** logistic regression, gradient boosting and XGBoost with monotonic constraints, evaluated leave-one-event-out. In progress: the registered model exists; closure needs the leakage audit, the sensitivity runs and the closure record.
 - [ ] **D. Physics-constrained MLP**, exported to ONNX.
 - [ ] **E. LLM advisory layer**, cached and rate-limited, never on the `/predict` path.
 - [ ] **F. Dashboard:** no hard-coded metrics, loading and error states, accessibility.

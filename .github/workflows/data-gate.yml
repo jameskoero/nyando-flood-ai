@@ -19,6 +19,13 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install gate dependencies
-        run: python -m pip install --quiet pandas numpy scipy scikit-learn pytest
+        run: |
+          # A connection that breaks mid-download can bypass pip's own retries, so the whole install is retried.
+          for attempt in 1 2 3; do
+            python -m pip install --quiet --retries 5 --timeout 60 -r requirements-gate.txt && exit 0
+            echo "install attempt $attempt failed"
+            sleep $((attempt * 15))
+          done
+          exit 1
       - name: A-Gate
         run: python -m pytest tests/test_data_gate.py -q --noconftest -p no:cacheprovider -rx
