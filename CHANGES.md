@@ -193,3 +193,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-02: Registered Phase C model as an ONNX artifact
 
 - Registered logistic:con as models/nyando_logcon_7a909898d4f6.onnx with its manifest entry, an exact ONNX exporter (src/models/export_onnx.py, scripts/export_registered.py), requirements-onnx.txt for CI, tests of the exporter and of the artifact, protocol Section 15 and register rows D21 and D22.
+
+## 2026-10-02: Gate install and README truthfulness
+
+- data-gate installs pinned dependencies (requirements-gate.txt) with a retried install after an IncompleteRead failure; the README now names the registered model, carries its claim limit, says it is not served and matches the repository and the live site; the README test checks it; register rows D23 and D24.
