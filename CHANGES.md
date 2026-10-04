@@ -197,3 +197,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-02: Gate install and README truthfulness
 
 - data-gate installs pinned dependencies (requirements-gate.txt) with a retried install after an IncompleteRead failure; the README now names the registered model, carries its claim limit, says it is not served and matches the repository and the live site; the README test checks it; register rows D23 and D24.
+
+## 2026-10-04: Robustness battery protocol and repository hygiene
+
+- Added protocol Section 16 and the robustness battery code and tests (nothing scored), a README Repository layout rewritten from the tracked tree and tested, a sampler docstring corrected against the exclusion-mask audit, and removed the v1 figures and a stray test package; register rows D25 to D28.

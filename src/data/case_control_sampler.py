@@ -2,12 +2,14 @@
 case_control_sampler.py — Case-control point sampling from GFM flood extent.
 
 For each event window, draws N points from inside the GFM ensemble flood
-extent ("case") and N points from outside it but within the same valid
-(non-excluded) area ("control"), clipped to the real Nyando ward AOI.
-Replaces blind random sampling — the standard design for this project's
-~2% flood-rate rarity problem, and honest because the extent itself is
-GFM's independently-validated output, not derived from this project's
-own covariates.
+extent ("case") and N points from outside it ("control"), clipped to the real
+Nyando ward AOI. This replaces blind random sampling. The labels come from GFM's
+flood extent, not from this project's own covariates.
+
+A control means "not detected as flooded by GFM", not "known dry": in the V2
+training file 945 of 2,450 controls (38.6%) lie inside GFM's exclusion mask, where
+GFM resets flood pixels to no flood (data/derived/gfm_layer_flags.csv and
+docs/PHASE_C_PROTOCOL.md, Section 12).
 """
 
 from __future__ import annotations
