@@ -138,24 +138,40 @@ The API runs on Render's free tier, so the first request after idle can take abo
 ## Repository layout
 
 ```text
-data/
-  MANIFEST.json                            SHA-256 and provenance for every data file
-  external/nyando_wards.geojson            ward boundaries
-  training/
-    nyando_training_v2_multidate.csv       V2 training data
-    nyando_training_v2_multidate_sets.csv  one row per scene date
-    nyando_training_v1*.csv                legacy, discredited
-models/
-  MANIFEST.json                            pre-V2 model files, recorded as legacy
-scripts/
-  build_initial_dataset.py                 rebuilds the V2 dataset (needs Earth Engine)
-  check_manifests.py                       independent manifest verification
-src/data/                                  GFM client, terrain, sampler, raw features
-tests/                                     A-Gate, sampler regression, README checks, legacy tests
-backend/                                   FastAPI service (legacy model)
-frontend/                                  React dashboard
-notebooks/                                 v1 notebooks (legacy)
-.github/workflows/                         ci.yml, data-gate.yml, manifest-check.yml
+data/MANIFEST.json                       SHA-256 and provenance for every data file
+data/DATA_SOURCES.md                     where each data source comes from
+data/external/                           ward boundaries (nyando_wards.geojson) and source notes
+data/training/                           V2 training data and its per-date sets table; the v1 files are legacy and discredited
+data/derived/                            gfm_layer_flags.csv: GFM exclusion-mask and reference-water flags for each training point
+models/MANIFEST.json                     SHA-256, status and training-data hash for every model file
+models/PROVENANCE.json                   provenance notes for the model files
+models/nyando_logcon_7a909898d4f6.onnx   the registered Phase C model (logistic:con, ONNX)
+models/nyando_xgb_v1.pkl                 pre-V2 model file, recorded as legacy
+src/data/                                GFM client, terrain, case-control sampler, raw features, audit and validation helpers
+src/features/                            build_features.py
+src/models/                              Phase C modules: cv (evaluation harness), baseline, boosters, constrained, decision, registration, export_onnx; also train_model.py and evaluate_model.py
+src/utils/                               geo_utils.py
+src/visualization/                       shap_plots.py
+src/tracking.py                          MLflow tracking wrapper
+scripts/                                 dataset build, manifest check, GFM layer audit and the Phase C run and export scripts
+tests/                                   A-Gate, README checks, evaluation harness, boosters, constrained logistic, registration, export, robustness and legacy tests
+docs/                                    protocols, audits and records (Phase C protocol, deviation register, hardening audit)
+docs/funding/                            superseded concept note
+backend/                                 FastAPI service (legacy model; backend/models/ holds the legacy model files)
+frontend/                                React dashboard
+notebooks/                               v1 notebooks (legacy)
+.github/workflows/                       ci.yml, data-gate.yml, manifest-check.yml
+
+README.md  CHANGES.md                    this file; dated change log
+CONTRIBUTING.md  LICENSE  SECURITY.md    contribution rules, license, security policy
+MODEL_CARD.md                            model card
+Dockerfile  docker-compose.yml           API image (python:3.11-slim, pinned versions) and a compose file
+vercel.json                              Vercel settings for the dashboard
+requirements.txt                         project and CI dependencies
+requirements-gate.txt                    exact pins for the data-gate job
+requirements-onnx.txt                    ONNX export and scoring dependencies, installed by CI
+pytest.ini  conftest.py                  pytest configuration
+gee_extract_nyando.py                    v1 Earth Engine extraction script (legacy; used by tests/test_gfm_client.py)
 ```
 
 ## Roadmap
