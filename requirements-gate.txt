@@ -1,0 +1,17 @@
+# Exact versions for the A-Gate (CI job data-gate). Resolved in a clean Python 3.11 and re-tested from this file alone.
+# Update only deliberately: resolve again, run the gate tests, commit this file.
+cloudpickle==3.1.2
+iniconfig==2.3.0
+joblib==1.6.0
+narwhals==2.26.0
+numpy==2.4.6
+packaging==26.3
+pandas==3.0.6
+pluggy==1.6.0
+pygments==2.21.0
+pytest==9.1.1
+python-dateutil==2.9.0.post0
+scikit-learn==1.9.1
+scipy==1.17.1
+six==1.17.0
+threadpoolctl==3.7.0
