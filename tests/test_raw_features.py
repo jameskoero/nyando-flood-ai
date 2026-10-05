@@ -5,6 +5,9 @@ confirmed April 2020 event -- same reference point Stage 2 used.
 from datetime import date
 
 from src.data.raw_features import extract_raw_features
+import pytest
+
+pytestmark = pytest.mark.usefixtures("ee_session")
 
 
 def test_ahero_raw_features_for_april_2020_event():

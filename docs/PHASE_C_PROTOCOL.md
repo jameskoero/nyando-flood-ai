@@ -308,6 +308,16 @@ R7. Every number is logged to MLflow whatever the outcome, and the exit criterio
 
 17.6 Not decided here. Whether the live service runs this version (check GET /health: registered_model.loaded after the redeploy); the dashboard stays on POST /predict until Phase F (register row D35); an applicability indicator for locations outside the training domain.
 
+## 18. Live verification of the served registered model (2026-10-05)
+
+18.0 Basis. Section 17.6 left open whether the live service runs the served code. After pull request 33 merged (main 219619b) and Render redeployed, the live service was checked from a Colab notebook against the repository's main branch.
+
+18.1 Results. GET /health reported registered_model loaded true with SHA-256 7a909898d4f67efc3291f656d2aa9e7c2559418f5e421eaaa68a158838f1cf8d and training-data hash 0b9283540d91154c0dda55b0d92cae7aa3cae6aeffad0390bbf77e028dd2063a, equal to models/MANIFEST.json, and the legacy model's SHA-256 equal to its manifest entry. POST /v2/score on 5 real training rows returned a score between 0 and 1, no risk class, the claim limit and the registered hash; without clay_percent it returned the warning; an unknown land_cover class returned 422. GET /v2/metrics returned the stored results, POST /predict kept its legacy notice, and /docs and /openapi.json stayed disabled. The artifact on main hashes to its manifest entry.
+
+18.2 Parity. The live scores equal the committed artifact run locally on the same 5 rows to a maximum absolute difference of 4.93e-05; the endpoint rounds scores to four decimals, so a difference up to 5e-05 is rounding.
+
+18.3 Status. Register row D9 closes with this record. The dashboard stays on POST /predict until Phase F (row D35).
+
 Deviations log after the first result:
 
 - r3 (2026-10-02): Sections 9 and 10 added after the baseline run, with the amendments above. No earlier section was edited.
@@ -318,3 +328,4 @@ Deviations log after the first result:
 - r8 (2026-10-04): Section 16 added after the audit of the repository and the registered model: the robustness battery (prior-only null, permutation audit, temporal holdout, sensitivity subsets, buffered-neighbour split, artifact logging) and how each is read, committed before any battery score exists. No earlier section was edited.
 - r9 (2026-10-05): the Section 16 results and the closure record: docs/PHASE_C_RESULTS.json (read from MLflow) and docs/PHASE_C_CLOSURE.md (rendered from it). No earlier section was edited.
 - r10 (2026-10-05): Section 17 added: how the registered model is served, verified and reported, and what stays with Phase F. No earlier section was edited.
+- r11 (2026-10-05): Section 18 added: the live verification of the served registered model. No earlier section was edited.

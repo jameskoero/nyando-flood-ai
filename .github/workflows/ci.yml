@@ -33,4 +33,10 @@ jobs:
       - name: Run tests
         env:
           GEE_SERVICE_ACCOUNT_KEY: ${{ secrets.GEE_SERVICE_ACCOUNT_KEY }}
-        run: pytest -v
+          # Pull requests from forks and from Dependabot get no Actions secrets (GitHub treats Dependabot runs like fork runs). Only those runs may skip the tests that need an Earth Engine session.
+          EE_OPTIONAL: ${{ github.event_name == 'pull_request' && (github.event.pull_request.user.login == 'dependabot[bot]' || github.event.pull_request.head.repo.full_name != github.repository) }}
+        run: |
+          if [ -z "$GEE_SERVICE_ACCOUNT_KEY" ] && [ "$EE_OPTIONAL" = "true" ]; then
+            echo "::notice::No Earth Engine credentials in this run (a fork or Dependabot pull request): the tests that need an Earth Engine session are skipped."
+          fi
+          pytest -v -rs

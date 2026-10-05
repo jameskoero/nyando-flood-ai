@@ -4,6 +4,9 @@ town in Nyando Constituency, near the river) as a physically-meaningful
 check point rather than an arbitrary coordinate.
 """
 from src.data.terrain_features import extract_terrain_features
+import pytest
+
+pytestmark = pytest.mark.usefixtures("ee_session")
 
 
 def test_ahero_point_has_low_hand():
