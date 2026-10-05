@@ -1,6 +1,7 @@
 """Datasheet and model card (docs/ROADMAP_DEVIATIONS.md D37 and D38): the documents match the code and the stored results."""
 import ast
 import json
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -52,7 +53,7 @@ def test_model_card_statements_agree_with_the_signs_of_the_results():
 
 
 def test_model_card_has_no_retracted_or_unverified_claims():
-    for bad in ("0.9222", "0.9717", "0.9022", "0.9727", "AUC > 0.85", "Prepare evacuation", "Immediate action", "Physically sensible", "No significant spatial bias"):
+    for bad in ("AUC > 0.85", "Prepare evacuation", "Immediate action", "Physically sensible", "No significant spatial bias"):
         assert bad not in CARD, bad
     assert "Mitchell" in CARD and "not a flood probability" in CARD and "retracted" in CARD
 
@@ -60,3 +61,11 @@ def test_model_card_has_no_retracted_or_unverified_claims():
 def test_register_records_the_data_licence_decision():
     rows = {l.split("|")[1].strip(): l for l in (ROOT / "docs" / "ROADMAP_DEVIATIONS.md").read_text(encoding="utf-8").splitlines() if l.startswith("| D")}
     assert "MERIT" in rows["D37"] and rows["D37"].rstrip().endswith("| open |") and rows["D38"].rstrip().endswith("| closed |")
+
+
+def test_every_four_decimal_figure_in_the_model_card_is_a_stored_result():
+    stored = ["%.4f" % REG["mappable/con/per_event_mean"], "%.4f" % REG["full/con/per_event_mean"], _iv(REG, "mappable/con/vs_elevation"), _iv(ROB, "buffer/con_minus_elevation"),
+              _iv(ROB, "temporal/con_minus_elevation"), _iv(ROB, "perm/land_cover/within_drop"), _iv(ROB, "temporal/land_cover_contribution")]
+    allowed = set(re.findall(r"\b0\.\d{4}\b", " ".join(stored)))
+    found = set(re.findall(r"\b0\.\d{4}\b", CARD))
+    assert found and found <= allowed, "figures in the model card that are not stored results: %s" % sorted(found - allowed)
