@@ -83,7 +83,7 @@ def test_protocol_exists_names_the_sealed_block_and_the_scan_hash():
 
 def test_register_records_the_d20_protocol_and_keeps_d20_open():
     rows = {l.split("|")[1].strip(): l.strip().strip("|").split("|")[-1].strip() for l in (ROOT / "docs" / "ROADMAP_DEVIATIONS.md").read_text(encoding="utf-8").splitlines() if l.startswith("| D")}
-    assert rows["D39"] == "closed" and rows["D20"].startswith("open")
+    assert rows["D39"] == "closed" and (rows["D20"].startswith("open") or (rows["D20"] == "closed" and (ROOT / "docs" / "D20_RESULTS.json").exists()))
 
 
 def test_failed_block_a_dates_are_listed_and_never_replaced_from_block_b():

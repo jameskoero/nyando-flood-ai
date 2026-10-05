@@ -107,3 +107,66 @@ def shared_training_rows(train_keys, block_keys):
     """Section 12.1: for each training row, True when its location also appears in Block A. Those rows are dropped from every arm's training data."""
     block = set(block_keys)
     return [k in block for k in train_keys]
+
+
+ARMS = ("elevation", "champion", "no_land_cover", "hgb:con", "xgb:con")
+CHALLENGERS = ("hgb:con", "xgb:con")
+TOLERANCE = 0.003      # Monte Carlo tolerance of a recomputed interval end (10,000 resamples)
+
+
+def to_micro(d):
+    """Per-event AUCs are stored as integers in millionths, so the stored file and the analysis use identical values."""
+    return {str(k): int(round(float(v) * 1e6)) for k, v in d.items()}
+
+
+def from_micro(d):
+    return {k: v / 1e6 for k, v in d.items()}
+
+
+def month_of(event):
+    """Calendar month of an event id: 'date-YYYY-MM-DD' gives YYYY-MM; ids such as '2020-04' or '2024-04_05' give their first seven characters."""
+    return event[5:12] if event.startswith("date-") else event[:7]
+
+
+def _stat(pb, a, b, n_boot, seed, alpha):
+    s = pb(a, b, n_boot=n_boot, seed=seed, alpha=alpha)
+    ev = sorted(set(a) & set(b))
+    _, lo, hi = month_cluster_interval([b[e] - a[e] for e in ev], [month_of(e) for e in ev], n_boot=n_boot, seed=seed, alpha=alpha)
+    s["month_ci_low"], s["month_ci_high"] = lo, hi
+    return s
+
+
+def analyse(old, blk, violations, n_boot=10000, seed=SEED, alpha=0.025):
+    """Section 7 applied to stored per-event AUCs (mappable frame primary). old: {arm: {event: AUC}} for champion, hgb:con and xgb:con on the existing events (selection split);
+    blk: {frame: {arm: {event: AUC}}} for Block A; violations: {challenger: {feature: count}}. Intervals: paired per-event bootstrap, 97.5% (alpha 0.025)."""
+    from src.models.cv import paired_event_bootstrap as pb
+    frames = {}
+    for fr in ("mappable", "full"):
+        a = blk[fr]
+        frames[fr] = {"champion_vs_elevation": _stat(pb, a["elevation"], a["champion"], n_boot, seed, alpha),
+                      "land_cover_contribution": _stat(pb, a["no_land_cover"], a["champion"], n_boot, seed, alpha)}
+        for c in CHALLENGERS:
+            frames[fr][c + "_vs_champion"] = _stat(pb, a["champion"], a[c], n_boot, seed, alpha)
+    pooled, rb = {}, {}
+    for c in CHALLENGERS:
+        if set(old["champion"]) & set(blk["mappable"]["champion"]):
+            raise ValueError("an existing event and a Block A event share an id")
+        base, other = {**old["champion"], **blk["mappable"]["champion"]}, {**old[c], **blk["mappable"][c]}
+        pooled[c] = _stat(pb, base, other, n_boot, seed, alpha)
+        f, p = frames["mappable"][c + "_vs_champion"], pooled[c]
+        ok = all(int(v) == 0 for v in violations[c].values())
+        rb[c] = {"eligible": ok, "block_ci_low": f["ci_low"], "pooled_ci_low": p["ci_low"], "replaces": bool(ok and challenger_replaces(f["ci_low"], f["mean_diff"], p["ci_low"], p["mean_diff"]))}
+    ra, rc, n = frames["mappable"]["champion_vs_elevation"], frames["mappable"]["land_cover_contribution"], len(blk["mappable"]["champion"])
+    est = block_a_estimable(n)
+    v = {"estimable": est, "n_scorable_block_a": n, "R-B": rb,
+         "R-A": {"replicates": replicates_beyond_elevation(ra["ci_low"]) if est else None, "ci_low": ra["ci_low"], "month_cluster_ci_low": ra["month_ci_low"]},
+         "R-C": {"survives": land_cover_survives(rc["ci_low"]) if est else None, "ci_low": rc["ci_low"], "month_cluster_ci_low": rc["month_ci_low"]},
+         "champion_stays": not (est and any(x["replaces"] for x in rb.values()))}
+    return {"frames": frames, "pooled": pooled, "verdicts": v}
+
+
+def sensitivity(blk, artifact, n_boot=10000, seed=SEED, alpha=0.025):
+    """Section 12.1 sensitivity: the registered artifact (fit on every mappable row, so it has seen the locations shared with Block A) minus elevation only, and minus the primary champion, on Block A."""
+    from src.models.cv import paired_event_bootstrap as pb
+    return {fr: {"artifact_vs_elevation": _stat(pb, blk[fr]["elevation"], artifact[fr], n_boot, seed, alpha),
+                 "artifact_vs_primary_champion": _stat(pb, blk[fr]["champion"], artifact[fr], n_boot, seed, alpha)} for fr in ("mappable", "full")}
