@@ -213,3 +213,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-05: Serving the registered model
 
 - POST /v2/score and GET /v2/metrics for the registered logistic:con model, hash-verified before loading; the legacy pickle is verified against models/MANIFEST.json before unpickling; /health reports both models; onnxruntime added to the image with a build check; tests, protocol Section 17, register rows D33 to D35.
+
+## 2026-10-05: Opt-in Earth Engine session and live verification
+
+- The Earth Engine session fixture is no longer automatic: an empty key is reported clearly, fork and Dependabot pull requests skip only the tests that need Earth Engine, the others run without credentials; register row D9 closed (protocol Section 18); row D36 added.
