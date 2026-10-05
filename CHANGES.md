@@ -221,3 +221,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-05: Datasheet and model card corrected to V2
 
 - data/DATA_SOURCES.md and MODEL_CARD.md rewritten (Gebru et al. 2021; Mitchell et al. 2019): asset IDs come from the code, numbers from docs/PHASE_C_RESULTS.json, tests/test_data_docs.py guards both; the retracted figures and the withdrawn preprint are gone; register rows D37 (open: data licence) and D38.
+
+## 2026-10-05: D20 protocol
+
+- The date-selection rule, the sample-size rule and the decision rules for the confirmatory replication are committed (src/models/d20.py, docs/D20_PROTOCOL.md) with the scan of 462 candidate GFM dates (data/derived/d20_scan.csv) and the seeded selection (data/derived/d20_selection.json); Block B is sealed for Phase D; register row D39, D20 stays open.
