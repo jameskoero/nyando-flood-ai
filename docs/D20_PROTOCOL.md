@@ -54,3 +54,10 @@ Section 6 did not say what happens when a committed Block A date cannot be built
 - Block A may therefore have fewer than 27 dates. The scored set is the built dates that are scorable on the frame in question.
 - Floor: with fewer than 15 scorable Block A events on the mappable frame, R-A, R-B and R-C are reported as not estimable and no claim is made. At 15 events the booster-versus-champion half-width would be about 0.0204, wider than Phase C's 0.0165.
 - In code: `built_block_a` and `block_a_estimable` in `src/models/d20.py`; `tests/test_d20.py` checks them and the text of this section.
+
+## 12. Block A build record (2026-10-05, before any model scored Block A)
+- Built 27 of 27 committed dates. Failed dates, listed and not replaced (Section 11): none.
+- Rows: 3780 (1890 floods, 1890 controls) at 70 points per class per date.
+- Controls outside the GFM exclusion mask: 1172 of 1890 (62.0%).
+- Scorable events (at least 30 rows of each class): 27 on the mappable frame and 27 on the full frame. The floor of 15 on the mappable frame is met.
+- Files: `data/confirmatory/`; their manifest entries carry no `label_source`. No model has scored these rows, and Block B is untouched.

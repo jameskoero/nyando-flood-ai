@@ -143,6 +143,7 @@ The API runs on Render's free tier, so the first request after idle can take abo
 data/MANIFEST.json                       SHA-256 and provenance for every data file
 data/DATA_SOURCES.md                     where each data source comes from
 data/external/                           ward boundaries (nyando_wards.geojson) and source notes
+data/confirmatory/                       D20 Block A: the built confirmatory dates (no label_source; see docs/D20_PROTOCOL.md)
 data/training/                           V2 training data and its per-date sets table; the v1 files are legacy and discredited
 data/derived/                            gfm_layer_flags.csv: GFM exclusion-mask and reference-water flags for each training point
 models/MANIFEST.json                     SHA-256, status and training-data hash for every model file

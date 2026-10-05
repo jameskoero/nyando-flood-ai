@@ -74,5 +74,38 @@
     "date_added": "2026-09-28",
     "sha256": "a9650d445b7eb66b7d61ba7ed9133ae7c4c0a7f602f4f5516350b07bd6edc891",
     "status": "companion"
+  },
+  "data/confirmatory/nyando_block_a.csv": {
+    "sha256": "53049508f3af01cdafa76a4d45623d266690112720f78e6656e39d8ddea2231e",
+    "date_added": "2026-10-05",
+    "status": "confirmatory",
+    "row_count": 3780,
+    "generated_by": "scripts/build_block_a.py (D20 Block A)",
+    "protocol": "docs/D20_PROTOCOL.md",
+    "label_provenance": "Copernicus GFM ensemble_flood_extent (Sentinel-1), the same pipeline as the training file; there is no label_source key on purpose, so no test mistakes this file for the training file",
+    "dates_built": 27,
+    "dates_failed": 0,
+    "points_per_class": 70,
+    "sets_table": "data/confirmatory/nyando_block_a_sets.csv",
+    "failure_log": "data/confirmatory/nyando_block_a_failures.csv",
+    "layer_flags": "data/confirmatory/nyando_block_a_layer_flags.csv"
+  },
+  "data/confirmatory/nyando_block_a_sets.csv": {
+    "sha256": "38e2c00f2e1677e3dac5569b3c3774a0b9b842062c73153d91834010d9471580",
+    "date_added": "2026-10-05",
+    "status": "companion",
+    "companion_of": "data/confirmatory/nyando_block_a.csv"
+  },
+  "data/confirmatory/nyando_block_a_failures.csv": {
+    "sha256": "ee106d1bd30a707e42081f8f47e603e9c5630e9b9dd18cdeb21beaf8bcb9f8b6",
+    "date_added": "2026-10-05",
+    "status": "companion",
+    "companion_of": "data/confirmatory/nyando_block_a.csv"
+  },
+  "data/confirmatory/nyando_block_a_layer_flags.csv": {
+    "sha256": "35b837e5d6452e7959a8e02969b41b7c19af04c35054ba8ce489a377091e0551",
+    "date_added": "2026-10-05",
+    "status": "companion",
+    "companion_of": "data/confirmatory/nyando_block_a.csv"
   }
 }
