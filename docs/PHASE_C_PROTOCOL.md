@@ -292,6 +292,22 @@ R7. Every number is logged to MLflow whatever the outcome, and the exit criterio
 
 16.7 Closure. After the battery, the results record (docs/PHASE_C_RESULTS.json), the closure record (docs/PHASE_C_CLOSURE.md) and a test that applies src/models/decision.py and src/models/registration.py to the stored values are committed in a separate pull request. Phase C closes with the exit criterion that the winner beats the baseline recorded as not met (Section 14.3, R7), whatever the battery shows: a battery result can only add limitations or mark the verdict unresolved.
 
+## 17. Serving the registered model (2026-10-05)
+
+17.0 Basis. Section 6 and Section 15.5 left serving to a separate pull request; register row D9 left the metrics source open. The live service reports its model in GET /health.
+
+17.1 Endpoint. POST /v2/score scores one location with the registered model through ONNX Runtime (CPU). The file is the active entry of models/MANIFEST.json; its bytes are hashed and compared with the entry before the session is created, and the session is built from those same bytes. A missing entry, a hash mismatch, a missing onnxruntime or inputs that differ from the contract leave the registered model unloaded: /v2/score then answers 503 with the reason, and the legacy POST /predict keeps working.
+
+17.2 Contract. Inputs: elevation, slope, rainfall_3day (at least 0), distance_river (at least 0), clay_percent (0 to 100, may be omitted), land_cover (one of the classes the model was trained on; a test compares the list with the model graph) and ward. Output: score, a ranking score from a case-control model that is not a flood probability; the model's file, SHA-256, training-data hash, protocol and registration run; the claim limit copied from the artifact's own metadata; warnings. There are no risk classes: the thresholds of the legacy endpoint were never validated for this model. When clay_percent is omitted the response warns that a blank clay value is informative in the training data (blank on 28% of flood cases and 1.8% of controls).
+
+17.3 Legacy loader. The legacy pickle is read, hashed and compared with its models/MANIFEST.json entry before joblib unpickles the same bytes (Section 6). A file without an entry, or with a different hash, is never unpickled; POST /predict then answers 503.
+
+17.4 Metrics. GET /v2/metrics returns values stored in docs/PHASE_C_RESULTS.json (read from MLflow when the closure record was built): no network call and no DagsHub request at serving time. It answers 503 unless the results name the same SHA-256 as the loaded registered model. The legacy GET /metrics is unchanged.
+
+17.5 Image. onnxruntime 1.30.0 is added to the Dockerfile and backend/requirements.txt, and the Dockerfile's build check now verifies and loads both models, so a bad build fails before it can replace the running service. The API tests also ran in a Python 3.11 environment built from the Dockerfile's pins.
+
+17.6 Not decided here. Whether the live service runs this version (check GET /health: registered_model.loaded after the redeploy); the dashboard stays on POST /predict until Phase F (register row D35); an applicability indicator for locations outside the training domain.
+
 Deviations log after the first result:
 
 - r3 (2026-10-02): Sections 9 and 10 added after the baseline run, with the amendments above. No earlier section was edited.
@@ -301,3 +317,4 @@ Deviations log after the first result:
 - r7 (2026-10-02): Section 15 added after the registration run and the ONNX probe: the registration result, the registered model, the exporter, the artifact and the CI load check. No earlier section was edited.
 - r8 (2026-10-04): Section 16 added after the audit of the repository and the registered model: the robustness battery (prior-only null, permutation audit, temporal holdout, sensitivity subsets, buffered-neighbour split, artifact logging) and how each is read, committed before any battery score exists. No earlier section was edited.
 - r9 (2026-10-05): the Section 16 results and the closure record: docs/PHASE_C_RESULTS.json (read from MLflow) and docs/PHASE_C_CLOSURE.md (rendered from it). No earlier section was edited.
+- r10 (2026-10-05): Section 17 added: how the registered model is served, verified and reported, and what stays with Phase F. No earlier section was edited.
