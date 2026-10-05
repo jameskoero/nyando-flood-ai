@@ -102,3 +102,13 @@ def test_block_a_below_the_floor_is_not_estimable():
 def test_protocol_states_the_failure_rule():
     text = (ROOT / "docs" / "D20_PROTOCOL.md").read_text(encoding="utf-8")
     assert "## 11. Dates that fail to build" in text and "never replaced" in text and "fewer than 15 scorable" in text
+
+
+def test_shared_training_rows_on_arithmetic_vectors():
+    assert d20.shared_training_rows(["a", "b", "a", "c"], ["a", "z"]) == [True, False, True, False]
+    assert d20.shared_training_rows(["a", "b"], []) == [False, False]
+
+
+def test_protocol_states_the_shared_location_rule():
+    text = (ROOT / "docs" / "D20_PROTOCOL.md").read_text(encoding="utf-8")
+    assert "## 12.1 Locations shared with Block A" in text and "refit by the same pipeline" in text and "registered artifact itself" in text

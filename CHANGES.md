@@ -233,3 +233,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-05: D20 Block A built
 
 - Block A (27 of 27 committed dates built, 0 failed and not replaced) is in data/confirmatory/ with manifest entries that carry no label_source; protocol Section 12 records the build; no model has scored it, and Block B is untouched.
+
+## 2026-10-05: D20 shared locations
+
+- The D20 protocol now says, before any Block A score exists, how locations shared between Block A and the training frame are handled: training rows at those locations are dropped from every arm (the champion's pipeline is refit; the registered artifact is a labelled sensitivity); src/models/d20.py and tests/test_d20.py encode it; register row D39 updated.
