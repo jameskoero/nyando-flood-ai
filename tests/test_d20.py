@@ -84,3 +84,21 @@ def test_protocol_exists_names_the_sealed_block_and_the_scan_hash():
 def test_register_records_the_d20_protocol_and_keeps_d20_open():
     rows = {l.split("|")[1].strip(): l.strip().strip("|").split("|")[-1].strip() for l in (ROOT / "docs" / "ROADMAP_DEVIATIONS.md").read_text(encoding="utf-8").splitlines() if l.startswith("| D")}
     assert rows["D39"] == "closed" and rows["D20"].startswith("open")
+
+
+def test_failed_block_a_dates_are_listed_and_never_replaced_from_block_b():
+    a, b = SEL["block_a"], SEL["block_b"]
+    built = d20.built_block_a(a, [a[0], a[5]])
+    assert built == [d for d in a if d not in (a[0], a[5])] and len(built) == len(a) - 2 and not set(built) & set(b)
+    assert d20.built_block_a(a, []) == a
+    with pytest.raises(ValueError):
+        d20.built_block_a(a, [b[0]])
+
+
+def test_block_a_below_the_floor_is_not_estimable():
+    assert d20.MIN_BLOCK_A_EVENTS == 15 and d20.block_a_estimable(15) and not d20.block_a_estimable(14)
+
+
+def test_protocol_states_the_failure_rule():
+    text = (ROOT / "docs" / "D20_PROTOCOL.md").read_text(encoding="utf-8")
+    assert "## 11. Dates that fail to build" in text and "never replaced" in text and "fewer than 15 scorable" in text

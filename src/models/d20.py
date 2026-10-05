@@ -85,3 +85,19 @@ def month_cluster_interval(diffs, months, n_boot=10000, seed=SEED, alpha=0.025):
         pick = rng.integers(0, len(groups), len(groups))
         means[b] = diffs[np.concatenate([groups[i] for i in pick])].mean()
     return float(diffs.mean()), float(np.quantile(means, alpha / 2)), float(np.quantile(means, 1 - alpha / 2))
+
+
+MIN_BLOCK_A_EVENTS = 15
+
+
+def built_block_a(block_a, failed):
+    """Section 11: the Block A dates that were built. A failed date is listed and never replaced, least of all from Block B."""
+    unknown = set(failed) - set(block_a)
+    if unknown:
+        raise ValueError("failed dates that are not in Block A: %s" % sorted(unknown))
+    return [d for d in block_a if d not in set(failed)]
+
+
+def block_a_estimable(n_scorable_events):
+    """Section 11: with fewer scorable Block A events than the floor, R-A, R-B and R-C are reported as not estimable and nothing is claimed."""
+    return bool(n_scorable_events >= MIN_BLOCK_A_EVENTS)
