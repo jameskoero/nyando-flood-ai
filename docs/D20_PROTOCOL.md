@@ -61,3 +61,10 @@ Section 6 did not say what happens when a committed Block A date cannot be built
 - Controls outside the GFM exclusion mask: 1172 of 1890 (62.0%).
 - Scorable events (at least 30 rows of each class): 27 on the mappable frame and 27 on the full frame. The floor of 15 on the mappable frame is met.
 - Files: `data/confirmatory/`; their manifest entries carry no `label_source`. No model has scored these rows, and Block B is untouched.
+
+## 12.1 Locations shared with Block A (added 2026-10-05, after the first scoring attempt stopped on them and before any Block A score existed)
+Section 5 says training rows at any location that appears in the scored block are dropped, as in the selection split, but the registered artifact was fit on every mappable row. The first scoring attempt checked for shared locations and stopped before it scored anything: 236 locations of Block A also appear in the mappable training frame. Block A's points come from the same GFM pixel grid as the training file, so overlap is expected, as it is inside the training file itself (the selection split removes training rows at held-out locations for that reason).
+- Primary analysis: every arm is fit on the mappable training frame with the rows at locations that appear in Block A removed (all Block A rows, so one training set serves both frames). The champion is refit by the same pipeline as the registered artifact (`logistic:con`, the same code and settings) on that reduced frame, and the challengers are refit on it at the same modal grid points.
+- Sensitivity: the registered artifact itself, fit on every mappable row and therefore having seen those locations, is scored on Block A and reported next to the primary champion. The primary verdicts do not depend on it.
+- In code: `shared_training_rows` in `src/models/d20.py`; the number of shared locations and of training rows dropped are stored in `docs/D20_RESULTS.json`.
+- No other rule changes.

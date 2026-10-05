@@ -101,3 +101,9 @@ def built_block_a(block_a, failed):
 def block_a_estimable(n_scorable_events):
     """Section 11: with fewer scorable Block A events than the floor, R-A, R-B and R-C are reported as not estimable and nothing is claimed."""
     return bool(n_scorable_events >= MIN_BLOCK_A_EVENTS)
+
+
+def shared_training_rows(train_keys, block_keys):
+    """Section 12.1: for each training row, True when its location also appears in Block A. Those rows are dropped from every arm's training data."""
+    block = set(block_keys)
+    return [k in block for k in train_keys]
