@@ -237,3 +237,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-05: D20 shared locations
 
 - The D20 protocol now says, before any Block A score exists, how locations shared between Block A and the training frame are handled: training rows at those locations are dropped from every arm (the champion's pipeline is refit; the registered artifact is a labelled sensitivity); src/models/d20.py and tests/test_d20.py encode it; register row D39 updated.
+
+## 2026-10-05: D20 Block A scored
+
+- Block A was scored once with the frozen Phase C models under the committed rules (27 scorable events; R-A False, R-C False, champion stays: False); docs/D20_RESULTS.json, protocol Section 13, tests/test_d20_results.py, register row D20 closed; Block B untouched.
