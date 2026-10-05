@@ -46,3 +46,11 @@ The data licence (D37); the label source (all labels come from GFM, so D20 canno
 
 ## 10. What the new events can resolve
 The booster-versus-champion half-width on the mappable frame is about 0.0165 on 23 events. If per-event spread holds, it scales with 1 / sqrt(events): about 0.0112 on 23 + 27 events. Differences near 0.01 stay borderline; the larger gap over elevation is the main test.
+
+## 11. Dates that fail to build (added 2026-10-05, before any Block A date was built)
+Section 6 did not say what happens when a committed Block A date cannot be built or scored. This rule was added before any Block A feature was built and before any model scored a new event.
+- A Block A date that fails to build (an exception, an incomplete CHIRPS window, coverage under 997,936 valid pixels at build time, or no usable rows) is recorded with its reason in the Block A build report and is never replaced. It is not replaced from Block B: Block B stays sealed.
+- A built date that has fewer than 30 rows of a class on a frame is reported as not scorable on that frame, and is not replaced either.
+- Block A may therefore have fewer than 27 dates. The scored set is the built dates that are scorable on the frame in question.
+- Floor: with fewer than 15 scorable Block A events on the mappable frame, R-A, R-B and R-C are reported as not estimable and no claim is made. At 15 events the booster-versus-champion half-width would be about 0.0204, wider than Phase C's 0.0165.
+- In code: `built_block_a` and `block_a_estimable` in `src/models/d20.py`; `tests/test_d20.py` checks them and the text of this section.
