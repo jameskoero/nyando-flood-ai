@@ -88,7 +88,7 @@ The flood share of the file (44.6%) is set by the sampling design and is not the
 - **A-Gate** (`tests/test_data_gate.py`): row count and flood rate, real dates matching scene ids, GFM provenance, points inside the wards, no unexpected blanks, the 4-feature logistic-regression check, no single feature separating the classes (AUC below 0.90), documented reasons for repeated values, and a consistent river flag. The original "clay flat between classes" rule is kept as an expected-failure report: labels never use clay, so a class difference reflects floodplain soils.
 - **Manifests** (`data/MANIFEST.json`, `models/MANIFEST.json`, checked by `scripts/check_manifests.py`): SHA-256 recomputed independently, models named by algorithm and hash prefix, no two binaries sharing a file name. Pre-V2 files are recorded as `legacy`.
 - **Protected `main`:** pull request required, and `test`, `data-gate` and `manifest-check` must pass. No bypass, no force-push.
-- **CI hygiene:** the gate workflows are read-only, use no secrets, run on every pull request and install exact pinned versions (`requirements-gate.txt`) with a retried install.
+- **CI hygiene:** every workflow declares read-only token permissions and pins each action to a commit SHA, and Dependabot keeps those pins current. The gate workflows use no secrets and run on every pull request; the gate installs exact versions (`requirements-gate.txt`) and the test job installs under exact version constraints (`constraints-ci.txt`), both with a retried install.
 
 ## Quick start
 
@@ -170,6 +170,7 @@ vercel.json                              Vercel settings for the dashboard
 requirements.txt                         project and CI dependencies
 requirements-gate.txt                    exact pins for the data-gate job
 requirements-onnx.txt                    ONNX export and scoring dependencies, installed by CI
+constraints-ci.txt                       exact versions of every package the CI test job can install (pip constraints)
 pytest.ini  conftest.py                  pytest configuration
 gee_extract_nyando.py                    v1 Earth Engine extraction script (legacy; used by tests/test_gfm_client.py)
 ```

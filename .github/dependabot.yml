@@ -1,0 +1,13 @@
+# Dependabot version updates. github-actions keeps the commit-SHA pins in .github/workflows current: a SHA pin that nobody updates rots into an unpatched dependency.
+# pip is deliberately absent: requirements.txt holds version ranges and the exact versions live in constraints-ci.txt, which is regenerated on purpose
+# because a bump has to pass against the whole pinned set. The Dockerfile base image is not covered either: its Python minor version is tied to the production pins.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"

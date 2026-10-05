@@ -205,3 +205,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-05: Phase C closed
 
 - Added docs/PHASE_C_RESULTS.json (read from MLflow), docs/PHASE_C_CLOSURE.md (rendered from it by src/models/closure.py), a test that fails if they differ, roadmap item C ticked, register rows D12, D14 and D29.
+
+## 2026-10-05: CI hardening
+
+- Every workflow declares read-only token permissions and pins its actions to commit SHAs; the test job installs under constraints-ci.txt with a retried install; Dependabot keeps the action pins current; tests/test_ci_hardening.py guards it; register rows D30 to D32.
