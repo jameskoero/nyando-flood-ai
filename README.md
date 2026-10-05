@@ -19,7 +19,7 @@ Ward-level flood susceptibility for five wards of the Nyando River basin, Kisumu
 |---|---|
 | Training data (V2) | Built and gated: 4,420 rows from 35 Sentinel-1 scene dates. Passes the A-Gate in CI. |
 | Integrity controls | Live: data gate, manifest check, protected `main`. |
-| Model | **Registered, not deployed (Phase C in progress).** `logistic:con`, a sign-constrained logistic regression trained on the mappable frame, is registered as `models/nyando_logcon_7a909898d4f6.onnx` (ONNX, SHA-256 prefix `7a909898d4f6`). Its scores rank locations inside the areas GFM can map. They are not flood probabilities, and they say nothing about locations inside the GFM exclusion mask or about floods GFM cannot detect. The deployed API still serves a pre-V2 model whose metrics are unverified. Rules and results: [Phase C protocol](docs/PHASE_C_PROTOCOL.md). |
+| Model | **Registered, not deployed (Phase C closed).** `logistic:con`, a sign-constrained logistic regression trained on the mappable frame, is registered as `models/nyando_logcon_7a909898d4f6.onnx` (ONNX, SHA-256 prefix `7a909898d4f6`). Its scores rank locations inside the areas GFM can map. They are not flood probabilities, and they say nothing about locations inside the GFM exclusion mask or about floods GFM cannot detect. The deployed API still serves a pre-V2 model whose metrics are unverified. Rules, results and limits: [Phase C protocol](docs/PHASE_C_PROTOCOL.md) and [closure record](docs/PHASE_C_CLOSURE.md). |
 | Experiment tracking | Live (Phase B): MLflow runs on DagsHub log the training-data SHA-256, the git commit and the origin (Colab or Termux). |
 | Dashboard | Live and labelled demonstration only: the retracted metrics were removed (`tests/test_frontend_claims.py` guards this) and every score carries a not-validated notice. It still shows legacy-model output; the live metrics panel, loading and error states are Phase F. |
 | Early warning (SMS, forecasts) | Not built. |
@@ -149,13 +149,13 @@ models/nyando_logcon_7a909898d4f6.onnx   the registered Phase C model (logistic:
 models/nyando_xgb_v1.pkl                 pre-V2 model file, recorded as legacy
 src/data/                                GFM client, terrain, case-control sampler, raw features, audit and validation helpers
 src/features/                            build_features.py
-src/models/                              Phase C modules: cv (evaluation harness), baseline, boosters, constrained, decision, registration, export_onnx; also train_model.py and evaluate_model.py
+src/models/                              Phase C modules: cv (evaluation harness), baseline, boosters, constrained, decision, registration, export_onnx, robustness (battery), closure (record); also train_model.py and evaluate_model.py
 src/utils/                               geo_utils.py
 src/visualization/                       shap_plots.py
 src/tracking.py                          MLflow tracking wrapper
-scripts/                                 dataset build, manifest check, GFM layer audit and the Phase C run and export scripts
+scripts/                                 dataset build, manifest check, GFM layer audit and the Phase C run, export and results scripts
 tests/                                   A-Gate, README checks, evaluation harness, boosters, constrained logistic, registration, export, robustness and legacy tests
-docs/                                    protocols, audits and records (Phase C protocol, deviation register, hardening audit)
+docs/                                    protocols, audits and records (Phase C protocol, results and closure record, deviation register, hardening audit)
 docs/funding/                            superseded concept note
 backend/                                 FastAPI service (legacy model; backend/models/ holds the legacy model files)
 frontend/                                React dashboard
@@ -177,9 +177,9 @@ gee_extract_nyando.py                    v1 Earth Engine extraction script (lega
 ## Roadmap
 
 - [x] **A. Data integrity:** GFM-labelled dataset, A-Gate in CI, manifests, protected `main`.
-- [ ] A (remainder). Leakage audit (permutation audit and a temporal holdout) and the OSM check of the zero-distance rows. The monotonicity test is in CI.
+- [ ] A (remainder). The OSM check of the 15 zero-distance rows. The monotonicity test is in CI; the permutation audit and the temporal holdout ran in Phase C (see the closure record), and leakage in `land_cover` is not excluded.
 - [x] **B. Experiment tracking:** MLflow on DagsHub, with the data hash logged on every run.
-- [ ] **C. Model suite:** logistic regression, gradient boosting and XGBoost with monotonic constraints, evaluated leave-one-event-out. In progress: the registered model exists; closure needs the leakage audit, the sensitivity runs and the closure record.
+- [x] **C. Model suite:** logistic regression, gradient boosting and XGBoost with monotonic constraints, evaluated leave-one-event-out. Closed with the registered model `logistic:con`; see the [closure record](docs/PHASE_C_CLOSURE.md) for what the boosters did and did not show.
 - [ ] **D. Physics-constrained MLP**, exported to ONNX.
 - [ ] **E. LLM advisory layer**, cached and rate-limited, never on the `/predict` path.
 - [ ] **F. Dashboard:** no hard-coded metrics, loading and error states, accessibility.

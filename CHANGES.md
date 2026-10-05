@@ -201,3 +201,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-04: Robustness battery protocol and repository hygiene
 
 - Added protocol Section 16 and the robustness battery code and tests (nothing scored), a README Repository layout rewritten from the tracked tree and tested, a sampler docstring corrected against the exclusion-mask audit, and removed the v1 figures and a stray test package; register rows D25 to D28.
+
+## 2026-10-05: Phase C closed
+
+- Added docs/PHASE_C_RESULTS.json (read from MLflow), docs/PHASE_C_CLOSURE.md (rendered from it by src/models/closure.py), a test that fails if they differ, roadmap item C ticked, register rows D12, D14 and D29.
