@@ -1,92 +1,46 @@
-# Model Card — Nyando Flood Risk AI v1.0
+# Model card: Nyando Flood AI V2 (registered model)
 
-> **Status: legacy model, not validated.** The performance figures previously published here are retracted (circular evaluation; see the README correction notice and CHANGES.md). A V2 rebuild is in progress, and a full model card will accompany the validated V2 model.
+Structured after Mitchell et al. (2019), "Model Cards for Model Reporting". The numbers below are checked against `docs/PHASE_C_RESULTS.json` by `tests/test_data_docs.py`; the full record is `docs/PHASE_C_CLOSURE.md`.
 
-## Developed by James Koero · Kisumu, Kenya · May 2026
+## Model details
+- File: `nyando_logcon_7a909898d4f6.onnx` (ONNX, CPU), SHA-256 `7a909898d4f67efc3291f656d2aa9e7c2559418f5e421eaaa68a158838f1cf8d`. Registered in MLflow run `54afe7e812fd4c4985280283d52f3793`.
+- Type: logistic regression, L2 penalty (C = 1), with sign constraints on four features (rainfall up, elevation down, distance to river down, slope down). The slope coefficient is held at 0 by its bound, so the model ignores slope.
+- Inputs: elevation, slope, rainfall_3day, distance_river, clay_percent (may be missing) and land_cover (WorldCover class).
+- Training data: the mappable frame (3,475 rows) of the 35-date training file, SHA-256 `0b9283540d91154c0dda55b0d92cae7aa3cae6aeffad0390bbf77e028dd2063a` (see `data/DATA_SOURCES.md`).
+- Serving: `POST /v2/score` returns a ranking score; `GET /v2/metrics` returns the stored results below.
+- Developed by James Koero, Kisumu, Kenya, 2026.
 
----
+## Intended use
+Rank locations, inside the areas GFM can map, by flood susceptibility, for research and planning support. The score is a ranking score, not a flood probability: the sample is case-control.
+Out of scope: flood probabilities, warnings or safety decisions; locations inside the GFM exclusion mask; floods GFM cannot detect; other basins.
 
-## Model Details
+## Evaluation data and method
+Leave-one-event-out over 23 scorable events (5 event scenes and 18 other dates with flood pixels), with locations shared with the held-out event removed. The mappable frame is the primary frame. Intervals are 97.5% paired per-event bootstrap intervals.
 
-| Field | Value |
-|---|---|
-| **Model Type** | GradientBoostingClassifier (scikit-learn 1.4+) |
-| **Version** | v1.0.0 |
-| **File** | `models/nyando_xgb_v1.pkl` |
-| **Input** | 6 real satellite features (see below) |
-| **Output** | Flood probability [0.0–1.0] + risk class |
-| **Serialisation** | joblib |
-| **Python** | 3.10+ |
+## Metrics
+- Per-event mean AUC: 0.9372 (mappable frame) and 0.9390 (full frame).
+- Against elevation only, mappable frame: +0.0397 [0.0076, 0.0774]. The advantage holds on the selection split.
+- With neighbours within 1,000 m removed: -0.0249 [-0.0921, 0.0350] against elevation only.
+- Out of time (trained on events up to 2021, 16 scorable test events): +0.0246 [-0.0150, 0.0758] against elevation only.
+The advantage is not demonstrated under the buffered split or out of time (the intervals include 0).
 
-## Hyperparameters
+## Quantitative analyses
+- land_cover has the largest permutation drop within events: +0.1045 [0.0853, 0.1239]. Its contribution survives out of time: +0.0398 [0.0144, 0.0706]. Whether it carries leaked label information is not excluded (register row D14).
+- Gradient-boosting and XGBoost models with the same constraints did not beat this model on both frames, and no sensitivity subset reversed that.
 
-```
-n_estimators=300, max_depth=6, learning_rate=0.05, subsample=0.80, random_state=42
-```
+## Ethical considerations
+- No personal data is used.
+- Labels come from one product, and 38.6% of controls lie inside its exclusion mask.
+- No thresholds were validated, so there are no risk classes. The score is not calibrated.
+- Per-ward evaluation is not done yet (roadmap Phase K).
 
-## Training Data
+## Caveats and recommendations
+- Do not use for safety decisions.
+- The advantage over elevation alone is not robust beyond the selection split; a replication on new dates is planned (D20).
+- A blank clay value is informative in the training data, so scores without clay are not comparable with scores that include it.
 
-- **Source:** Real Google Earth Engine satellite data
-- **Points:** 2,308 real GEE observations
-- **Bounds:** lon 34.70–35.40°E, lat 0.40°S–0.10°N (Nyando sub-county, Kenya)
-- **Flood labels:** Physics-calibrated; 2 Sentinel-1 SAR-confirmed flood anchors
-- **Flood rate:** 22% calibrated
-
-## Performance
-
-No validated performance figures are published for this model. The figures previously listed here are retracted. The only V2 figure is the data gate's leakage check (bare 4-feature leave-one-event-out AUC 0.841, required to stay below 0.90), which tests the data, not a model.
-
-## Feature Importance
-
-```
-elevation        ████████████████████ 0.31
-rainfall_3day    ████████████████     0.26
-distance_river   ████████████         0.19
-slope            ████████             0.13
-clay_percent     █████                0.08
-land_cover       ██                   0.03
-```
-
-Physically sensible: low elevation + high rainfall + close river = flood ✅
-
-## Risk Classification
-
-| Class | Score | Action |
-|---|---|---|
-| LOW | 0.00–0.35 | No action |
-| MEDIUM | 0.35–0.60 | Monitor |
-| HIGH | 0.60–0.80 | Prepare evacuation |
-| CRITICAL | 0.80–1.00 | Immediate action |
-
-## Limitations
-
-1. SAR flood labels from single event (April 2024) — only 2 confirmed pixels
-2. Trained on Nyando sub-county only — retraining needed for other basins
-3. CHIRPS v2 ~5km rainfall resolution — misses hyper-local variation
-4. Static model — no real-time update without new CHIRPS query
-5. WorldPop 2020 population data — may undercount recent urban growth
-
-## Bias Audit
-
-Performance evaluated across low/mid/high elevation zones.
-All zones AUC > 0.85. No significant spatial bias detected.
-
-## Ethics
-
-- Zero personal data — all inputs satellite-derived
-- Feature importances published — full transparency
-- High recall (0.9222) prioritised — missing a flood is worse than a false alarm
-- MIT + CC-BY-4.0 open access
-
-## Compliance
-
-No personal or household data is used (open, satellite-derived data only). No data-protection compliance determination is documented in this repository.
+## Legacy model
+`models/nyando_xgb_v1.pkl` (SHA-256 `de0e721c808b72730658880337f5f40cb88172f01186eb9e3908e527d6e31bb5`) is the pre-V2 model behind `POST /predict`. Its published figures were retracted (circular evaluation). No validated performance exists for it, and its risk classes were never validated. It is retired in Phase F.
 
 ## Citation
-
-```
-Koero, James Onyango (2026). Nyando Flood AI v1.0.
-https://github.com/jameskoero/nyando-flood-ai
-```
-
-*Follows Mitchell et al. (2019) model card standard.*
+Koero, J. O. (2026). Nyando Flood AI. https://github.com/jameskoero/nyando-flood-ai. Model card format: Mitchell et al. (2019).

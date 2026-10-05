@@ -217,3 +217,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-05: Opt-in Earth Engine session and live verification
 
 - The Earth Engine session fixture is no longer automatic: an empty key is reported clearly, fork and Dependabot pull requests skip only the tests that need Earth Engine, the others run without credentials; register row D9 closed (protocol Section 18); row D36 added.
+
+## 2026-10-05: Datasheet and model card corrected to V2
+
+- data/DATA_SOURCES.md and MODEL_CARD.md rewritten (Gebru et al. 2021; Mitchell et al. 2019): asset IDs come from the code, numbers from docs/PHASE_C_RESULTS.json, tests/test_data_docs.py guards both; the retracted figures and the withdrawn preprint are gone; register rows D37 (open: data licence) and D38.
