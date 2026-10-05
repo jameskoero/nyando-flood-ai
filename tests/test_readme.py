@@ -132,7 +132,7 @@ def test_status_matches_the_model_manifest():
         assert name in status, "the README Status must name the registered model " + name
         low = status.lower()
         assert "exclusion mask" in low and "not flood probabilities" in low, "the README Status must carry the claim limit"
-        assert "not served" in api.lower(), "the README API section must say the registered model is not served yet"
+        assert "/v2/score" in api and "registered_model" in api, "the README API section must describe how the registered model is served and reported"
     c_done = re.search(r"^- \[x\] \*\*C\. ", roadmap, re.M) is not None
     assert c_done == (REPO / "docs" / "PHASE_C_CLOSURE.md").exists(), "Roadmap item C is checked only with docs/PHASE_C_CLOSURE.md"
     b_done = re.search(r"^- \[x\] \*\*B\. ", roadmap, re.M) is not None

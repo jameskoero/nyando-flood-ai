@@ -19,16 +19,19 @@ RUN pip install --no-cache-dir \
     uvicorn==0.29.0 \
     pydantic==2.7.1 \
     python-multipart==0.0.9 \
-    slowapi==0.1.9
+    slowapi==0.1.9 \
+    onnxruntime==1.30.0
 
 COPY . .
 
 RUN python -c "\
-import joblib, os; \
-paths = ['backend/models/nyando_xgb_v1.pkl', 'models/nyando_xgb_v1.pkl']; \
-found = [p for p in paths if os.path.exists(p)]; \
-print('Found:', found); \
-m = joblib.load(found[0]) if found else None; \
-print('Model OK:', type(m) if m else 'NOT FOUND')"
+from backend.integrity import load_verified_pickle; \
+from backend.registered import load_registered; \
+import joblib; \
+m, _ = load_verified_pickle('backend/models/nyando_xgb_v1.pkl', '/app', joblib.load); \
+r = load_registered('/app'); \
+print('Legacy model verified and loaded:', type(m).__name__); \
+print('Registered model:', r.describe()); \
+assert r.session is not None, r.reason"
 
 CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]

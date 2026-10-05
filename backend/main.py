@@ -11,6 +11,8 @@ from pydantic import BaseModel, Field
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
+from backend.integrity import load_verified_pickle
+from backend.registered import LAND_COVER_CLASSES, load_registered, metrics_payload
 
 limiter = Limiter(key_func=get_remote_address)
 
@@ -47,6 +49,7 @@ app.add_middleware(
 )
 
 _dir = os.path.dirname(os.path.abspath(__file__))
+REPO_ROOT = os.path.abspath(os.path.join(_dir, ".."))
 PATHS = [
     os.path.join(_dir, "models", "nyando_xgb_v1.pkl"),
     os.path.join(_dir, "..", "models", "nyando_xgb_v1.pkl"),
@@ -68,9 +71,8 @@ print(f"Model path resolved: {MODEL_PATH}")
 
 if MODEL_PATH:
     try:
-        model = joblib.load(MODEL_PATH)
-        with open(MODEL_PATH, "rb") as f:
-            MODEL_SHA256 = hashlib.sha256(f.read()).hexdigest()
+        # The file's SHA-256 is compared with models/MANIFEST.json before joblib unpickles it (protocol Sections 6 and 17).
+        model, MODEL_SHA256 = load_verified_pickle(MODEL_PATH, REPO_ROOT, joblib.load)
         print(f"Model loaded from {MODEL_PATH}")
         print(f"SHA-256: {MODEL_SHA256}")
     except Exception as e:
@@ -122,6 +124,7 @@ def health():
         "training_data_file": PROVENANCE.get("training_data_file"),
         "training_data_sha256": PROVENANCE.get("training_data_sha256"),
         "version": "1.0.0",
+        "registered_model": REGISTERED.describe(),
     }
 
 @app.get("/metrics")
@@ -157,3 +160,53 @@ def predict(request: Request, data: FloodInput):
         "model_version": "1.0.0",
         "notice": "Legacy model, not validated. Do not use for safety decisions."
     }
+
+
+
+# ---- Registered Phase C model: POST /v2/score and GET /v2/metrics (docs/PHASE_C_PROTOCOL.md Section 17, register rows D9 and D33) ----
+from typing import Optional
+from pydantic import field_validator
+
+REGISTERED = load_registered(REPO_ROOT)
+print("Registered model:", REGISTERED.describe())
+CLAY_WARNING = ("clay_percent is missing: in the training data a blank clay value is informative (blank on 28% of flood cases but only 1.8% of controls), "
+                "so this score is not comparable with scores that include clay_percent.")
+
+
+class ScoreInput(BaseModel):
+    elevation: float = Field(allow_inf_nan=False)
+    slope: float = Field(allow_inf_nan=False)
+    rainfall_3day: float = Field(ge=0, allow_inf_nan=False)
+    distance_river: float = Field(ge=0, allow_inf_nan=False)
+    clay_percent: Optional[float] = Field(default=None, ge=0, le=100, allow_inf_nan=False)
+    land_cover: int
+    ward: str = Field(default="Unknown", max_length=64)
+
+    @field_validator("land_cover")
+    @classmethod
+    def _known_land_cover(cls, v):
+        if v not in LAND_COVER_CLASSES:
+            raise ValueError("land_cover must be a class the model was trained on")
+        return v
+
+
+@app.post("/v2/score")
+@limiter.limit("10/minute")
+@limiter.limit(str(GLOBAL_PREDICT_LIMIT) + "/minute", key_func=_global_key)
+def score_v2(request: Request, data: ScoreInput):
+    if REGISTERED.session is None:
+        return JSONResponse(status_code=503, content={"error": "Registered model not loaded", "model_loaded": False, "reason": REGISTERED.reason})
+    s = REGISTERED.score(data.model_dump())
+    return {"score": round(s, 4), "score_meaning": "ranking score from a case-control model; not a flood probability", "ward": data.ward,
+            "model": REGISTERED.describe(), "claim_limit": REGISTERED.meta.get("claim_limit"), "warnings": [CLAY_WARNING] if data.clay_percent is None else []}
+
+
+@app.get("/v2/metrics")
+def metrics_v2():
+    try:
+        payload = metrics_payload(REPO_ROOT)
+    except Exception as e:
+        return JSONResponse(status_code=503, content={"available": False, "reason": "stored results unreadable (%s)" % type(e).__name__})
+    if payload is None or REGISTERED.session is None or payload["model_sha256"] != REGISTERED.sha256:
+        return JSONResponse(status_code=503, content={"available": False, "reason": "No stored results match the served registered model."})
+    return payload

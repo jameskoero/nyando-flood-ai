@@ -209,3 +209,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-05: CI hardening
 
 - Every workflow declares read-only token permissions and pins its actions to commit SHAs; the test job installs under constraints-ci.txt with a retried install; Dependabot keeps the action pins current; tests/test_ci_hardening.py guards it; register rows D30 to D32.
+
+## 2026-10-05: Serving the registered model
+
+- POST /v2/score and GET /v2/metrics for the registered logistic:con model, hash-verified before loading; the legacy pickle is verified against models/MANIFEST.json before unpickling; /health reports both models; onnxruntime added to the image with a build check; tests, protocol Section 17, register rows D33 to D35.

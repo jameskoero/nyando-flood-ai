@@ -19,7 +19,7 @@ Ward-level flood susceptibility for five wards of the Nyando River basin, Kisumu
 |---|---|
 | Training data (V2) | Built and gated: 4,420 rows from 35 Sentinel-1 scene dates. Passes the A-Gate in CI. |
 | Integrity controls | Live: data gate, manifest check, protected `main`. |
-| Model | **Registered, not deployed (Phase C closed).** `logistic:con`, a sign-constrained logistic regression trained on the mappable frame, is registered as `models/nyando_logcon_7a909898d4f6.onnx` (ONNX, SHA-256 prefix `7a909898d4f6`). Its scores rank locations inside the areas GFM can map. They are not flood probabilities, and they say nothing about locations inside the GFM exclusion mask or about floods GFM cannot detect. The deployed API still serves a pre-V2 model whose metrics are unverified. Rules, results and limits: [Phase C protocol](docs/PHASE_C_PROTOCOL.md) and [closure record](docs/PHASE_C_CLOSURE.md). |
+| Model | **Registered and served by the API code at `POST /v2/score` (Phase C closed).** `logistic:con`, a sign-constrained logistic regression trained on the mappable frame, is registered as `models/nyando_logcon_7a909898d4f6.onnx` (ONNX, SHA-256 prefix `7a909898d4f6`). Its scores rank locations inside the areas GFM can map. They are not flood probabilities, and they say nothing about locations inside the GFM exclusion mask or about floods GFM cannot detect. The legacy `POST /predict` still serves a pre-V2 model whose metrics are unverified; `GET /health` on the live service shows whether it runs this version (`registered_model.loaded`). Rules, results and limits: [Phase C protocol](docs/PHASE_C_PROTOCOL.md) and [closure record](docs/PHASE_C_CLOSURE.md). |
 | Experiment tracking | Live (Phase B): MLflow runs on DagsHub log the training-data SHA-256, the git commit and the origin (Colab or Termux). |
 | Dashboard | Live and labelled demonstration only: the retracted metrics were removed (`tests/test_frontend_claims.py` guards this) and every score carries a not-validated notice. It still shows legacy-model output; the live metrics panel, loading and error states are Phase F. |
 | Early warning (SMS, forecasts) | Not built. |
@@ -114,9 +114,11 @@ It resumes after an interruption and takes about 10 minutes. The full test suite
 
 ## API (legacy model)
 
-The deployed service predates V2 and serves a legacy model. Interactive docs are disabled in production. The registered V2 model is not served yet: serving it needs onnxruntime in the image, a SHA-256 check against `models/MANIFEST.json` before loading, and a new input contract (a separate pull request).
+The deployed service predates V2 and serves a legacy model. Interactive docs are disabled in production. The registered V2 model is served at `POST /v2/score` by this code; it loads only after its SHA-256 matches `models/MANIFEST.json`, and the live service reports whether it is loaded in `GET /health`.
 
-- `GET /health` reports the loaded model's file name, SHA-256 and provenance.
+- `POST /v2/score` scores one location with the registered model and returns `score`, a ranking score that is not a flood probability, with the model's hash and claim limit. It has no risk classes, because none were validated. `clay_percent` may be omitted (the response then carries a warning).
+- `GET /v2/metrics` returns the stored evaluation of the registered model from `docs/PHASE_C_RESULTS.json`, or 503 when it is unavailable.
+- `GET /health` reports both models: the legacy model's file name, SHA-256 and provenance, and `registered_model` (loaded or not, file, SHA-256, training-data hash).
 - `GET /metrics` returns validated metrics, or HTTP 503 when none are published for the served model.
 - `POST /predict` is rate-limited. The example below shows the shape only; the values are illustrative.
 
@@ -157,7 +159,7 @@ scripts/                                 dataset build, manifest check, GFM laye
 tests/                                   A-Gate, README checks, evaluation harness, boosters, constrained logistic, registration, export, robustness and legacy tests
 docs/                                    protocols, audits and records (Phase C protocol, results and closure record, deviation register, hardening audit)
 docs/funding/                            superseded concept note
-backend/                                 FastAPI service (legacy model; backend/models/ holds the legacy model files)
+backend/                                 FastAPI service: legacy model on /predict, registered ONNX model on /v2/score (backend/models/ holds the legacy model files)
 frontend/                                React dashboard
 notebooks/                               v1 notebooks (legacy)
 .github/workflows/                       ci.yml, data-gate.yml, manifest-check.yml
