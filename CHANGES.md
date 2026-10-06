@@ -249,3 +249,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-06: promotion rules for hgb:con
 
 - docs/PROMOTION_PROTOCOL.md and src/models/promotion.py fix, before any is computed, the gates that decide whether hgb:con replaces logistic:con; tests/test_promotion.py; register row D41. No gate is computed and the registered model is unchanged.
+
+## 2026-10-06: promotion gate run
+
+- The statistical gates of docs/PROMOTION_PROTOCOL.md were computed once: every statistical gate passed; the export gates come next. docs/PROMOTION_RESULTS.json, tests/test_promotion_results.py, register row D41.
