@@ -14,6 +14,10 @@ Training data for a research model that ranks locations, inside the areas the Gl
 - A point with no clay value keeps `clay_percent` blank: blank on 28% of flood points and 1.8% of controls, so a blank is informative. Every other missing value drops the point, and drops are logged. Nothing is imputed.
 - 945 of the 2,450 controls (38.6%) lie inside GFM's exclusion mask, where GFM cannot map floods. "Control" therefore means "not detected as flooded", not "known dry".
 
+### 2.1 Confirmatory data: D20 Block A
+- `data/confirmatory/nyando_block_a.csv`: 3,780 rows (1,890 floods, 1,890 controls) from 27 of the 27 committed dates (0 failed and were not replaced), 70 points per class per date, built by `scripts/build_block_a.py` through the same pipeline as the training file. Controls outside the GFM exclusion mask: 1,172 of 1,890.
+- Its manifest entries carry no `label_source`, so no test treats it as a training file. It was scored once and is not used for training (`docs/D20_PROTOCOL.md`, Sections 12 and 13). A second block of 26 dates (Block B) is selected and sealed for Phase D: it is not built.
+
 ## 3. Collection process
 - Labels: GFM flood extent from the EODC STAC API (`https://stac.eodc.eu/api/v1`, collection `GFM`).
 - Sampling: case-control per scene, because flood pixels are rare (0.07% to 1.3% of valid pixels per scene).

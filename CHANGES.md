@@ -241,3 +241,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-05: D20 Block A scored
 
 - Block A was scored once with the frozen Phase C models under the committed rules (27 scorable events; R-A False, R-C False, champion stays: False); docs/D20_RESULTS.json, protocol Section 13, tests/test_d20_results.py, register row D20 closed; Block B untouched.
+
+## 2026-10-06: D20 claims
+
+- The README, model card, closure record and datasheet now state what D20 found (the advantage over elevation only did not replicate, the land_cover contribution was not shown, both boosters beat the champion), with numbers read from docs/D20_RESULTS.json and tests that tie them; register row D40. The registered model is unchanged.

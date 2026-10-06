@@ -101,3 +101,12 @@ Trained on events dated 2021 or earlier (1106 rows), scored on later events (218
 | boosters, full frame | `b74d0c183b914b298a6b404e3d49718a` | `35578998ecae90f00fb0d24c61da0731e7b46df0` |
 
 Regenerate the results and this record with `python scripts/build_phase_c_results.py` (needs a DagsHub token).
+
+## Update after D20 (2026-10-05)
+
+The confirmatory replication scored 27 new events once with the frozen Phase C models (`docs/D20_PROTOCOL.md` Section 13, `docs/D20_RESULTS.json`, MLflow run `2aa7d3b9d810426181425379a97f2828`). It supersedes parts of this record; the registered model is unchanged by it.
+- Value beyond elevation only: champion minus elevation only on the new events +0.0117 [-0.0107, 0.0381] (wins 11, losses 16); the value beyond elevation only does not replicate.
+- land_cover contribution: +0.0157 [-0.0028, 0.0378] (wins 13, losses 13); the contribution is not shown on the new events. Leakage is not excluded either way.
+- hgb:con minus the champion: new events +0.0206 [0.0094, 0.0309] (wins 21, losses 5); pooled over 50 events +0.0138 [0.0036, 0.0230] (wins 33, losses 12); zero violations: yes; it passes the replacement rule.
+- xgb:con minus the champion: new events +0.0204 [0.0097, 0.0306] (wins 22, losses 5); pooled over 50 events +0.0139 [0.0043, 0.0227] (wins 34, losses 11); zero violations: yes; it passes the replacement rule.
+- The statement above that no booster beat logistic:con describes the 23 Phase C events only. Registering a booster is a separate decision under rules R2 to R4.

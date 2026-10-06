@@ -183,7 +183,7 @@ gee_extract_nyando.py                    v1 Earth Engine extraction script (lega
 - [x] **A. Data integrity:** GFM-labelled dataset, A-Gate in CI, manifests, protected `main`.
 - [ ] A (remainder). The OSM check of the 15 zero-distance rows. The monotonicity test is in CI; the permutation audit and the temporal holdout ran in Phase C (see the closure record), and leakage in `land_cover` is not excluded.
 - [x] **B. Experiment tracking:** MLflow on DagsHub, with the data hash logged on every run.
-- [x] **C. Model suite:** logistic regression, gradient boosting and XGBoost with monotonic constraints, evaluated leave-one-event-out. Closed with the registered model `logistic:con`; see the [closure record](docs/PHASE_C_CLOSURE.md) for what the boosters did and did not show.
+- [x] **C. Model suite:** logistic regression, gradient boosting and XGBoost with monotonic constraints, evaluated leave-one-event-out. Closed with the registered model `logistic:con`; see the [closure record](docs/PHASE_C_CLOSURE.md) for what the boosters did and did not show. D20 then tested these results on new events ([D20 protocol](docs/D20_PROTOCOL.md), Section 13): the advantage over elevation only did not replicate and both boosters beat `logistic:con`; which model is registered is decided separately.
 - [ ] **D. Physics-constrained MLP**, exported to ONNX.
 - [ ] **E. LLM advisory layer**, cached and rate-limited, never on the `/predict` path.
 - [ ] **F. Dashboard:** no hard-coded metrics, loading and error states, accessibility.
