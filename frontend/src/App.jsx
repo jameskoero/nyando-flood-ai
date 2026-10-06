@@ -56,7 +56,6 @@ function NyandoMap({ ward }) {
     "Kabonyo/Kanyagwal":   { lat: -0.221, lng: 34.875 },
     "Kobura":              { lat: -0.236, lng: 34.862 },
   };
-  const active = wardCoords[ward] || wardCoords["Ahero"];
 
   const wardDots = Object.entries(wardCoords).map(([name, c]) => ({
     name, ...c,
