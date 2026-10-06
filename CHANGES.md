@@ -245,3 +245,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-06: D20 claims
 
 - The README, model card, closure record and datasheet now state what D20 found (the advantage over elevation only did not replicate, the land_cover contribution was not shown, both boosters beat the champion), with numbers read from docs/D20_RESULTS.json and tests that tie them; register row D40. The registered model is unchanged.
+
+## 2026-10-06: promotion rules for hgb:con
+
+- docs/PROMOTION_PROTOCOL.md and src/models/promotion.py fix, before any is computed, the gates that decide whether hgb:con replaces logistic:con; tests/test_promotion.py; register row D41. No gate is computed and the registered model is unchanged.
