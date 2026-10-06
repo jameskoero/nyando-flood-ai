@@ -82,7 +82,8 @@ def main():
     results = {"schema": 1, "date": date.today().isoformat(), "registered_model": {"file": rel, "sha256": entry["sha256"], "arm": "logistic:con"},
                "runs": runs, "artifact_readback": artifact_readback(auth, REGISTRATION, Path(rel).name)}
     (ROOT / "docs" / "PHASE_C_RESULTS.json").write_text(json.dumps(results, indent=1, sort_keys=True) + "\n", encoding="utf-8")
-    doc = render(results)
+    d20p = ROOT / "docs" / "D20_RESULTS.json"
+    doc = render(results, json.loads(d20p.read_text(encoding="utf-8")) if d20p.exists() else None)
     (ROOT / "docs" / "PHASE_C_CLOSURE.md").write_text(doc, encoding="utf-8")
     print("robustness run:", rob_id, "| artifact read-back present:", results["artifact_readback"]["present"], "\n")
     print("\n".join(doc.splitlines()[:14]))

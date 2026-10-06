@@ -23,10 +23,11 @@ Leave-one-event-out over 23 scorable events (5 event scenes and 18 other dates w
 - With neighbours within 1,000 m removed: -0.0249 [-0.0921, 0.0350] against elevation only.
 - Out of time (trained on events up to 2021, 16 scorable test events): +0.0246 [-0.0150, 0.0758] against elevation only.
 The advantage is not demonstrated under the buffered split or out of time (the intervals include 0).
+- On new events (D20: 27 events scored once, `docs/D20_PROTOCOL.md` Section 13): +0.0117 [-0.0107, 0.0381] against elevation only. The value beyond elevation only does not replicate there, so it is shown on the selection split only.
 
 ## Quantitative analyses
-- land_cover has the largest permutation drop within events: +0.1045 [0.0853, 0.1239]. Its contribution survives out of time: +0.0398 [0.0144, 0.0706]. Whether it carries leaked label information is not excluded (register row D14).
-- Gradient-boosting and XGBoost models with the same constraints did not beat this model on both frames, and no sensitivity subset reversed that.
+- land_cover has the largest permutation drop within events: +0.1045 [0.0853, 0.1239]. Its contribution survives out of time: +0.0398 [0.0144, 0.0706]. On the 27 new D20 events the contribution is not shown (+0.0157 [-0.0028, 0.0378]). Whether it carries leaked label information is not excluded (register row D14).
+- Gradient-boosting and XGBoost models with the same constraints did not beat this model on both frames on the 23 Phase C events. On the 27 new D20 events both beat it (hgb:con minus this model +0.0206 [0.0094, 0.0309]; xgb:con minus this model +0.0204 [0.0097, 0.0306]) and pooled over 50 events (hgb:con +0.0138 [0.0036, 0.0230]; xgb:con +0.0139 [0.0043, 0.0227]). Which model is registered is decided separately: this card describes the registered model.
 
 ## Ethical considerations
 - No personal data is used.
@@ -36,7 +37,7 @@ The advantage is not demonstrated under the buffered split or out of time (the i
 
 ## Caveats and recommendations
 - Do not use for safety decisions.
-- The advantage over elevation alone is not robust beyond the selection split; a replication on new dates is planned (D20).
+- The advantage over elevation alone is not robust beyond the selection split: the D20 replication on new events did not confirm it.
 - A blank clay value is informative in the training data, so scores without clay are not comparable with scores that include it.
 
 ## Legacy model

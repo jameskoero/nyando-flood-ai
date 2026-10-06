@@ -196,6 +196,21 @@ def render_rest(results, r):
     return L
 
 
-def render(results):
+def render_d20(d20):
+    """Update after D20 (docs/D20_PROTOCOL.md Section 13), rendered from docs/D20_RESULTS.json."""
+    a, bm = d20["analysis"], d20["block_a"]
+    v, m, p = a["verdicts"], a["frames"]["mappable"], a["pooled"]
+    L = ["", "## Update after D20 (%s)" % d20["date"], "",
+         "The confirmatory replication scored %d new events once with the frozen Phase C models (`docs/D20_PROTOCOL.md` Section 13, `docs/D20_RESULTS.json`, MLflow run `%s`). It supersedes parts of this record; the registered model is unchanged by it." % (bm["scorable_mappable"], d20["mlflow"]["run_id"]),
+         "- Value beyond elevation only: champion minus elevation only on the new events %s; the value beyond elevation only %s." % (iv(m["champion_vs_elevation"]), "replicates" if v["R-A"]["replicates"] else "does not replicate"),
+         "- land_cover contribution: %s; the contribution %s on the new events. Leakage is not excluded either way." % (iv(m["land_cover_contribution"]), "survives" if v["R-C"]["survives"] else "is not shown")]
+    for c in ("hgb:con", "xgb:con"):
+        L.append("- %s minus the champion: new events %s; pooled over %d events %s; zero violations: %s; %s." % (c, iv(m[c + "_vs_champion"]), p[c]["n_events"], iv(p[c]), "yes" if v["R-B"][c]["eligible"] else "no", "it passes the replacement rule" if v["R-B"][c]["replaces"] else "it does not pass the replacement rule"))
+    L.append("- The statement above that no booster beat logistic:con describes the 23 Phase C events only. Registering a booster is a separate decision under rules R2 to R4.")
+    return L
+
+
+def render(results, d20=None):
     r, arm = readings(results), registered_arm(results)
-    return "\n".join(render_outcome(results, r, arm) + render_battery(results, r) + render_rest(results, r)) + "\n"
+    lines = render_outcome(results, r, arm) + render_battery(results, r) + render_rest(results, r)
+    return "\n".join(lines + (render_d20(d20) if d20 else [])) + "\n"

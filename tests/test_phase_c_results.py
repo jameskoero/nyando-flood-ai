@@ -23,7 +23,8 @@ def results():
 
 
 def test_closure_record_is_the_rendering_of_the_results(results):
-    assert (ROOT / "docs" / "PHASE_C_CLOSURE.md").read_text(encoding="utf-8") == render(results)
+    d20 = ROOT / "docs" / "D20_RESULTS.json"
+    assert (ROOT / "docs" / "PHASE_C_CLOSURE.md").read_text(encoding="utf-8") == render(results, json.loads(d20.read_text(encoding="utf-8")) if d20.exists() else None)
 
 
 def test_results_are_traceable_to_logged_runs(results):
