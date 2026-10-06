@@ -152,7 +152,7 @@ models/nyando_logcon_7a909898d4f6.onnx   the registered Phase C model (logistic:
 models/nyando_xgb_v1.pkl                 pre-V2 model file, recorded as legacy
 src/data/                                GFM client, terrain, case-control sampler, raw features, audit and validation helpers
 src/features/                            build_features.py
-src/models/                              Phase C modules: cv (evaluation harness), baseline, boosters, constrained, decision, registration, export_onnx, robustness (battery), closure (record); also train_model.py and evaluate_model.py
+src/models/                              Phase C modules: cv (evaluation harness), baseline, boosters, constrained, decision, registration, export_onnx, robustness (battery), closure (record), promotion (gates); also train_model.py and evaluate_model.py
 src/utils/                               geo_utils.py
 src/visualization/                       shap_plots.py
 src/tracking.py                          MLflow tracking wrapper
