@@ -36,8 +36,8 @@ def test_results_are_traceable_to_logged_runs(results):
         assert re.fullmatch(r"[0-9a-f]{7,40}", run["commit"]), name
         assert run["training_data_sha256"] == train[0] and run["status"] == "FINISHED", name
     models = json.loads((ROOT / "models" / "MANIFEST.json").read_text(encoding="utf-8"))
-    active = [(k, v) for k, v in models.items() if v.get("status") == "active"]
-    assert len(active) == 1 and results["registered_model"]["file"] == active[0][0] and results["registered_model"]["sha256"] == active[0][1]["sha256"]
+    e = models.get(results["registered_model"]["file"])
+    assert e is not None and e["sha256"] == results["registered_model"]["sha256"] and e["status"] in ("active", "retired")
 
 
 def test_decision_code_reproduces_the_registered_arm(results):

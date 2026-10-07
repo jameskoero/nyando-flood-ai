@@ -257,3 +257,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-07: hgb:con exporter
 
 - src/models/export_hgb.py writes hgb:con as one ai.onnx.ml TreeEnsemble (opset 5) with the production input contract; tests/test_export_hgb.py checks export gates E1 to E3 on real rows in CI; register row D42. No artifact is committed and the registered model is unchanged.
+
+## 2026-10-07: model-agnostic tests
+
+- Tests that meant the Phase C model now name it; the class check reads land_cover_classes metadata when present; a retired model status needs a README rule. No behaviour change.

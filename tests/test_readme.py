@@ -112,8 +112,10 @@ def test_retracted_figures_appear_only_in_the_correction_notice():
 
 def test_status_matches_the_model_manifest():
     models = json.loads((REPO / "models" / "MANIFEST.json").read_text())
-    other = sorted(k for k, e in models.items() if e.get("status") not in ("legacy", "active"))
-    assert not other, "model statuses other than legacy and active need a README rule: %s" % other
+    other = sorted(k for k, e in models.items() if e.get("status") not in ("legacy", "active", "retired"))
+    assert not other, "model statuses other than legacy, active and retired need a README rule: %s" % other
+    for k in sorted(k for k, e in models.items() if e.get("status") == "retired"):
+        assert Path(k).name in _readme() and "retired" in _readme().lower(), "the README must name the retired model " + Path(k).name
     active = {k: e for k, e in models.items() if e.get("status") == "active"}
     text = _readme()
 

@@ -38,9 +38,9 @@ def ee_session():
 @pytest.fixture(scope="module")
 def entry():
     models = json.loads((ROOT / "models" / "MANIFEST.json").read_text(encoding="utf-8"))
-    active = {k: v for k, v in models.items() if v.get("status") == "active"}
-    assert len(active) == 1, "exactly one active model is expected, found %s" % sorted(active)
-    return next(iter(active.items()))
+    phase_c = {k: v for k, v in models.items() if v.get("algorithm") == "logistic_constrained" and v.get("status") in ("active", "retired")}
+    assert len(phase_c) == 1, "exactly one Phase C registered model is expected, found %s" % sorted(phase_c)
+    return next(iter(phase_c.items()))
 
 
 @pytest.fixture(scope="module")
