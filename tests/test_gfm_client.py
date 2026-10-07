@@ -8,10 +8,12 @@ from datetime import date
 from shapely.geometry import box
 
 from src.data.gfm_client import GFMClient
+import pytest
 
 NYANDO_AOI = box(34.70, -0.40, 35.40, 0.10)  # from gee_extract_nyando.py
 
 
+@pytest.mark.live
 def test_search_finds_known_event():
     client = GFMClient()
     items = client.search_items(
@@ -20,6 +22,7 @@ def test_search_finds_known_event():
     assert len(items) > 0, "expected real GFM coverage for the confirmed April 2020 window"
 
 
+@pytest.mark.live
 def test_peak_extent_returns_provenance():
     client = GFMClient()
     result = client.get_peak_flood_extent(

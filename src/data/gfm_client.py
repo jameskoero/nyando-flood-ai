@@ -44,6 +44,7 @@ logger = logging.getLogger(__name__)
 
 GFM_STAC_URL = "https://stac.eodc.eu/api/v1"
 GFM_COLLECTION = "GFM"
+GFM_TIMEOUT = (10, 30)  # (connect, read) seconds for every STAC request: the catalogue search once hung with no answer and froze CI
 
 FLOOD_VALUE = 1
 NO_FLOOD_VALUE = 0
@@ -77,8 +78,8 @@ class FloodExtentResult:
 class GFMClient:
     """Client over the EODC GFM STAC catalogue."""
 
-    def __init__(self, stac_url: str = GFM_STAC_URL) -> None:
-        self._catalog = Client.open(stac_url)
+    def __init__(self, stac_url: str = GFM_STAC_URL, timeout=GFM_TIMEOUT) -> None:
+        self._catalog = Client.open(stac_url, timeout=timeout)
 
     def search_items(self, bbox: list[float], date_window: str) -> list[Item]:
         """Search GFM items intersecting bbox within an ISO date_window, e.g. '2020-04-01/2020-04-30'."""

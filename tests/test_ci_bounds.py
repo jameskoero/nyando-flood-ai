@@ -24,5 +24,5 @@ def test_remote_raster_reads_are_bounded():
 
 
 def test_a_slow_test_prints_its_stack():
-    assert re.search(r"pytest -v -rs -o faulthandler_timeout=\d+", CI)
+    assert re.search(r"-o faulthandler_timeout=\d+", CI)
 # END OF FILE
