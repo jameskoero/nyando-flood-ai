@@ -51,3 +51,20 @@ def decision(statistical, export=None):
 def block_b_allowed(freeze_exists, block_b_paths):
     """Block B may be built only after the freeze file is merged."""
     return bool(freeze_exists) or not list(block_b_paths)
+
+
+# Stage 2 procedure (docs/PHASE_D_PROTOCOL.md Section 9, r2)
+MIN_CLASS_N = 30      # rows of each class an event needs to be scorable (src/models/cv.py)
+N_BOOT = 10000
+ALPHA = 0.025         # 97.5% paired per-event bootstrap interval
+REPRODUCE = {"hgb:con": (0.943, 0.001), "logistic:con": (0.937239, 0.0005)}  # mean per-event AUC on the existing events, mappable frame: README and Phase C record; reported, never a gate
+
+
+def _key(p):
+    return tuple(sorted((k, tuple(v) if isinstance(v, (list, tuple)) else v) for k, v in p.items()))
+
+
+def modal_point(chosen, grid):
+    """The grid point chosen by most outer folds; ties go to the earlier (simpler) grid point."""
+    keys = [_key(c) for c in chosen]
+    return max(grid, key=lambda g: (keys.count(_key(g)), -list(grid).index(g)))
