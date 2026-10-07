@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parent.parent
-PURE = "tests/test_case_control_sampler.py::test_sampling_returns_both_classes"
+PURE = "tests/test_baseline.py::test_unseen_land_cover_class_is_ignored"
 GATED = "tests/test_ee_gating.py::test_earth_engine_session_is_usable"
 
 

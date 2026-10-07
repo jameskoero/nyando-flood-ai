@@ -8,6 +8,7 @@ from datetime import date
 import geopandas as gpd
 
 from src.data.case_control_sampler import sample_case_control_points
+import pytest
 
 
 def _load_nyando_aoi():
@@ -16,6 +17,7 @@ def _load_nyando_aoi():
     return aoi, str(wards.crs)
 
 
+@pytest.mark.live
 def test_sampling_returns_both_classes():
     aoi, aoi_crs = _load_nyando_aoi()
     points = sample_case_control_points(
