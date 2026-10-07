@@ -54,7 +54,7 @@ def block_b_allowed(freeze_exists, block_b_paths):
 
 
 # Stage 2 procedure (docs/PHASE_D_PROTOCOL.md Section 9, r2)
-MIN_CLASS_N = 30      # rows of each class an event needs to be scorable (src/models/cv.py)
+MIN_CLASS_N = 1       # rows of each class an event needs to be scorable: both classes present, as in Phase C (r3)
 N_BOOT = 10000
 ALPHA = 0.025         # 97.5% paired per-event bootstrap interval
 REPRODUCE = {"hgb:con": (0.943, 0.001), "logistic:con": (0.937239, 0.0005)}  # mean per-event AUC on the existing events, mappable frame: README and Phase C record; reported, never a gate
@@ -68,3 +68,13 @@ def modal_point(chosen, grid):
     """The grid point chosen by most outer folds; ties go to the earlier (simpler) grid point."""
     keys = [_key(c) for c in chosen]
     return max(grid, key=lambda g: (keys.count(_key(g)), -list(grid).index(g)))
+
+
+# r3 and r4 (docs/PHASE_D_PROTOCOL.md Sections 10 and 11)
+def x3_ok(violations):
+    return all(int(v) == 0 for v in violations.values())
+
+
+def early_decision(violations):
+    """None when the selected model meets X3 on its whole-frame fit (Block B may then be built); otherwise the outcome, without spending Block B."""
+    return None if x3_ok(violations) else NOT_PROMOTED

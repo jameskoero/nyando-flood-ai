@@ -74,3 +74,17 @@ Date: 2026-10-07 (r1). Committed before any MLP is trained or scored. Rules as c
 - Monotonicity: `monotone_violations` (200 real rows) on whole-mappable fits of the selected MLP, its control and the selected hgb:con; reported, no gate at this stage.
 - Reproduction checks, reported and never a gate: hgb:con's mappable mean per-event AUC against 0.943 (tolerance 0.001) and logistic:con's against 0.937239 (tolerance 0.0005).
 - Record: `docs/PHASE_D_RESULTS.json` from the run's raw results, with one MLflow run read back. Nothing in this section decides promotion: Block B decides (Section 4). The frozen candidate in `docs/PHASE_D_FREEZE.json` is the selected point, in its own pull request.
+
+## 10. Amendment r3 (2026-10-07, before the Stage 2 fixed-point evaluations are rerun)
+
+- What happened: the first Stage 2 run used MIN_CLASS_N = 30, taken from `src/models/cv.py` where it governs ward-level evaluation, as the scorable-event rule of Section 9. On the mappable frame only 5 events qualified, not the 23 of Phase C, and both reproduction checks reported not reproduced (hgb:con 0.841302 against 0.943, logistic:con 0.840106 against 0.937239). The checks did their job: the rule was wrong, not the models.
+- Amendment: an event is scorable when both classes are present, MIN_CLASS_N = 1, the rule of Phase C and of `select_params` (the 5 event scenes and the 18 dates with flood pixels give 23 events on the mappable frame). Section 9's rule of 30 is withdrawn.
+- Effect: the selection is unaffected, because `select_params` already used 1; the selected points (MLP: hidden (64, 32), penalty weight 1; hgb:con: depth 4, 100 iterations, minimum leaf 20) come from the nested outer folds, whose probabilities are reused from the first run (the nested code is unchanged). Everything scored with the rule of 30, that is the fixed-point evaluations and every statistic, is recomputed.
+- Disclosure: the first run's output under the rule of 30 was seen before this amendment, including its full-frame comparisons. The amendment follows from the event count and the failed reproduction checks, not from a comparison, and it applies to every arm alike.
+
+## 11. Amendment r4 (2026-10-07, before any Block B date is built): early decision on X3
+
+- Stage 2's violation check on the whole-mappable fits (the X3 measure of Section 5: `monotone_violations`, 200 real rows) found the selected MLP violating the constraints on many rows (rainfall_3day 79, elevation 148, distance_river 80, slope 198 of 200), the penalty-weight-0 control on a similar number (125, 136, 160, 197) and hgb:con on none. A soft penalty does not guarantee monotonicity (Section 1) and X3 requires zero violations, so the selected MLP cannot pass X3.
+- Rule: if the selected MLP has any violation in that check, the outcome is "PHASE D NOT PROMOTED - hgb:con RETAINED" without building Block B (`early_decision` in `src/models/phase_d.py`). Block B stays unbuilt, unscored and sealed for a future candidate: spending the one unbiased test on a model that cannot be promoted would use it up for nothing.
+- Basis and disclosure: the rule rests only on the violation counts, which do not depend on r3, and on no AUC comparison; the counts were seen before this amendment.
+- The MLP remains Model B of the robustness study, with its violation rate stated. A future candidate (a stronger penalty, or a network monotone by construction) needs its own protocol and may use Block B.

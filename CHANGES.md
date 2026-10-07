@@ -292,3 +292,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-07: Phase D Stage 2 procedure and run code (D46)
 
 - docs/PHASE_D_PROTOCOL.md Section 9 (r2) fixes the Stage 2 procedure before any MLP score exists; src/models/phase_d.py gains the selected-point rule and constants; src/models/phase_d_cv.py (cached nested selection, equal to nested_scores), phase_d_stats.py, phase_d_jobs.py and phase_d_run.py implement it; tests/test_phase_d_stage2.py guards it. Nothing is trained in this change and Block B stays sealed.
+
+## 2026-10-07: Phase D amendments r3 and r4 (D46)
+
+- r3: a scorable event has both classes (MIN_CLASS_N = 1, as in Phase C), replacing the rule of 30 that left 5 mappable events and failed both reproduction checks; src/models/phase_d_stats.py follows. r4: if the selected MLP has any monotonicity violation in the Stage 2 check, Phase D ends NOT PROMOTED without building Block B, which stays sealed (early_decision in src/models/phase_d.py). Sections 10 and 11 of docs/PHASE_D_PROTOCOL.md state both, with what was seen before each.

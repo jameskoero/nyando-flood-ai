@@ -20,7 +20,7 @@ def ee_session():
 
 
 def test_the_procedure_is_stated_with_the_rules_in_code():
-    assert D.MIN_CLASS_N == MIN_CLASS_N and "MIN_CLASS_N = %d" % D.MIN_CLASS_N in SEC
+    assert D.MIN_CLASS_N == 1 and "MIN_CLASS_N = %d" % D.MIN_CLASS_N in SEC
     assert "%d resamples" % D.N_BOOT in SEC and "alpha %g" % D.ALPHA in SEC and "most outer folds" in SEC and "Block B decides" in SEC and "never a gate" in SEC
     assert all("%g" % want in SEC and "tolerance %g" % tol in SEC for want, tol in D.REPRODUCE.values())
 
