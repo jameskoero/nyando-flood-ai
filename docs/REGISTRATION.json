@@ -1,0 +1,145 @@
+{
+ "date": "2026-10-07",
+ "environment": {
+  "numpy": "1.26.4",
+  "onnxruntime": "1.30.0",
+  "pandas": "3.0.6",
+  "python": "3.11.17",
+  "scikit-learn": "1.6.1"
+ },
+ "export_gates": {
+  "E1_max_abs_diff": {
+   "block_a": 3.3306690738754696e-16,
+   "training": 2.498001805406602e-16
+  },
+  "E2_per_event_auc_diff": {
+   "block_a": 0.0,
+   "training": 0.0
+  },
+  "E3_violations": {
+   "distance_river": 0,
+   "elevation": 0,
+   "rainfall_3day": 0,
+   "slope": 0
+  },
+  "E4_sha256_in_manifest": true,
+  "passed": true,
+  "tolerance": 1e-06
+ },
+ "fixed_params": {
+  "max_depth": 4,
+  "max_iter": 100,
+  "min_samples_leaf": 20
+ },
+ "graph": {
+  "leaves": 1113,
+  "member_nodes": 157,
+  "nodes": 1013,
+  "trees": 100
+ },
+ "layer_flags_sha256": "01723237a4cc953d5f5dc6131911c7474d9a86d3b0cfc3adcb1639c79195b4b2",
+ "metrics": {
+  "arm": "hgb:con",
+  "beyond_elevation_only": {
+   "pooled_events": true
+  },
+  "evaluation": "leave-one-event-out over the 23 existing events (shared locations removed) and the 27 D20 Block A events scored once; paired per-event bootstrap, 97.5% intervals",
+  "model_sha256": "5ae81ad8b0303c8a8bef79f177199e34f1d3cad87cb609afc6825a4b9980b723",
+  "per_event_mean_auc": {
+   "block_a_full": 0.965,
+   "block_a_mappable": 0.971,
+   "existing_events_full": 0.955,
+   "existing_events_mappable": 0.943
+  },
+  "record": "docs/PROMOTION_RESULTS.json",
+  "registered_model": "models/nyando_hgbcon_5ae81ad8b030.onnx",
+  "runs": {
+   "d20_scoring": "2aa7d3b9d810426181425379a97f2828",
+   "promotion_gates": "0059c71af97d46c49db6afa5dd1ea651",
+   "registration": "fc48f612a09d4667a55fc06c3323bba8"
+  },
+  "source": "docs/REGISTRATION.json",
+  "training_data_sha256": "0b9283540d91154c0dda55b0d92cae7aa3cae6aeffad0390bbf77e028dd2063a",
+  "versus_elevation_only": {
+   "pooled_mappable": {
+    "ci_high": 0.061053124750000035,
+    "ci_low": 0.019270281249999997,
+    "losses": 9,
+    "mean_diff": 0.038376839999999995,
+    "wins": 36
+   }
+  },
+  "versus_previous_model": {
+   "buffered": {
+    "ci_high": 0.009053033152173913,
+    "ci_low": -0.02964104728260869,
+    "losses": 11,
+    "mean_diff": -0.008828086956521741,
+    "wins": 10
+   },
+   "new/full": {
+    "ci_high": 0.027263779629629628,
+    "ci_low": 0.00524152175925924,
+    "losses": 8,
+    "mean_diff": 0.016424814814814812,
+    "wins": 19
+   },
+   "new/mappable": {
+    "ci_high": 0.03090961527777779,
+    "ci_low": 0.009424739351851842,
+    "losses": 5,
+    "mean_diff": 0.020576814814814815,
+    "wins": 21
+   },
+   "pooled/full": {
+    "ci_high": 0.02450731825000004,
+    "ci_low": 0.00807757125,
+    "losses": 13,
+    "mean_diff": 0.016439540000000002,
+    "wins": 35
+   },
+   "pooled/mappable": {
+    "ci_high": 0.02300201700000001,
+    "ci_low": 0.003616010750000003,
+    "losses": 12,
+    "mean_diff": 0.013798540000000001,
+    "wins": 33
+   },
+   "temporal": {
+    "ci_high": 0.01946273437500002,
+    "ci_low": -0.012957206249999978,
+    "losses": 6,
+    "mean_diff": 0.003911937499999997,
+    "wins": 9
+   }
+  }
+ },
+ "model": {
+  "arm": "hgb:con",
+  "file": "models/nyando_hgbcon_5ae81ad8b030.onnx",
+  "sha256": "5ae81ad8b0303c8a8bef79f177199e34f1d3cad87cb609afc6825a4b9980b723",
+  "size_bytes": 39560
+ },
+ "outcome": "D20 PROMOTED",
+ "previous": {
+  "file": "models/nyando_logcon_7a909898d4f6.onnx",
+  "sha256": "7a909898d4f67efc3291f656d2aa9e7c2559418f5e421eaaa68a158838f1cf8d",
+  "status": "retired"
+ },
+ "promotion_results": "docs/PROMOTION_RESULTS.json",
+ "promotion_results_sha256": "34484d4efabacf0b8ed9fb5ad682fff66c92f68925627db899a6701344bc9884",
+ "protocol": "docs/PROMOTION_PROTOCOL.md",
+ "protocol_sha256": "98b4ea776962f848d964c13af84fb8bb0e4845560cdc8a786088da28b314dbfc",
+ "registration_run": "fc48f612a09d4667a55fc06c3323bba8",
+ "schema": 1,
+ "statistical_gates": {
+  "S1": true,
+  "S2": true,
+  "S3": true,
+  "S4": true,
+  "S5": true,
+  "S6": true
+ },
+ "tracking_uri": "https://dagshub.com/jmskoero/nyando-flood-ai.mlflow",
+ "training_data_sha256": "0b9283540d91154c0dda55b0d92cae7aa3cae6aeffad0390bbf77e028dd2063a"
+}

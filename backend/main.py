@@ -204,7 +204,7 @@ def score_v2(request: Request, data: ScoreInput):
 @app.get("/v2/metrics")
 def metrics_v2():
     try:
-        payload = metrics_payload(REPO_ROOT)
+        payload = metrics_payload(REPO_ROOT, REGISTERED.sha256)
     except Exception as e:
         return JSONResponse(status_code=503, content={"available": False, "reason": "stored results unreadable (%s)" % type(e).__name__})
     if payload is None or REGISTERED.session is None or payload["model_sha256"] != REGISTERED.sha256:

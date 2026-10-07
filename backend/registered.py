@@ -56,8 +56,14 @@ def load_registered(root, ort_loader=None):
     return r
 
 
-def metrics_payload(root):
-    """Stored evaluation of the registered model from docs/PHASE_C_RESULTS.json (read from MLflow when the closure record was built); None if the file is absent."""
+def metrics_payload(root, sha256=None):
+    """Stored evaluation of the served model: docs/REGISTRATION.json when it names the loaded model's SHA-256 (the D20 promotion), otherwise docs/PHASE_C_RESULTS.json (read from MLflow when the closure record was built); None if neither exists."""
+    reg = os.path.join(root, "docs", "REGISTRATION.json")
+    if sha256 and os.path.exists(reg):
+        with open(reg, encoding="utf-8") as f:
+            rec = json.load(f)
+        if rec.get("model", {}).get("sha256") == sha256:
+            return rec["metrics"]
     path = os.path.join(root, "docs", "PHASE_C_RESULTS.json")
     if not os.path.exists(path):
         return None

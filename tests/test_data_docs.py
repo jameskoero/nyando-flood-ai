@@ -66,7 +66,7 @@ def test_register_records_the_data_licence_decision():
 def test_every_four_decimal_figure_in_the_model_card_is_a_stored_result():
     stored = ["%.4f" % REG["mappable/con/per_event_mean"], "%.4f" % REG["full/con/per_event_mean"], _iv(REG, "mappable/con/vs_elevation"), _iv(ROB, "buffer/con_minus_elevation"),
               _iv(ROB, "temporal/con_minus_elevation"), _iv(ROB, "perm/land_cover/within_drop"), _iv(ROB, "temporal/land_cover_contribution")]
-    allowed = set(re.findall(r"\b0\.\d{4}\b", " ".join(stored))) | _d20_figures()
+    allowed = set(re.findall(r"\b0\.\d{4}\b", " ".join(stored))) | _d20_figures() | _promotion_figures()
     found = set(re.findall(r"\b0\.\d{4}\b", CARD))
     assert found and found <= allowed, "figures in the model card that are not stored results: %s" % sorted(found - allowed)
 
@@ -79,3 +79,11 @@ def _d20_figures():
     a = json.loads(p.read_text(encoding="utf-8"))["analysis"]
     stats = [s for fr in a["frames"].values() for s in fr.values()] + list(a["pooled"].values())
     return {"%.4f" % abs(s[k]) for s in stats for k in ("mean_diff", "ci_low", "ci_high")}
+
+
+def _promotion_figures():
+    """Every four-decimal figure of the stored promotion statistics (absolute values), for the model-card guard."""
+    p = ROOT / "docs" / "PROMOTION_RESULTS.json"
+    if not p.exists():
+        return set()
+    return {"%.4f" % abs(s[k]) for s in json.loads(p.read_text(encoding="utf-8"))["stats"].values() for k in ("mean_diff", "ci_low", "ci_high")}
