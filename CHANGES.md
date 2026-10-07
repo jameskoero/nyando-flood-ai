@@ -265,4 +265,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-07: hgb:con registered (D20 PROMOTED)
 
 - models/nyando_hgbcon_5ae81ad8b030.onnx replaces logistic:con as the served model under docs/PROMOTION_PROTOCOL.md (statistical gates in docs/PROMOTION_RESULTS.json, export gates and outcome in docs/REGISTRATION.json, MLflow run fc48f612a09d4667a55fc06c3323bba8 with the artifact); logistic:con is retired; /v2/metrics serves the registration record; model card, README and register row D43 updated.
-\n\n## 2026-10-07: CI no longer waits without a limit\n\n- PR #52's required `test` check stalled for over 30 minutes in tests/test_case_control_sampler.py::test_sampling_returns_both_classes (CI log of the cancelled run); src/data/gfm_client.py reads remote rasters one scene at a time with no timeout, and ci.yml had no time limit. ci.yml now sets GDAL network timeouts and retries, a 25-minute step limit, a 30-minute job limit and faulthandler_timeout=300; tests/test_ci_bounds.py guards them. No dependency added.\n
+
+## 2026-10-07: CI no longer waits without a limit
+
+- PR #52's required `test` check stalled for over 30 minutes in tests/test_case_control_sampler.py::test_sampling_returns_both_classes (CI log of the cancelled run); src/data/gfm_client.py reads remote rasters one scene at a time with no timeout, and ci.yml had no time limit. ci.yml now sets GDAL network timeouts and retries, a 25-minute step limit, a 30-minute job limit and faulthandler_timeout=300; tests/test_ci_bounds.py guards them. No dependency added.
