@@ -12,6 +12,7 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
@@ -31,7 +32,13 @@ jobs:
           exit 1
 
       - name: Run tests
+        timeout-minutes: 25
         env:
+          # The GFM tests read remote rasters through GDAL, which waits forever by default. These bounds make a stalled read fail with its own error (connect 20 s, transfer 60 s, 3 retries 5 s apart).
+          GDAL_HTTP_CONNECTTIMEOUT: "20"
+          GDAL_HTTP_TIMEOUT: "60"
+          GDAL_HTTP_MAX_RETRY: "3"
+          GDAL_HTTP_RETRY_DELAY: "5"
           GEE_SERVICE_ACCOUNT_KEY: ${{ secrets.GEE_SERVICE_ACCOUNT_KEY }}
           # Pull requests from forks and from Dependabot get no Actions secrets (GitHub treats Dependabot runs like fork runs). Only those runs may skip the tests that need an Earth Engine session.
           EE_OPTIONAL: ${{ github.event_name == 'pull_request' && (github.event.pull_request.user.login == 'dependabot[bot]' || github.event.pull_request.head.repo.full_name != github.repository) }}
@@ -39,4 +46,4 @@ jobs:
           if [ -z "$GEE_SERVICE_ACCOUNT_KEY" ] && [ "$EE_OPTIONAL" = "true" ]; then
             echo "::notice::No Earth Engine credentials in this run (a fork or Dependabot pull request): the tests that need an Earth Engine session are skipped."
           fi
-          pytest -v -rs
+          pytest -v -rs -o faulthandler_timeout=300
