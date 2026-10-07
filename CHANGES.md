@@ -296,3 +296,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-07: Phase D amendments r3 and r4 (D46)
 
 - r3: a scorable event has both classes (MIN_CLASS_N = 1, as in Phase C), replacing the rule of 30 that left 5 mappable events and failed both reproduction checks; src/models/phase_d_stats.py follows. r4: if the selected MLP has any monotonicity violation in the Stage 2 check, Phase D ends NOT PROMOTED without building Block B, which stays sealed (early_decision in src/models/phase_d.py). Sections 10 and 11 of docs/PHASE_D_PROTOCOL.md state both, with what was seen before each.
+
+## 2026-10-07: Phase D Stage 2 results on the existing events (D46)
+
+- docs/PHASE_D_RESULTS.json records the Stage 2 run of docs/PHASE_D_PROTOCOL.md Section 9: nested selection of the MLP and of hgb:con on the 35 outer folds, the selected points, per-event AUCs in millionths for the MLP, hgb:con, logistic:con, elevation only and the control, the paired statistics, the five seeds, the reproduction checks and the violation counts, with one MLflow run read back. tests/test_phase_d_results.py recomputes every mean and statistic from the stored AUCs. Phase D ends NOT PROMOTED by the early decision of protocol Section 11 (register row D47): hgb:con stays registered and Block B stays sealed. Register row D46 is closed.
