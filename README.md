@@ -18,9 +18,10 @@ Ward-level flood susceptibility for five wards of the Nyando River basin, Kisumu
 | Area | State |
 |---|---|
 | Training data (V2) | Built and gated: 4,420 rows from 35 Sentinel-1 scene dates. Passes the A-Gate in CI. |
-| Integrity controls | Live: data gate, manifest check, protected `main`. |
+| Integrity controls | Live: data gate, manifest check, protected `main`, and a separate `live-data` job for the tests that call external services (register row D44). |
 | Model | **Registered and served live at `POST /v2/score` (D20 promotion, 2026-10-07).** `hgb:con`, a histogram gradient-boosting model with monotonic constraints trained on the mappable frame, is registered as `models/nyando_hgbcon_5ae81ad8b030.onnx` (ONNX, SHA-256 prefix `5ae81ad8b030`), decided by the gates of the [promotion protocol](docs/PROMOTION_PROTOCOL.md); record: [docs/REGISTRATION.json](docs/REGISTRATION.json). The Phase C model `logistic:con` (`models/nyando_logcon_7a909898d4f6.onnx`) is retired; see the [Phase C protocol](docs/PHASE_C_PROTOCOL.md) and the [closure record](docs/PHASE_C_CLOSURE.md). Scores rank locations inside the areas GFM can map (outside its exclusion mask) and are not flood probabilities. |
-| Experiment tracking | Live (Phase B): MLflow runs on DagsHub log the training-data SHA-256, the git commit and the origin (Colab or Termux). |
+| Experiment tracking | Live (Phase B): MLflow runs on DagsHub log the training-data SHA-256, the git commit and the origin (Colab or Termux). The D20 scoring, promotion-gate and registration runs are recorded in `docs/D20_RESULTS.json`, `docs/PROMOTION_RESULTS.json` and `docs/REGISTRATION.json`. |
+| Phase D (physics-constrained MLP) | Stage 0 only: the protocol and its rules as code are committed (`docs/PHASE_D_PROTOCOL.md`, `src/models/phase_d.py`, register row D46). No MLP is trained, and Block B stays unbuilt and unscored until the Phase D freeze file is merged. |
 | Dashboard | Live and labelled demonstration only: the retracted metrics were removed (`tests/test_frontend_claims.py` guards this) and every score carries a not-validated notice. It still shows legacy-model output; the live metrics panel, loading and error states are Phase F. |
 | Early warning (SMS, forecasts) | Not built. Phase G stays in sandbox and shadow mode while the service stays on Render's free tier (register row D45); no public alerts. |
 
@@ -92,6 +93,7 @@ The flood share of the file (44.6%) is set by the sampling design and is not the
 - **Protected `main`:** pull request required, and `test`, `data-gate` and `manifest-check` must pass. No bypass, no force-push.
 - **CI hygiene:** every workflow declares read-only token permissions and pins each action to a commit SHA, and Dependabot keeps those pins current. The gate workflows use no secrets and run on every pull request; the gate installs exact versions (`requirements-gate.txt`) and the test job installs under exact version constraints (`constraints-ci.txt`), both with a retried install. Fork and Dependabot pull requests have no Actions secrets, so the tests that need an Earth Engine session are skipped there with a visible notice; a trusted run without the key fails with a clear message, and runs with the key execute everything.
 - **Live-data tests:** tests that call the live EODC GFM catalogue run in a separate `live-data` job that is not a required check, so a slow third-party service cannot block merges; the required `test` job runs the rest (register row D44).
+- **Sealed test block:** Block B of the D20 selection stays unbuilt and unscored; `tests/test_phase_d.py` fails if a Block B file appears before the Phase D freeze file is merged.
 - **Not built yet:** the scheduled `train-check` and `drift-monitor` workflows and a gated `deploy` workflow (register row D13).
 
 ## Quick start
@@ -157,13 +159,13 @@ models/nyando_logcon_7a909898d4f6.onnx   the Phase C model (logistic:con, ONNX),
 models/nyando_xgb_v1.pkl                 pre-V2 model file, recorded as legacy
 src/data/                                GFM client, terrain, case-control sampler, raw features, audit and validation helpers
 src/features/                            build_features.py
-src/models/                              Phase C modules: cv (evaluation harness), baseline, boosters, constrained, decision, registration, export_onnx, robustness (battery), closure (record), promotion (gates), export_hgb (tree exporter); also train_model.py and evaluate_model.py
+src/models/                              Phase C modules: cv (evaluation harness), baseline, boosters, constrained, decision, registration, export_onnx, robustness (battery), closure (record), promotion (gates), export_hgb (tree exporter), phase_d (Phase D rules); also train_model.py and evaluate_model.py
 src/utils/                               geo_utils.py
 src/visualization/                       shap_plots.py
 src/tracking.py                          MLflow tracking wrapper
 scripts/                                 dataset build, manifest check, GFM layer audit, Phase C, D20, promotion and registration runs, export and results scripts, D11 OSM check
 tests/                                   A-Gate, README checks, evaluation harness, boosters, constrained logistic, registration, export, robustness and legacy tests
-docs/                                    protocols, results and records: Phase C, D20 and promotion protocols, registration record, D11 OSM check, deviation register, hardening audit
+docs/                                    protocols, results and records: Phase C, D20, promotion and Phase D protocols, registration record, D11 OSM check, deviation register, hardening audit
 docs/funding/                            superseded concept note
 backend/                                 FastAPI service: legacy model on /predict, registered ONNX model on /v2/score (backend/models/ holds the legacy model files)
 frontend/                                React dashboard
@@ -185,17 +187,21 @@ gee_extract_nyando.py                    v1 Earth Engine extraction script (lega
 
 ## Roadmap
 
+- [x] **0. Hotfix (part):** `GET /health` reports the loaded models' SHA-256, `/docs` and `/redoc` return 404 on the live service, and `GET /metrics` answers 503 when no validated metrics are published.
+- [ ] **0. Hotfix (remainder):** the per-client rate limit on `/predict` does not hold; only the shared cap does (`docs/PHASE_CLOSURE.md`; cause not established).
 - [x] **A. Data integrity:** GFM-labelled dataset, A-Gate in CI, manifests, protected `main`.
 - [x] A (remainder). The OSM check of the 15 zero-distance rows is recorded (`docs/D11_OSM_CHECK.json`, register row D11). The monotonicity test is in CI; the permutation audit and the temporal holdout ran in Phase C (see the closure record), and leakage in `land_cover` is not excluded.
 - [x] **B. Experiment tracking:** MLflow on DagsHub, with the data hash logged on every run.
 - [x] **C. Model suite:** logistic regression, gradient boosting and XGBoost with monotonic constraints, evaluated leave-one-event-out. Closed with the registered model `logistic:con` (replaced below); see the [closure record](docs/PHASE_C_CLOSURE.md) for what the boosters did and did not show. D20 then tested these results on new events ([D20 protocol](docs/D20_PROTOCOL.md), Section 13): the advantage over elevation only did not replicate and both boosters beat `logistic:con`; the [promotion protocol](docs/PROMOTION_PROTOCOL.md) then registered `hgb:con` ("D20 PROMOTED", record: [docs/REGISTRATION.json](docs/REGISTRATION.json)).
 - [x] **Gates:** `data-gate`, `manifest-check` and `test` are required checks on protected `main`.
 - [ ] **Gates (remainder):** scheduled `train-check`, `drift-monitor` and a gated `deploy` workflow (register row D13).
-- [ ] **D. Physics-constrained MLP**, exported to ONNX. Serving through ONNX Runtime is already done (register row D33); the MLP is not started.
+- [x] **D. Stage 0:** the physics-constrained MLP protocol and its rules as code are committed ([protocol](docs/PHASE_D_PROTOCOL.md), register row D46); nothing is trained.
+- [ ] **D. (remainder):** the MLP itself: code, Colab training, ONNX export and one decision on Block B. Serving through ONNX Runtime is already done (register row D33).
 - [ ] **E. LLM advisory layer**, cached and rate-limited, never on the `/predict` path.
 - [ ] **F. Dashboard:** no hard-coded metrics, loading and error states, accessibility.
 - [ ] **G-H. SMS alerts** (only after a public WARMA feed is confirmed; sandbox and shadow mode only while the service stays on Render's free tier, register row D45) and an MCP/LangGraph showcase.
-- [ ] **J-K. Model card, datasheet, paper**, and a Zenodo erratum before any new numbers are cited.
+- [x] **K (part):** the model card and the datasheet (`data/DATA_SOURCES.md`) are rewritten to V2 (register row D38).
+- [ ] **J-K (remainder):** ward-level fairness slices, the paper, and a Zenodo erratum before any new numbers are cited.
 
 ## License and data terms
 
