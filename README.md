@@ -22,13 +22,13 @@ Ward-level flood susceptibility for five wards of the Nyando River basin, Kisumu
 | Model | **Registered and served live at `POST /v2/score` (D20 promotion, 2026-10-07).** `hgb:con`, a histogram gradient-boosting model with monotonic constraints trained on the mappable frame, is registered as `models/nyando_hgbcon_5ae81ad8b030.onnx` (ONNX, SHA-256 prefix `5ae81ad8b030`), decided by the gates of the [promotion protocol](docs/PROMOTION_PROTOCOL.md); record: [docs/REGISTRATION.json](docs/REGISTRATION.json). The Phase C model `logistic:con` (`models/nyando_logcon_7a909898d4f6.onnx`) is retired; see the [Phase C protocol](docs/PHASE_C_PROTOCOL.md) and the [closure record](docs/PHASE_C_CLOSURE.md). Scores rank locations inside the areas GFM can map (outside its exclusion mask) and are not flood probabilities. |
 | Experiment tracking | Live (Phase B): MLflow runs on DagsHub log the training-data SHA-256, the git commit and the origin (Colab or Termux). |
 | Dashboard | Live and labelled demonstration only: the retracted metrics were removed (`tests/test_frontend_claims.py` guards this) and every score carries a not-validated notice. It still shows legacy-model output; the live metrics panel, loading and error states are Phase F. |
-| Early warning (SMS, forecasts) | Not built. |
+| Early warning (SMS, forecasts) | Not built. Phase G stays in sandbox and shadow mode while the service stays on Render's free tier (register row D45); no public alerts. |
 
 ## What this is and is not
 
 **Is:** a reproducible, tested pipeline that turns open satellite products into a labelled flood dataset for the Nyando wards, plus the tooling that keeps that dataset honest.
 
-**Is not (yet):** a forecast or an operational warning system. No lead time is claimed. The trained model, its metrics and its calibration come after this data work.
+**Is not (yet):** a forecast or an operational warning system. No lead time is claimed. The registered model ranks locations and is not calibrated to probabilities; calibration comes with the risk-bucket work in Phase E.
 
 ## Data (V2)
 
@@ -70,6 +70,7 @@ The flood share of the file (44.6%) is set by the sampling design and is not the
 - **Point rainfall is weak on its own.** `rainfall_3day` alone separates the classes at AUC 0.55, while `elevation` alone reaches 0.82.
 - **Not circular.** A bare 4-feature logistic regression (elevation, slope, rainfall, distance) scores 0.841 leave-one-event-out, under the 0.90 gate.
 - **Flood points cluster.** The 1,970 flood cases form about 1,087 separate patches (points within 60 m linked), so evaluation has to be leave-one-event-out and patch-aware.
+- **Registered model.** `hgb:con`, mean per-event AUC on the mappable frame: 0.943 over the 23 existing events and 0.971 over the 27 new D20 events (full frame: 0.955 and 0.965). Against `logistic:con`, pooled over the 50 events, the paired difference is +0.0138 [0.0036, 0.0230] (mappable) and +0.0164 [0.0081, 0.0245] (full). No advantage is shown under the 1 km buffered split (-0.0088 [-0.0296, 0.0091]) or out of time (+0.0039 [-0.0130, 0.0195]). Scores rank locations and are not flood probabilities (`docs/REGISTRATION.json`).
 
 ## Known limitations
 
@@ -80,7 +81,8 @@ The flood share of the file (44.6%) is set by the sampling design and is not the
 - Rainfall windows are date-level features, so the 35 dates give only 35 distinct values.
 - Some dates contribute a single flood patch; weight by patch when evaluating.
 - GFM cannot map everywhere: 945 of the 2,450 controls (38.6%) lie inside its exclusion mask, where flood pixels are reset to no flood (`data/derived/gfm_layer_flags.csv`). Scores say nothing about locations inside that mask or about floods GFM cannot detect.
-- The Phase C model comparison is unresolved between evaluation frames, so the registered model is the simplest candidate that satisfies the declared monotonic constraints (`docs/PHASE_C_PROTOCOL.md`, Sections 13 to 15).
+- The registered model `hgb:con` beats `logistic:con` on the new D20 events and pooled, but no advantage is shown under the 1 km buffered split or out of time (`MODEL_CARD.md`); the evidence is in `docs/PROMOTION_RESULTS.json`.
+- `river_adjacent_verified` is derived from `distance_river == 0` and is not evidence of a river. The OSM check (`docs/D11_OSM_CHECK.json`) found 14 of the 15 zero-distance rows inside OSM water or wetland areas and 0 with an OSM waterway line within 50 m (register row D11).
 - Cross-validation of the bare 4-feature logistic baseline, leave-one-event-out (recomputed by `tests/test_v2_audit.py`): pooled AUC 0.841 (all held-out predictions together; the A-Gate limit of 0.90 applies to this figure), mean per-event AUC 0.910 (mean over held-out events that contain both classes), and pooled AUC 0.826 when training also excludes every location that appears in the held-out event. The location-excluded figure is the more conservative estimate of generalisation.
 
 ## Integrity controls
@@ -89,6 +91,8 @@ The flood share of the file (44.6%) is set by the sampling design and is not the
 - **Manifests** (`data/MANIFEST.json`, `models/MANIFEST.json`, checked by `scripts/check_manifests.py`): SHA-256 recomputed independently, models named by algorithm and hash prefix, no two binaries sharing a file name. Pre-V2 files are recorded as `legacy`.
 - **Protected `main`:** pull request required, and `test`, `data-gate` and `manifest-check` must pass. No bypass, no force-push.
 - **CI hygiene:** every workflow declares read-only token permissions and pins each action to a commit SHA, and Dependabot keeps those pins current. The gate workflows use no secrets and run on every pull request; the gate installs exact versions (`requirements-gate.txt`) and the test job installs under exact version constraints (`constraints-ci.txt`), both with a retried install. Fork and Dependabot pull requests have no Actions secrets, so the tests that need an Earth Engine session are skipped there with a visible notice; a trusted run without the key fails with a clear message, and runs with the key execute everything.
+- **Live-data tests:** tests that call the live EODC GFM catalogue run in a separate `live-data` job that is not a required check, so a slow third-party service cannot block merges; the required `test` job runs the rest (register row D44).
+- **Not built yet:** the scheduled `train-check` and `drift-monitor` workflows and a gated `deploy` workflow (register row D13).
 
 ## Quick start
 
@@ -114,10 +118,10 @@ It resumes after an interruption and takes about 10 minutes. The full test suite
 
 ## API (legacy model)
 
-The deployed service predates V2 and serves a legacy model. Interactive docs are disabled in production. The registered V2 model is served at `POST /v2/score` by this code; it loads only after its SHA-256 matches `models/MANIFEST.json`, and the live service reports whether it is loaded in `GET /health`.
+The deployed service serves the registered V2 model at `POST /v2/score` and still serves the legacy model at `POST /predict`. Interactive docs (`/docs`, `/redoc`) are disabled in production (checked live: both return 404). The registered V2 model is served at `POST /v2/score` by this code; it loads only after its SHA-256 matches `models/MANIFEST.json`, and the live service reports whether it is loaded in `GET /health`.
 
 - `POST /v2/score` scores one location with the registered model and returns `score`, a ranking score that is not a flood probability, with the model's hash and claim limit. It has no risk classes, because none were validated. `clay_percent` may be omitted (the response then carries a warning).
-- `GET /v2/metrics` returns the stored evaluation of the registered model from `docs/PHASE_C_RESULTS.json`, or 503 when it is unavailable.
+- `GET /v2/metrics` returns the stored evaluation of the registered model: `docs/REGISTRATION.json` when it names the loaded model, otherwise `docs/PHASE_C_RESULTS.json`; 503 when neither is available.
 - `GET /health` reports both models: the legacy model's file name, SHA-256 and provenance, and `registered_model` (loaded or not, file, SHA-256, training-data hash).
 - `GET /metrics` returns validated metrics, or HTTP 503 when none are published for the served model.
 - `POST /predict` is rate-limited. The example below shows the shape only; the values are illustrative.
@@ -135,7 +139,7 @@ The deployed service predates V2 and serves a legacy model. Interactive docs are
 
 Legacy risk classes (from the code): LOW below 0.35, MEDIUM 0.35 to 0.60, HIGH 0.60 to 0.80, CRITICAL 0.80 and above. The score is a legacy-model output, not a validated flood probability.
 
-The API runs on Render's free tier, so the first request after idle can take about a minute. Live services: [dashboard](https://nyando-flood-ai.vercel.app) and [API health](https://nyando-flood-api.onrender.com/health).
+The API runs on Render's free tier, so the first request after idle can take about a minute. It stays on the free tier by the owner's decision (register row D45). Live services: [dashboard](https://nyando-flood-ai.vercel.app) and [API health](https://nyando-flood-api.onrender.com/health).
 
 ## Repository layout
 
@@ -157,9 +161,9 @@ src/models/                              Phase C modules: cv (evaluation harness
 src/utils/                               geo_utils.py
 src/visualization/                       shap_plots.py
 src/tracking.py                          MLflow tracking wrapper
-scripts/                                 dataset build, manifest check, GFM layer audit and the Phase C run, export and results scripts
+scripts/                                 dataset build, manifest check, GFM layer audit, Phase C, D20, promotion and registration runs, export and results scripts, D11 OSM check
 tests/                                   A-Gate, README checks, evaluation harness, boosters, constrained logistic, registration, export, robustness and legacy tests
-docs/                                    protocols, audits and records (Phase C protocol, results and closure record, deviation register, hardening audit)
+docs/                                    protocols, results and records: Phase C, D20 and promotion protocols, registration record, D11 OSM check, deviation register, hardening audit
 docs/funding/                            superseded concept note
 backend/                                 FastAPI service: legacy model on /predict, registered ONNX model on /v2/score (backend/models/ holds the legacy model files)
 frontend/                                React dashboard
@@ -182,13 +186,15 @@ gee_extract_nyando.py                    v1 Earth Engine extraction script (lega
 ## Roadmap
 
 - [x] **A. Data integrity:** GFM-labelled dataset, A-Gate in CI, manifests, protected `main`.
-- [ ] A (remainder). The OSM check of the 15 zero-distance rows. The monotonicity test is in CI; the permutation audit and the temporal holdout ran in Phase C (see the closure record), and leakage in `land_cover` is not excluded.
+- [x] A (remainder). The OSM check of the 15 zero-distance rows is recorded (`docs/D11_OSM_CHECK.json`, register row D11). The monotonicity test is in CI; the permutation audit and the temporal holdout ran in Phase C (see the closure record), and leakage in `land_cover` is not excluded.
 - [x] **B. Experiment tracking:** MLflow on DagsHub, with the data hash logged on every run.
-- [x] **C. Model suite:** logistic regression, gradient boosting and XGBoost with monotonic constraints, evaluated leave-one-event-out. Closed with the registered model `logistic:con`; see the [closure record](docs/PHASE_C_CLOSURE.md) for what the boosters did and did not show. D20 then tested these results on new events ([D20 protocol](docs/D20_PROTOCOL.md), Section 13): the advantage over elevation only did not replicate and both boosters beat `logistic:con`; which model is registered is decided separately.
-- [ ] **D. Physics-constrained MLP**, exported to ONNX.
+- [x] **C. Model suite:** logistic regression, gradient boosting and XGBoost with monotonic constraints, evaluated leave-one-event-out. Closed with the registered model `logistic:con` (replaced below); see the [closure record](docs/PHASE_C_CLOSURE.md) for what the boosters did and did not show. D20 then tested these results on new events ([D20 protocol](docs/D20_PROTOCOL.md), Section 13): the advantage over elevation only did not replicate and both boosters beat `logistic:con`; the [promotion protocol](docs/PROMOTION_PROTOCOL.md) then registered `hgb:con` ("D20 PROMOTED", record: [docs/REGISTRATION.json](docs/REGISTRATION.json)).
+- [x] **Gates:** `data-gate`, `manifest-check` and `test` are required checks on protected `main`.
+- [ ] **Gates (remainder):** scheduled `train-check`, `drift-monitor` and a gated `deploy` workflow (register row D13).
+- [ ] **D. Physics-constrained MLP**, exported to ONNX. Serving through ONNX Runtime is already done (register row D33); the MLP is not started.
 - [ ] **E. LLM advisory layer**, cached and rate-limited, never on the `/predict` path.
 - [ ] **F. Dashboard:** no hard-coded metrics, loading and error states, accessibility.
-- [ ] **G-H. SMS alerts** (only after a public WARMA feed is confirmed) and an MCP/LangGraph showcase.
+- [ ] **G-H. SMS alerts** (only after a public WARMA feed is confirmed; sandbox and shadow mode only while the service stays on Render's free tier, register row D45) and an MCP/LangGraph showcase.
 - [ ] **J-K. Model card, datasheet, paper**, and a Zenodo erratum before any new numbers are cited.
 
 ## License and data terms

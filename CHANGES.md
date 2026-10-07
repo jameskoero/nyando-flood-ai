@@ -276,3 +276,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-07: live-service tests run in their own job (D44)
 
 - The EODC GFM search hung (CI and Colab stack dumps), freezing the required test check. The GFM client now sets a (10 s, 30 s) timeout; tests that call it carry @pytest.mark.live and run in the live-data job (not a required check); the required test job runs -m "not live"; test_ee_gating runs an offline test in its subprocess. tests/test_ci_live_split.py guards the split. Includes the CI bounds of PR #53.
+
+## 2026-10-07: README matches the registered model
+
+- README states hgb:con (figures read from docs/REGISTRATION.json), the D11 OSM result, the live /docs and /redoc check, the live-data job (D44), the workflows not yet built (D13) and the free-tier decision (register row D45); roadmap ticks updated. tests/test_readme_registered.py guards the figures.
