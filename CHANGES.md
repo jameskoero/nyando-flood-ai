@@ -280,3 +280,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-07: README matches the registered model
 
 - README states hgb:con (figures read from docs/REGISTRATION.json), the D11 OSM result, the live /docs and /redoc check, the live-data job (D44), the workflows not yet built (D13) and the free-tier decision (register row D45); roadmap ticks updated. tests/test_readme_registered.py guards the figures.
+
+## 2026-10-07: Phase D Stage 0 protocol (D46) and README
+
+- docs/PHASE_D_PROTOCOL.md, src/models/phase_d.py and tests/test_phase_d.py commit the physics-constrained MLP (grid, loss, constraint set, selection, freeze file, Block B decision gates, export gates) before any MLP is trained; Block B stays sealed; no torch in production files. README states Phase D Stage 0, the hotfix status and the model-card tick; the MLP itself stays unticked (tests/test_readme_phase_d.py).
