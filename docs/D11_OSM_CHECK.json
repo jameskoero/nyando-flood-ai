@@ -1,0 +1,281 @@
+{
+ "radius_m": 50,
+ "rows": [
+  {
+   "event_id": "2020-04",
+   "flooded": 0,
+   "inside_water_or_wetland": [
+    {
+     "name": "Lake Victoria",
+     "natural": "water",
+     "water": "lake"
+    }
+   ],
+   "lat": -0.266472,
+   "lon": 34.825111,
+   "other_feature_within_50m": [],
+   "queried_utc": "2026-10-07T09:56:46Z",
+   "status": "ok",
+   "waterway_within_50m": []
+  },
+  {
+   "event_id": "2020-04",
+   "flooded": 0,
+   "inside_water_or_wetland": [
+    {
+     "name": "Lake Victoria",
+     "natural": "water",
+     "water": "lake"
+    }
+   ],
+   "lat": -0.265661,
+   "lon": 34.821003,
+   "other_feature_within_50m": [],
+   "queried_utc": "2026-10-07T09:48:44Z",
+   "status": "ok",
+   "timestamp_is_run_snapshot": true,
+   "waterway_within_50m": []
+  },
+  {
+   "event_id": "2020-04",
+   "flooded": 0,
+   "inside_water_or_wetland": [
+    {
+     "name": "Lake Victoria",
+     "natural": "water",
+     "water": "lake"
+    }
+   ],
+   "lat": -0.26259,
+   "lon": 34.819962,
+   "other_feature_within_50m": [],
+   "queried_utc": "2026-10-07T09:48:44Z",
+   "status": "ok",
+   "timestamp_is_run_snapshot": true,
+   "waterway_within_50m": []
+  },
+  {
+   "event_id": "2021-04",
+   "flooded": 1,
+   "inside_water_or_wetland": [
+    {
+     "name": "Kusa swamp",
+     "natural": "wetland",
+     "wetland": "wet_meadow"
+    }
+   ],
+   "lat": -0.265145,
+   "lon": 34.837655,
+   "other_feature_within_50m": [],
+   "queried_utc": "2026-10-07T09:58:35Z",
+   "status": "ok",
+   "waterway_within_50m": []
+  },
+  {
+   "event_id": "2021-04",
+   "flooded": 1,
+   "inside_water_or_wetland": [
+    {
+     "name": "Kusa swamp",
+     "natural": "wetland",
+     "wetland": "wet_meadow"
+    }
+   ],
+   "lat": -0.266579,
+   "lon": 34.83764,
+   "other_feature_within_50m": [],
+   "queried_utc": "2026-10-07T09:48:44Z",
+   "status": "ok",
+   "timestamp_is_run_snapshot": true,
+   "waterway_within_50m": []
+  },
+  {
+   "event_id": "2021-04",
+   "flooded": 1,
+   "inside_water_or_wetland": [
+    {
+     "name": "Lake Victoria",
+     "natural": "water",
+     "water": "lake"
+    }
+   ],
+   "lat": -0.267405,
+   "lon": 34.834588,
+   "other_feature_within_50m": [],
+   "queried_utc": "2026-10-07T09:48:44Z",
+   "status": "ok",
+   "timestamp_is_run_snapshot": true,
+   "waterway_within_50m": []
+  },
+  {
+   "event_id": "2021-04",
+   "flooded": 1,
+   "inside_water_or_wetland": [
+    {
+     "name": "Lake Victoria",
+     "natural": "water",
+     "water": "lake"
+    }
+   ],
+   "lat": -0.266937,
+   "lon": 34.837636,
+   "other_feature_within_50m": [],
+   "queried_utc": "2026-10-07T09:48:44Z",
+   "status": "ok",
+   "timestamp_is_run_snapshot": true,
+   "waterway_within_50m": []
+  },
+  {
+   "event_id": "2022-05",
+   "flooded": 0,
+   "inside_water_or_wetland": [
+    {
+     "name": "Lake Victoria",
+     "natural": "water",
+     "water": "lake"
+    }
+   ],
+   "lat": -0.267722,
+   "lon": 34.824918,
+   "other_feature_within_50m": [],
+   "queried_utc": "2026-10-07T10:50:03Z",
+   "status": "ok",
+   "waterway_within_50m": []
+  },
+  {
+   "event_id": "2026-03",
+   "flooded": 0,
+   "inside_water_or_wetland": [
+    {
+     "name": "Lake Victoria",
+     "natural": "water",
+     "water": "lake"
+    }
+   ],
+   "lat": -0.262647,
+   "lon": 34.830344,
+   "other_feature_within_50m": [],
+   "queried_utc": "2026-10-07T09:48:44Z",
+   "status": "ok",
+   "timestamp_is_run_snapshot": true,
+   "waterway_within_50m": []
+  },
+  {
+   "event_id": "2026-03",
+   "flooded": 0,
+   "inside_water_or_wetland": [
+    {
+     "name": "Lake Victoria",
+     "natural": "water",
+     "water": "lake"
+    }
+   ],
+   "lat": -0.265482,
+   "lon": 34.828881,
+   "other_feature_within_50m": [],
+   "queried_utc": "2026-10-07T09:48:44Z",
+   "status": "ok",
+   "timestamp_is_run_snapshot": true,
+   "waterway_within_50m": []
+  },
+  {
+   "event_id": "date-2021-01-18",
+   "flooded": 1,
+   "inside_water_or_wetland": [
+    {
+     "name": "Kusa swamp",
+     "natural": "wetland",
+     "wetland": "wet_meadow"
+    }
+   ],
+   "lat": -0.266758,
+   "lon": 34.837638,
+   "other_feature_within_50m": [],
+   "queried_utc": "2026-10-07T10:02:09Z",
+   "status": "ok",
+   "waterway_within_50m": []
+  },
+  {
+   "event_id": "date-2022-12-19",
+   "flooded": 1,
+   "inside_water_or_wetland": [
+    {
+     "name": "Kusa swamp",
+     "natural": "wetland",
+     "wetland": "wet_meadow"
+    }
+   ],
+   "lat": -0.265626,
+   "lon": 34.84302,
+   "other_feature_within_50m": [],
+   "queried_utc": "2026-10-07T10:03:53Z",
+   "status": "ok",
+   "waterway_within_50m": []
+  },
+  {
+   "event_id": "date-2022-12-19",
+   "flooded": 0,
+   "inside_water_or_wetland": [],
+   "lat": -0.260224,
+   "lon": 34.826253,
+   "other_feature_within_50m": [
+    {
+     "natural": "wetland"
+    }
+   ],
+   "queried_utc": "2026-10-07T09:48:44Z",
+   "status": "ok",
+   "timestamp_is_run_snapshot": true,
+   "waterway_within_50m": []
+  },
+  {
+   "event_id": "date-2024-03-31",
+   "flooded": 1,
+   "inside_water_or_wetland": [
+    {
+     "name": "Lake Victoria",
+     "natural": "water",
+     "water": "lake"
+    }
+   ],
+   "lat": -0.241486,
+   "lon": 34.814285,
+   "other_feature_within_50m": [],
+   "queried_utc": "2026-10-07T09:48:44Z",
+   "status": "ok",
+   "timestamp_is_run_snapshot": true,
+   "waterway_within_50m": []
+  },
+  {
+   "event_id": "date-2024-03-31",
+   "flooded": 1,
+   "inside_water_or_wetland": [
+    {
+     "name": "Kusa swamp",
+     "natural": "wetland",
+     "wetland": "wet_meadow"
+    }
+   ],
+   "lat": -0.265691,
+   "lon": 34.838007,
+   "other_feature_within_50m": [],
+   "queried_utc": "2026-10-07T09:48:44Z",
+   "status": "ok",
+   "timestamp_is_run_snapshot": true,
+   "waterway_within_50m": []
+  }
+ ],
+ "schema": 4,
+ "snapshot_utc": "2026-10-07T10:50:03Z",
+ "source": "OpenStreetMap via Overpass API",
+ "status": "complete",
+ "summary": {
+  "answered": 15,
+  "failed": 0,
+  "inside_water_or_wetland": 14,
+  "other_feature_within_50m": 1,
+  "rows": 15,
+  "with_waterway_within_50m": 0
+ },
+ "training_data_sha256": "0b9283540d91154c0dda55b0d92cae7aa3cae6aeffad0390bbf77e028dd2063a"
+}

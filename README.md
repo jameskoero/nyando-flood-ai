@@ -7,7 +7,7 @@ Ward-level flood susceptibility for five wards of the Nyando River basin, Kisumu
 [![manifest-check](https://github.com/jameskoero/nyando-flood-ai/actions/workflows/manifest-check.yml/badge.svg)](https://github.com/jameskoero/nyando-flood-ai/actions/workflows/manifest-check.yml)
 [![Code license: MIT](https://img.shields.io/badge/code%20license-MIT-blue.svg)](LICENSE)
 
-> **Correction notice (Sept 2026).** The performance figures previously shown in this README (AUC-ROC 0.9717, F1 0.9022, CV AUC 0.9727) are **retracted**. They came from a training file with only 2 flood-labelled rows out of 2,308 (see [CHANGES.md](CHANGES.md)), after SMOTE was applied before the train/test split. A V2 rebuild with independent Copernicus GFM flood labels is in progress. **Do not cite the retracted figures.**
+> **Correction notice (Sept 2026).** The performance figures previously shown in this README (AUC-ROC 0.9717, F1 0.9022, CV AUC 0.9727) are **retracted**. They came from a training file with only 2 flood-labelled rows out of 2,308 (see [CHANGES.md](CHANGES.md)), after SMOTE was applied before the train/test split. The V2 rebuild with independent Copernicus GFM flood labels is live (see Status below). **Do not cite the retracted figures.**
 
 ## Contents
 

@@ -48,3 +48,7 @@ The training files contain values derived from MERIT Hydro (elevation, slope, HA
 
 ## 7. Maintenance
 Rebuild with `scripts/build_initial_dataset.py`. Hashes live in `data/MANIFEST.json` and are recomputed by CI (`data-gate`, `manifest-check`). Changes go through pull requests and `docs/ROADMAP_DEVIATIONS.md`.
+
+## river_adjacent_verified (register row D11)
+
+The column is derived from distance_river == 0 and is not independent evidence of a river. OSM comparison, snapshot 2026-10-07T10:50:03Z (docs/D11_OSM_CHECK.json): OSM answered 15 of 15 rows; of those, 0 have a waterway line within 50 m, 1 have another OSM feature within 50 m that is not a waterway (tags in the file), and 14 lie inside an OSM water or wetland area. The column keeps its name because renaming it would change the training file hash.
