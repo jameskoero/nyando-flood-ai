@@ -261,3 +261,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-07: model-agnostic tests
 
 - Tests that meant the Phase C model now name it; the class check reads land_cover_classes metadata when present; a retired model status needs a README rule. No behaviour change.
+
+## 2026-10-07: hgb:con registered (D20 PROMOTED)
+
+- models/nyando_hgbcon_5ae81ad8b030.onnx replaces logistic:con as the served model under docs/PROMOTION_PROTOCOL.md (statistical gates in docs/PROMOTION_RESULTS.json, export gates and outcome in docs/REGISTRATION.json, MLflow run fc48f612a09d4667a55fc06c3323bba8 with the artifact); logistic:con is retired; /v2/metrics serves the registration record; model card, README and register row D43 updated.

@@ -112,11 +112,17 @@ def test_legacy_predict_still_works_and_stays_labelled(client):
 
 
 def test_metrics_v2_matches_the_stored_results(client):
-    res = json.loads((ROOT / "docs" / "PHASE_C_RESULTS.json").read_text(encoding="utf-8"))
     r = client.get("/v2/metrics")
     assert r.status_code == 200
     m = r.json()
-    assert m["model_sha256"] == res["registered_model"]["sha256"] == REGISTERED.sha256
+    assert m["model_sha256"] == REGISTERED.sha256
+    reg = ROOT / "docs" / "REGISTRATION.json"
+    rec = json.loads(reg.read_text(encoding="utf-8")) if reg.exists() else None
+    if rec and rec["model"]["sha256"] == REGISTERED.sha256:
+        assert m == rec["metrics"] and m["source"] == "docs/REGISTRATION.json" and m["runs"]["registration"] == rec["registration_run"]
+        return
+    res = json.loads((ROOT / "docs" / "PHASE_C_RESULTS.json").read_text(encoding="utf-8"))
+    assert m["model_sha256"] == res["registered_model"]["sha256"]
     assert m["per_event_mean_auc"]["mappable"] == res["runs"]["registration"]["metrics"]["mappable/con/per_event_mean"]
     assert m["runs"]["registration"] == res["runs"]["registration"]["id"] and isinstance(m["beyond_elevation_only"]["selection_split"], bool)
 

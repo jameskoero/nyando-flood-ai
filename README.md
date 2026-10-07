@@ -19,7 +19,7 @@ Ward-level flood susceptibility for five wards of the Nyando River basin, Kisumu
 |---|---|
 | Training data (V2) | Built and gated: 4,420 rows from 35 Sentinel-1 scene dates. Passes the A-Gate in CI. |
 | Integrity controls | Live: data gate, manifest check, protected `main`. |
-| Model | **Registered and served live at `POST /v2/score` (Phase C closed).** `logistic:con`, a sign-constrained logistic regression trained on the mappable frame, is registered as `models/nyando_logcon_7a909898d4f6.onnx` (ONNX, SHA-256 prefix `7a909898d4f6`). Its scores rank locations inside the areas GFM can map. They are not flood probabilities, and they say nothing about locations inside the GFM exclusion mask or about floods GFM cannot detect. The legacy `POST /predict` still serves a pre-V2 model whose metrics are unverified. On 2026-10-05 the live `GET /health` reported `registered_model.loaded` true with the SHA-256 listed in `models/MANIFEST.json`. Rules, results and limits: [Phase C protocol](docs/PHASE_C_PROTOCOL.md) and [closure record](docs/PHASE_C_CLOSURE.md). |
+| Model | **Registered and served live at `POST /v2/score` (D20 promotion, 2026-10-07).** `hgb:con`, a histogram gradient-boosting model with monotonic constraints trained on the mappable frame, is registered as `models/nyando_hgbcon_5ae81ad8b030.onnx` (ONNX, SHA-256 prefix `5ae81ad8b030`), decided by the gates of the [promotion protocol](docs/PROMOTION_PROTOCOL.md); record: [docs/REGISTRATION.json](docs/REGISTRATION.json). The Phase C model `logistic:con` (`models/nyando_logcon_7a909898d4f6.onnx`) is retired; see the [Phase C protocol](docs/PHASE_C_PROTOCOL.md) and the [closure record](docs/PHASE_C_CLOSURE.md). Scores rank locations inside the areas GFM can map (outside its exclusion mask) and are not flood probabilities. |
 | Experiment tracking | Live (Phase B): MLflow runs on DagsHub log the training-data SHA-256, the git commit and the origin (Colab or Termux). |
 | Dashboard | Live and labelled demonstration only: the retracted metrics were removed (`tests/test_frontend_claims.py` guards this) and every score carries a not-validated notice. It still shows legacy-model output; the live metrics panel, loading and error states are Phase F. |
 | Early warning (SMS, forecasts) | Not built. |
@@ -148,7 +148,8 @@ data/training/                           V2 training data and its per-date sets 
 data/derived/                            gfm_layer_flags.csv: GFM exclusion-mask and reference-water flags for each training point
 models/MANIFEST.json                     SHA-256, status and training-data hash for every model file
 models/PROVENANCE.json                   provenance notes for the model files
-models/nyando_logcon_7a909898d4f6.onnx   the registered Phase C model (logistic:con, ONNX)
+models/nyando_hgbcon_5ae81ad8b030.onnx   the registered model (hgb:con, ONNX TreeEnsemble), D20 promotion
+models/nyando_logcon_7a909898d4f6.onnx   the Phase C model (logistic:con, ONNX), retired
 models/nyando_xgb_v1.pkl                 pre-V2 model file, recorded as legacy
 src/data/                                GFM client, terrain, case-control sampler, raw features, audit and validation helpers
 src/features/                            build_features.py
