@@ -1,0 +1,4 @@
+# Training only (Phase D, docs/PHASE_D_PROTOCOL.md): the physics-constrained MLP is trained on CPU in Colab and exported to ONNX. torch is never installed in production, in CI or in the image.
+# 2.11.0+cpu is the version run in Colab on 2026-10-07 (Python 3.13); it has not been run on Python 3.11.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.11.0+cpu

@@ -284,3 +284,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-07: Phase D Stage 0 protocol (D46) and README
 
 - docs/PHASE_D_PROTOCOL.md, src/models/phase_d.py and tests/test_phase_d.py commit the physics-constrained MLP (grid, loss, constraint set, selection, freeze file, Block B decision gates, export gates) before any MLP is trained; Block B stays sealed; no torch in production files. README states Phase D Stage 0, the hotfix status and the model-card tick; the MLP itself stays unticked (tests/test_readme_phase_d.py).
+
+## 2026-10-07: Phase D Stage 1, the MLP code and its offline tests (D46)
+
+- src/models/mlp_pre.py (numpy preprocessing: median fill and blank indicator for clay_percent, standardisation, land_cover one-hot, 14 inputs) and src/models/mlp.py (PhysicsMLP: tanh network, binary cross-entropy plus the penalty weight times a soft constraint penalty from autograd at real rows) implement docs/PHASE_D_PROTOCOL.md Section 1. torch is pinned only in requirements-train.txt. tests/test_mlp_pre.py runs in CI; tests/test_mlp.py needs torch and is skipped in CI until the train-check workflow exists (register row D13). Nothing is trained and Block B stays sealed.
