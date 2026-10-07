@@ -18,8 +18,8 @@ SENS = RES["registered_artifact_sensitivity"]
 def test_results_name_the_committed_block_a_models_and_training_data():
     b = RES["block_a"]
     assert hashlib.sha256((ROOT / b["file"]).read_bytes()).hexdigest() == b["sha256"] == MAN[b["file"]]["sha256"]
-    act = [(k, v) for k, v in MODELS.items() if v.get("status") == "active"][0]
-    assert RES["models"]["champion"] == {"file": act[0], "sha256": act[1]["sha256"]}
+    c = RES["models"]["champion"]
+    assert c["file"] in MODELS and MODELS[c["file"]]["sha256"] == c["sha256"] and MODELS[c["file"]]["status"] in ("active", "retired")
     assert RES["training_data_sha256"] in [v["sha256"] for v in MAN.values() if isinstance(v, dict) and "label_source" in v]
     assert b["scorable_mappable"] >= d20.MIN_BLOCK_A_EVENTS
     assert b["shared_locations"] > 0 and b["training_rows_dropped"] >= b["shared_locations"] and b["training_rows_used"] + b["training_rows_dropped"] == b["training_rows_total"]

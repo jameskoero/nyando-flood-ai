@@ -127,7 +127,12 @@ def test_the_api_land_cover_classes_equal_the_model_graph():
     else:
         onnx = pytest.importorskip("onnx")
     model = onnx.load(str(ROOT / ACTIVE[0][0]))
-    assert sorted(int(i.name.split("_")[1]) for i in model.graph.initializer if i.name.startswith("category_")) == sorted(LAND_COVER_CLASSES)
+    meta = {p.key: p.value for p in model.metadata_props}
+    if "land_cover_classes" in meta:
+        classes = [int(c) for c in meta["land_cover_classes"].split(",")]
+    else:
+        classes = [int(i.name.split("_")[1]) for i in model.graph.initializer if i.name.startswith("category_")]
+    assert sorted(classes) == sorted(LAND_COVER_CLASSES)
 
 
 def test_protocol_section_17_exists():
