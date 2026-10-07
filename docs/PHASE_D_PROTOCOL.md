@@ -61,3 +61,16 @@ Date: 2026-10-07 (r1). Committed before any MLP is trained or scored. Rules as c
 ## 8. Stages
 
 - Stage 1: model code and tests offline; `torch` only in `requirements-train.txt`, never in the production files. Stage 2: Colab CPU training with MLflow. Stage 3: ONNX export with the parity gates. Stage 4: the freeze, Block B, the decision applied once, then serving through the hash-verified loader. Stop after each stage.
+
+## 9. Stage 2 procedure (r2, 2026-10-07; committed before any MLP score exists)
+
+- Frames: the mappable frame selects and is the headline; the full frame is reported. Outer folds: one per event_id of the frame (leave-one-event-out, shared locations removed). An event is scorable with at least MIN_CLASS_N = 30 rows of each class; per-event AUCs are stored in millionths.
+- Selection: `select_params` of `src/models/boosters.py` over the six grid points inside every outer fold, computed one fold at a time and cached by `src/models/phase_d_cv.py` (equal to `nested_scores`, tested).
+- Selected point: the grid point chosen by most outer folds of the mappable run; ties go to the earlier (simpler) point (`modal_point`). The same rule gives hgb:con's point from its grid.
+- Headline (mappable frame, existing events): the MLP's nested outer scores minus hgb:con's nested outer scores (same splits, same selection rule), minus logistic:con (fixed, `build_constrained_logistic`, no tuning) and minus elevation only (score = minus elevation).
+- Full frame (reported): the selected points of the MLP and of hgb:con, and logistic:con, each fitted with fixed settings in leave-one-event-out on the full frame.
+- Control: the selected hidden size with penalty weight 0, fixed, on both frames. Seeds 42 to 46: the selected point, fixed, mappable frame.
+- Statistics: paired per-event bootstrap of the MLP minus each reference, 10000 resamples, seed 42, alpha 0.025, computed from the stored millionths.
+- Monotonicity: `monotone_violations` (200 real rows) on whole-mappable fits of the selected MLP, its control and the selected hgb:con; reported, no gate at this stage.
+- Reproduction checks, reported and never a gate: hgb:con's mappable mean per-event AUC against 0.943 (tolerance 0.001) and logistic:con's against 0.937239 (tolerance 0.0005).
+- Record: `docs/PHASE_D_RESULTS.json` from the run's raw results, with one MLflow run read back. Nothing in this section decides promotion: Block B decides (Section 4). The frozen candidate in `docs/PHASE_D_FREEZE.json` is the selected point, in its own pull request.

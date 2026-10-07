@@ -288,3 +288,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-07: Phase D Stage 1, the MLP code and its offline tests (D46)
 
 - src/models/mlp_pre.py (numpy preprocessing: median fill and blank indicator for clay_percent, standardisation, land_cover one-hot, 14 inputs) and src/models/mlp.py (PhysicsMLP: tanh network, binary cross-entropy plus the penalty weight times a soft constraint penalty from autograd at real rows) implement docs/PHASE_D_PROTOCOL.md Section 1. torch is pinned only in requirements-train.txt. tests/test_mlp_pre.py runs in CI; tests/test_mlp.py needs torch and is skipped in CI until the train-check workflow exists (register row D13). Nothing is trained and Block B stays sealed.
+
+## 2026-10-07: Phase D Stage 2 procedure and run code (D46)
+
+- docs/PHASE_D_PROTOCOL.md Section 9 (r2) fixes the Stage 2 procedure before any MLP score exists; src/models/phase_d.py gains the selected-point rule and constants; src/models/phase_d_cv.py (cached nested selection, equal to nested_scores), phase_d_stats.py, phase_d_jobs.py and phase_d_run.py implement it; tests/test_phase_d_stage2.py guards it. Nothing is trained in this change and Block B stays sealed.
