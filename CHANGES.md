@@ -269,3 +269,10 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-07: D11 closed
 
 - scripts/check_osm_d11.py compares the 15 zero-distance rows with OpenStreetMap (docs/D11_OSM_CHECK.json): OSM answered 15 of 15 rows; of those, 0 have a waterway line within 50 m, 1 have another OSM feature within 50 m that is not a waterway (tags in the file), and 14 lie inside an OSM water or wetland area. The flag stays derived and is not renamed. README notice no longer says the rebuild is in progress.
+## 2026-10-07: CI no longer waits without a limit
+
+- PR #52's required `test` check stalled for over 30 minutes in tests/test_case_control_sampler.py::test_sampling_returns_both_classes (CI log of the cancelled run); src/data/gfm_client.py reads remote rasters one scene at a time with no timeout, and ci.yml had no time limit. ci.yml now sets GDAL network timeouts and retries, a 25-minute step limit, a 30-minute job limit and faulthandler_timeout=300; tests/test_ci_bounds.py guards them. No dependency added.
+
+## 2026-10-07: live-service tests run in their own job (D44)
+
+- The EODC GFM search hung (CI and Colab stack dumps), freezing the required test check. The GFM client now sets a (10 s, 30 s) timeout; tests that call it carry @pytest.mark.live and run in the live-data job (not a required check); the required test job runs -m "not live"; test_ee_gating runs an offline test in its subprocess. tests/test_ci_live_split.py guards the split. Includes the CI bounds of PR #53.
