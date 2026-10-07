@@ -1,10 +1,10 @@
 """Phase D Stage 2 statistics (docs/PHASE_D_PROTOCOL.md Section 9): per-event AUCs stored in millionths, paired per-event bootstrap of the MLP minus each reference, reproduction checks and seeds."""
 from src.models import phase_d as D
-from src.models.cv import EVENT, MIN_CLASS_N, SEED, paired_event_bootstrap, per_group_auc
+from src.models.cv import EVENT, SEED, paired_event_bootstrap, per_group_auc
 
 
 def aucs(df, scores):
-    return {str(e): int(round(a * 1e6)) for e, a in per_group_auc(df, scores, EVENT, MIN_CLASS_N).items()}
+    return {str(e): int(round(a * 1e6)) for e, a in per_group_auc(df, scores, EVENT, D.MIN_CLASS_N).items()}
 
 
 def mean(a):
