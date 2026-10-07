@@ -253,3 +253,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-06: promotion gate run
 
 - The statistical gates of docs/PROMOTION_PROTOCOL.md were computed once: every statistical gate passed; the export gates come next. docs/PROMOTION_RESULTS.json, tests/test_promotion_results.py, register row D41.
+
+## 2026-10-07: hgb:con exporter
+
+- src/models/export_hgb.py writes hgb:con as one ai.onnx.ml TreeEnsemble (opset 5) with the production input contract; tests/test_export_hgb.py checks export gates E1 to E3 on real rows in CI; register row D42. No artifact is committed and the registered model is unchanged.
