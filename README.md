@@ -21,7 +21,7 @@ Ward-level flood susceptibility for five wards of the Nyando River basin, Kisumu
 | Integrity controls | Live: data gate, manifest check, protected `main`, and a separate `live-data` job for the tests that call external services (register row D44). |
 | Model | **Registered and served live at `POST /v2/score` (D20 promotion, 2026-10-07).** `hgb:con`, a histogram gradient-boosting model with monotonic constraints trained on the mappable frame, is registered as `models/nyando_hgbcon_5ae81ad8b030.onnx` (ONNX, SHA-256 prefix `5ae81ad8b030`), decided by the gates of the [promotion protocol](docs/PROMOTION_PROTOCOL.md); record: [docs/REGISTRATION.json](docs/REGISTRATION.json). The Phase C model `logistic:con` (`models/nyando_logcon_7a909898d4f6.onnx`) is retired; see the [Phase C protocol](docs/PHASE_C_PROTOCOL.md) and the [closure record](docs/PHASE_C_CLOSURE.md). Scores rank locations inside the areas GFM can map (outside its exclusion mask) and are not flood probabilities. |
 | Experiment tracking | Live (Phase B): MLflow runs on DagsHub log the training-data SHA-256, the git commit and the origin (Colab or Termux). The D20 scoring, promotion-gate and registration runs are recorded in `docs/D20_RESULTS.json`, `docs/PROMOTION_RESULTS.json` and `docs/REGISTRATION.json`. |
-| Phase D (physics-constrained MLP) | Stage 0 only: the protocol and its rules as code are committed (`docs/PHASE_D_PROTOCOL.md`, `src/models/phase_d.py`, register row D46). No MLP is trained, and Block B stays unbuilt and unscored until the Phase D freeze file is merged. |
+| Phase D (physics-constrained MLP) | Stages 0 and 1: the protocol and its rules as code (`docs/PHASE_D_PROTOCOL.md`, `src/models/phase_d.py`, register row D46) and the model code with offline tests (`src/models/mlp.py`, `src/models/mlp_pre.py`; `torch` only in `requirements-train.txt`) are committed. No MLP is trained, and Block B stays unbuilt and unscored until the Phase D freeze file is merged. |
 | Dashboard | Live and labelled demonstration only: the retracted metrics were removed (`tests/test_frontend_claims.py` guards this) and every score carries a not-validated notice. It still shows legacy-model output; the live metrics panel, loading and error states are Phase F. |
 | Early warning (SMS, forecasts) | Not built. Phase G stays in sandbox and shadow mode while the service stays on Render's free tier (register row D45); no public alerts. |
 
@@ -159,7 +159,7 @@ models/nyando_logcon_7a909898d4f6.onnx   the Phase C model (logistic:con, ONNX),
 models/nyando_xgb_v1.pkl                 pre-V2 model file, recorded as legacy
 src/data/                                GFM client, terrain, case-control sampler, raw features, audit and validation helpers
 src/features/                            build_features.py
-src/models/                              Phase C modules: cv (evaluation harness), baseline, boosters, constrained, decision, registration, export_onnx, robustness (battery), closure (record), promotion (gates), export_hgb (tree exporter), phase_d (Phase D rules); also train_model.py and evaluate_model.py
+src/models/                              Phase C modules: cv (evaluation harness), baseline, boosters, constrained, decision, registration, export_onnx, robustness (battery), closure (record), promotion (gates), export_hgb (tree exporter), phase_d (Phase D rules), mlp_pre and mlp (Phase D model); also train_model.py and evaluate_model.py
 src/utils/                               geo_utils.py
 src/visualization/                       shap_plots.py
 src/tracking.py                          MLflow tracking wrapper
@@ -180,6 +180,7 @@ vercel.json                              Vercel settings for the dashboard
 requirements.txt                         project and CI dependencies
 requirements-gate.txt                    exact pins for the data-gate job
 requirements-onnx.txt                    ONNX export and scoring dependencies, installed by CI
+requirements-train.txt                   training only (Phase D): torch, never installed in production or CI
 constraints-ci.txt                       exact versions of every package the CI test job can install (pip constraints)
 pytest.ini  conftest.py                  pytest configuration
 gee_extract_nyando.py                    v1 Earth Engine extraction script (legacy; used by tests/test_gfm_client.py)
@@ -196,7 +197,8 @@ gee_extract_nyando.py                    v1 Earth Engine extraction script (lega
 - [x] **Gates:** `data-gate`, `manifest-check` and `test` are required checks on protected `main`.
 - [ ] **Gates (remainder):** scheduled `train-check`, `drift-monitor` and a gated `deploy` workflow (register row D13).
 - [x] **D. Stage 0:** the physics-constrained MLP protocol and its rules as code are committed ([protocol](docs/PHASE_D_PROTOCOL.md), register row D46); nothing is trained.
-- [ ] **D. (remainder):** the MLP itself: code, Colab training, ONNX export and one decision on Block B. Serving through ONNX Runtime is already done (register row D33).
+- [x] **D. Stage 1:** the model code and its offline tests are committed (`src/models/mlp.py`, `src/models/mlp_pre.py`); nothing is trained.
+- [ ] **D. (remainder):** the MLP itself: Colab training, ONNX export and one decision on Block B. Serving through ONNX Runtime is already done (register row D33).
 - [ ] **E. LLM advisory layer**, cached and rate-limited, never on the `/predict` path.
 - [ ] **F. Dashboard:** no hard-coded metrics, loading and error states, accessibility.
 - [ ] **G-H. SMS alerts** (only after a public WARMA feed is confirmed; sandbox and shadow mode only while the service stays on Render's free tier, register row D45) and an MCP/LangGraph showcase.
