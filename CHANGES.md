@@ -300,3 +300,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-07: Phase D Stage 2 results on the existing events (D46)
 
 - docs/PHASE_D_RESULTS.json records the Stage 2 run of docs/PHASE_D_PROTOCOL.md Section 9: nested selection of the MLP and of hgb:con on the 35 outer folds, the selected points, per-event AUCs in millionths for the MLP, hgb:con, logistic:con, elevation only and the control, the paired statistics, the five seeds, the reproduction checks and the violation counts, with one MLflow run read back. tests/test_phase_d_results.py recomputes every mean and statistic from the stored AUCs. Phase D ends NOT PROMOTED by the early decision of protocol Section 11 (register row D47): hgb:con stays registered and Block B stays sealed. Register row D46 is closed.
+
+## 2026-10-10: Security baseline (D48)
+
+- The production image installs exactly the versions CI tests and audits (constraints-ci.txt) and runs as a non-root user; python-multipart is removed because the API takes JSON only. The audit of the image's old pins had found 7 advisories each in python-multipart 0.0.9 and starlette 0.36.3; .github/workflows/security.yml now audits the served set weekly. Every API response carries security headers. SECURITY.md names V2 as supported; docs/SECURITY_BASELINE.md holds the threat model, the verified controls and the open items.

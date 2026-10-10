@@ -1,0 +1,31 @@
+name: security
+on:
+  schedule:
+    - cron: "17 5 * * 1"
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - constraints-ci.txt
+      - requirements.txt
+      - Dockerfile
+      - .github/workflows/security.yml
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.11"
+      - name: Install the served set under the CI constraints
+        run: |
+          pip install --no-cache-dir -c constraints-ci.txt fastapi uvicorn pydantic slowapi onnxruntime numpy pandas scikit-learn joblib
+          pip freeze > "$RUNNER_TEMP/served.txt"
+      - name: Audit the served set and the CI pins
+        run: |
+          pip install --no-cache-dir pip-audit==2.10.1
+          pip-audit -r "$RUNNER_TEMP/served.txt" --no-deps --disable-pip --progress-spinner off
+          pip-audit -r constraints-ci.txt --no-deps --disable-pip --progress-spinner off
