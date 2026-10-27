@@ -308,3 +308,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-27: Pinned packages with new advisories
 
 - The weekly audit failed after new advisories were published for opentelemetry-api (in the image's install set), certifi and pillow; constraints-ci.txt now pins opentelemetry-api 1.45.1, certifi 2026.10.19 and pillow 13.0.0, and docs/SECURITY_BASELINE.md records it. The image installs from the same constraints, so the next Render build picks up the fix.
+
+## 2026-10-27: Phase E protocol and level rules (D49)
+
+- docs/PHASE_E_PROTOCOL.md is committed before any level is computed: levels are rank bands (terciles of out-of-fold reference scores), validated once on Block A by three gates with an event-clustered bootstrap; the advisory contract (Gemini, then Groq, then a template; reference-substitution attributions, not SHAP; /v2/advisory) is fixed. src/advisory/rules.py holds the rules as code and tests/test_phase_e.py checks them on known values. Register row D49 records four deviations from the roadmap's Phase E text. Nothing is validated or served yet.
