@@ -316,3 +316,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-28: Shipping tools and workflow document
 
 - tools/ship.sh and tools/ci_failures.sh (GitHub CLI) ship a change as one pull request and print the failing tests when CI fails; docs/DEV_WORKFLOW.md records the setup and the rules learned from repeated failures: CI is the test oracle, stage files before testing, heavy runs stay out of the shipping shell, and no token is pasted into chat.
+
+## 2026-10-28: ship.sh waits for the checks to register
+
+- tools/ship.sh asked GitHub for check results before any had registered and reported a false CI failure; it now waits up to two minutes for the checks to appear, then watches them.
