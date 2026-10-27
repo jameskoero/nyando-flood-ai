@@ -165,6 +165,7 @@ src/utils/                               geo_utils.py
 src/visualization/                       shap_plots.py
 src/tracking.py                          MLflow tracking wrapper
 scripts/                                 dataset build, manifest check, GFM layer audit, Phase C, D20, promotion and registration runs, export and results scripts, D11 OSM check
+tools/                                   shipping tools: ship a change as one pull request, print failing CI tests (GitHub CLI)
 tests/                                   A-Gate, README checks, evaluation harness, boosters, constrained logistic, registration, export, robustness and legacy tests
 docs/                                    protocols, results and records: Phase C, D20, promotion and Phase D protocols, registration record, D11 OSM check, deviation register, hardening audit
 docs/funding/                            superseded concept note
