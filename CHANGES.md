@@ -304,3 +304,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-10: Security baseline (D48)
 
 - The production image installs exactly the versions CI tests and audits (constraints-ci.txt) and runs as a non-root user; python-multipart is removed because the API takes JSON only. The audit of the image's old pins had found 7 advisories each in python-multipart 0.0.9 and starlette 0.36.3; .github/workflows/security.yml now audits the served set weekly. Every API response carries security headers. SECURITY.md names V2 as supported; docs/SECURITY_BASELINE.md holds the threat model, the verified controls and the open items.
+
+## 2026-10-27: Pinned packages with new advisories
+
+- The weekly audit failed after new advisories were published for opentelemetry-api (in the image's install set), certifi and pillow; constraints-ci.txt now pins opentelemetry-api 1.45.1, certifi 2026.10.19 and pillow 13.0.0, and docs/SECURITY_BASELINE.md records it. The image installs from the same constraints, so the next Render build picks up the fix.
