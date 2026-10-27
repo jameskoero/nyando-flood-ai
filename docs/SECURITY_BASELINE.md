@@ -35,6 +35,7 @@ Trust boundaries: the internet to the API (unauthenticated by design: it returns
 - The same serving set rebuilt under the CI constraints without python-multipart: no known vulnerabilities; the API tests passed (30 passed, 1 skipped).
 - GitHub: secret scanning and push protection were already on; Dependabot alerts, security updates and CodeQL default setup were enabled and read back, and the first CodeQL run succeeded. Branch protection binds admins and requires `test`, `data-gate` and `manifest-check`.
 - Before this change the live API sent no security headers beyond `access-control-allow-origin: *`.
+- 2026-10-27: the weekly audit failed on three new advisories in the pinned set: opentelemetry-api 1.45.0 (in the image's install set, fixed in 1.45.1), certifi 2026.7.22 (fixed in 2026.10.19) and pillow 12.3.0 (fixed in 13.0.0); the pins were raised, the full CI set resolved on Python 3.11 (pip check clean) and the audit passed again. backend/requirements.txt still names python-multipart 0.0.9, which the image does not install.
 
 ## Open items
 
