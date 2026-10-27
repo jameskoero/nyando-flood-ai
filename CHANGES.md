@@ -312,3 +312,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-27: Phase E protocol and level rules (D49)
 
 - docs/PHASE_E_PROTOCOL.md is committed before any level is computed: levels are rank bands (terciles of out-of-fold reference scores), validated once on Block A by three gates with an event-clustered bootstrap; the advisory contract (Gemini, then Groq, then a template; reference-substitution attributions, not SHAP; /v2/advisory) is fixed. src/advisory/rules.py holds the rules as code and tests/test_phase_e.py checks them on known values. Register row D49 records four deviations from the roadmap's Phase E text. Nothing is validated or served yet.
+
+## 2026-10-28: Shipping tools and workflow document
+
+- tools/ship.sh and tools/ci_failures.sh (GitHub CLI) ship a change as one pull request and print the failing tests when CI fails; docs/DEV_WORKFLOW.md records the setup and the rules learned from repeated failures: CI is the test oracle, stage files before testing, heavy runs stay out of the shipping shell, and no token is pasted into chat.
