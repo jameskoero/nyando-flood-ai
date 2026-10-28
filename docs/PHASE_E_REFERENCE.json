@@ -1,0 +1,25 @@
+{
+  "flags_file": "data/derived/gfm_layer_flags.csv",
+  "frame": "mappable",
+  "land_cover_mode": 30,
+  "land_cover_mode_rows": 1410,
+  "median": {
+    "clay_percent": 45.400001525878906,
+    "distance_river": 1436.5583872575455,
+    "elevation": 1141.800048828125,
+    "rainfall_3day": 22.488510131835938,
+    "slope": 0.16648387908935547
+  },
+  "n": {
+    "clay_percent": 2899,
+    "distance_river": 3475,
+    "elevation": 3475,
+    "land_cover": 3475,
+    "rainfall_3day": 3475,
+    "slope": 3475
+  },
+  "rows": 3475,
+  "schema": 1,
+  "training_file": "data/training/nyando_training_v2_multidate.csv",
+  "training_sha256": "0b9283540d91154c0dda55b0d92cae7aa3cae6aeffad0390bbf77e028dd2063a"
+}
