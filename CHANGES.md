@@ -320,3 +320,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-28: ship.sh waits for the checks to register
 
 - tools/ship.sh asked GitHub for check results before any had registered and reported a false CI failure; it now waits up to two minutes for the checks to appear, then watches them.
+
+## 2026-10-28: Phase E protocol amendment r1 (D49)
+
+- docs/PHASE_E_PROTOCOL.md Section 8: before any E1 number exists, Block A rows at locations that also occur in the training frame are excluded from the level validation, because the registered artifact was fitted on every mappable training row (D20 Section 12.1: 236 Block A locations, 288 training rows). tests/test_phase_e.py checks the amendment text.

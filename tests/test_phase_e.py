@@ -59,3 +59,8 @@ def test_the_protocol_states_the_frozen_rules_and_the_four_deviations():
 def test_the_register_row_points_at_this_test_file():
     rows = [l for l in REGISTER.splitlines() if l.startswith("| D49 |")]
     assert len(rows) == 1 and "tests/test_phase_e.py::test_the_protocol_states_the_frozen_rules_and_the_four_deviations" in rows[0]
+
+
+def test_the_protocol_excludes_block_a_rows_at_training_locations():
+    s8 = TEXT.split("## 8. Amendment r1")[1]
+    assert "Section 12.1" in s8 and "excluded from the validation" in s8 and "kept rows only" in s8 and "no E1 number was computed before" in s8
