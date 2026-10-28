@@ -197,7 +197,8 @@ gee_extract_nyando.py                    v1 Earth Engine extraction script (lega
 - [x] **B. Experiment tracking:** MLflow on DagsHub, with the data hash logged on every run.
 - [x] **C. Model suite:** logistic regression, gradient boosting and XGBoost with monotonic constraints, evaluated leave-one-event-out. Closed with the registered model `logistic:con` (replaced below); see the [closure record](docs/PHASE_C_CLOSURE.md) for what the boosters did and did not show. D20 then tested these results on new events ([D20 protocol](docs/D20_PROTOCOL.md), Section 13): the advantage over elevation only did not replicate and both boosters beat `logistic:con`; the [promotion protocol](docs/PROMOTION_PROTOCOL.md) then registered `hgb:con` ("D20 PROMOTED", record: [docs/REGISTRATION.json](docs/REGISTRATION.json)).
 - [x] **Gates:** `data-gate`, `manifest-check` and `test` are required checks on protected `main`.
-- [ ] **Gates (remainder):** scheduled `train-check`, `drift-monitor` and a gated `deploy` workflow (register row D13).
+- [x] **Gates (train-check):** the weekly `train-check` workflow reruns the parity refit and the E1 recompute and fails the run on drift (PR #77, register row D13).
+- [ ] **Gates (remainder):** `drift-monitor` and a gated `deploy` workflow, both in Phase F (register row D13).
 - [x] **D. Stage 0:** the physics-constrained MLP protocol and its rules as code are committed ([protocol](docs/PHASE_D_PROTOCOL.md), register row D46); nothing is trained.
 - [x] **D. Stage 1:** the model code and its offline tests are committed (`src/models/mlp.py`, `src/models/mlp_pre.py`); nothing is trained.
 - [x] **D. Stage 2 and conclusion:** selection and evaluation on the existing events are recorded (`docs/PHASE_D_RESULTS.json`, one MLflow run). Phase D ends not promoted: the selected MLP has monotonicity violations and cannot pass export gate X3, so `hgb:con` stays registered and Block B stays sealed (register rows D46 and D47).
