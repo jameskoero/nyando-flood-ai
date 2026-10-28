@@ -344,3 +344,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-28: advisory core built (E2a, D49)
 
 - Phase E2a adds the pure advisory core in src/advisory: attribution by reference substitution, a categorical context, a deterministic template, an output guard with ten named rules and a versioned prompt; docs/PHASE_E_ADVISORY.md records the contract and tests/test_advisory_core.py checks it offline. No provider, endpoint or key yet (E2b and E3).
+
+## 2026-10-28: advisory providers and orchestrator built (E2b, D49)
+
+- Phase E2b adds src/advisory/providers.py (Gemini and Groq over urllib, key only in a header, errors carry only a kind and a status) and src/advisory/orchestrator.py (providers in order, each answer through the guard, then the template; 8 s per provider, 12 s in all, one hour cache of accepted answers only). Tested against local stand-in servers and a fake clock; no endpoint or key yet (E3). docs/PHASE_E_ADVISORY.md Section 6 records it.

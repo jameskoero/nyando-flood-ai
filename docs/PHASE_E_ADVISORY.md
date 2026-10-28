@@ -34,3 +34,11 @@ A rejected text is replaced by the deterministic template, which is tested to pa
 ## 5. What it does not claim
 
 Land cover is the 2020 product and whether it leaks label information is not excluded (register row D14), so the advisory calls it a driver of the score, never a cause. No probability, no timing, no instruction to act, no comparison between wards and no statement about any event. The band reports how locations like this one were ranked in the held-out validation, a case-control sample, and nothing more.
+
+## 6. Providers and fallback
+
+Gemini first, then Groq, then the deterministic template (protocol Section 5). Each provider call is limited to 8 s and the whole request to 12 s; a provider asked after the time is spent is skipped. A provider is used only when both its settings exist: GEMINI_API_KEY and GEMINI_MODEL, GROQ_API_KEY and GROQ_MODEL. Model names are settings because providers retire models; no key or model name is stored in the repository.
+
+A key is sent only in a request header. An error carries only its kind (timeout, http, network or shape) and an HTTP status, never a key, a URL or a response body. Provider text goes through the output guard before it is used.
+
+An accepted provider answer is cached in memory for one hour by the hash of the prompt version and the categorical context. A template fallback is not cached, so the next request tries the providers again and an outage ends as soon as the providers answer.
