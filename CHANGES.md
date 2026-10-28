@@ -336,3 +336,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-28: train-check workflow (D13)
 
 - .github/workflows/train-check.yml: a weekly scheduled run (Tuesday 04:41 UTC) and a manual run of the two measured tests under the CI pins, read-only and secret-free; a failing run is the alarm. tests/test_train_check.py checks the workflow text. The register and README closing of D13 follows.
+
+## 2026-10-28: train-check recorded (D13)
+
+- Register row D13 and the README gates line record that train-check is built (PR 77, first manual run 40669969228 passed) and that drift-monitor and deploy stay open for Phase F; tests/test_train_check.py checks both records.
