@@ -48,3 +48,9 @@ An accepted provider answer is cached in memory for one hour by the hash of the 
 The reference for the attribution is the median of each numeric feature and the most common land-cover class (the smallest class code on a tie) of the mappable training frame: the flood rows and the controls outside the exclusion mask, the frame the E1 cutpoints were built on. The values are stored in docs/PHASE_E_REFERENCE.json with the training file's SHA-256, and are built from the real file by scripts/build_advisory_reference.py, which uses the standard library only.
 
 tests/test_advisory_reference.py rebuilds them in CI and computes them a second way with pandas and the repository's own restrict_to_mappable; a difference fails the build. The builder writes nothing if the file's hash, its counts (4,420 rows, 1,970 floods, 3,475 mappable), its columns or its alignment with the layer-flag file differ from the verified ones.
+
+## 8. The endpoint
+
+POST /v2/advisory takes the same fields as /v2/score and returns the score, the level, the drivers, the advisory text, where the text came from (gemini, groq or template) and the fixed limits text. The level is shown only if the live model's SHA-256 appears in docs/PHASE_E_RESULTS.json, the file that validated the cutpoints; otherwise it is withheld. The ward is used only if it is one of the five ward names in data/external/nyando_wards.geojson; anything else is treated as no ward, so free text never reaches a provider.
+
+The endpoint allows 5 requests per minute per client and the shared 15 per minute, because a request can reach a provider; /v2/score never calls a provider. With no provider settings the endpoint answers from the deterministic template. The Docker build imports the service and stops if the levels are not bound to the registered model, so a mismatch keeps the previous deploy.

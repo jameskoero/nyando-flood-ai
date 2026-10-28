@@ -228,3 +228,18 @@ def metrics_v2():
     if payload is None or REGISTERED.session is None or payload["model_sha256"] != REGISTERED.sha256:
         return JSONResponse(status_code=503, content={"available": False, "reason": "No stored results match the served registered model."})
     return payload
+
+
+# ---- Phase E advisory: POST /v2/advisory (docs/PHASE_E_ADVISORY.md Section 8, register row D49) ----
+from backend.advisory import AdvisoryService  # noqa: E402
+
+ADVISORY = AdvisoryService(REGISTERED, REPO_ROOT, os.environ)
+
+
+@app.post("/v2/advisory")
+@limiter.limit("5/minute")
+@limiter.limit(str(GLOBAL_PREDICT_LIMIT) + "/minute", key_func=_global_key)
+def advisory_v2(request: Request, data: ScoreInput):
+    if REGISTERED.session is None:
+        return JSONResponse(status_code=503, content={"error": "Registered model not loaded", "model_loaded": False})
+    return ADVISORY.respond(data.model_dump(), [CLAY_WARNING] if data.clay_percent is None else [])

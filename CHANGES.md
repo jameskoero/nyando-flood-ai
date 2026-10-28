@@ -352,3 +352,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-28: advisory reference values built from the real training data (D49)
 
 - docs/PHASE_E_REFERENCE.json holds the median of each numeric feature and the most common land-cover class of the mappable training frame (3475 rows, training file found by its SHA-256), built by scripts/build_advisory_reference.py with the standard library only and read by src/advisory/reference.py. tests/test_advisory_reference.py rebuilds it from the real file and recomputes it with pandas and restrict_to_mappable; the builder writes nothing if the hash, the counts, the columns or the alignment with the layer-flag file differ from the verified ones.
+
+## 2026-10-28: advisory endpoint built (E3, D49)
+
+- POST /v2/advisory (backend/advisory.py, route appended to backend/main.py): score and level from the registered model and the cutpoints of docs/PHASE_E_RESULTS.json (level shown only if the live model's SHA-256 is in that file), three drivers by reference substitution against docs/PHASE_E_REFERENCE.json, text from Gemini then Groq then the template, only the five ward names accepted, 5 requests per minute per client plus the shared 15. The Docker build imports the service and stops if the levels are not bound to the registered model. tests/test_advisory_service.py and tests/test_advisory_endpoint.py (real model, real training rows, fake provider, import graph without mlflow or xgboost) check it. Live check with real keys is next; D49 stays open until then.
