@@ -1,0 +1,25 @@
+name: train-check
+# Roadmap Section 2 (register row D13): a weekly training smoke test. It refits the fixed-parameter hgb:con on the full frame, compares every event's AUC with the values Phase D stored, and recomputes the E1 record. The token is read-only, so a failing run is the alarm; no issue is opened.
+on:
+  schedule:
+    - cron: "41 4 * * 2"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  train-check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
+        with:
+          python-version: "3.11"
+      - name: Install the CI set
+        run: python -m pip install --retries 5 -r requirements.txt -r requirements-onnx.txt -c constraints-ci.txt pytest
+      - name: Smoke test
+        run: python -m pytest -q -p no:cacheprovider tests/test_environment_parity.py tests/test_phase_e_results.py

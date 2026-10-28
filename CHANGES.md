@@ -332,3 +332,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-28: Phase E E1 results (D49)
 
 - docs/PHASE_E_RESULTS.json records the E1 run (GitHub Actions run 40630420773, MLflow run 218ee0ed6c064f369918c4d99c077811): all three gates passed and the recorded outcome is LEVELS VALIDATED, as a ranking claim on held-out Block A rows outside the training locations. tests/test_phase_e_results.py recomputes every figure from the stored per-event counts; tests/test_environment_parity.py checks that the CI environment reproduces the per-event AUCs Phase D stored for the fixed-parameter hgb:con on the full frame.
+
+## 2026-10-28: train-check workflow (D13)
+
+- .github/workflows/train-check.yml: a weekly scheduled run (Tuesday 04:41 UTC) and a manual run of the two measured tests under the CI pins, read-only and secret-free; a failing run is the alarm. tests/test_train_check.py checks the workflow text. The register and README closing of D13 follows.
