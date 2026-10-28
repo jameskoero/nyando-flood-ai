@@ -324,3 +324,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-28: Phase E protocol amendment r1 (D49)
 
 - docs/PHASE_E_PROTOCOL.md Section 8: before any E1 number exists, Block A rows at locations that also occur in the training frame are excluded from the level validation, because the registered artifact was fitted on every mappable training row (D20 Section 12.1: 236 Block A locations, 288 training rows). tests/test_phase_e.py checks the amendment text.
+
+## 2026-10-28: Phase E E1 run script and workflow (D49)
+
+- E1 for the validated levels (D49): src/advisory/e1.py (shared-location exclusion, per-event counts, gates summary), scripts/run_phase_e1.py (reference scores, cutpoints, one scoring pass over the kept Block A rows, three gates, one MLflow run, one RESULT_JSON line), a manual read-only workflow .github/workflows/e1.yml and tests/test_phase_e1.py. Not run yet.
