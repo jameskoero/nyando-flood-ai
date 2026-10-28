@@ -45,3 +45,9 @@ Committed before any level is computed and before any advisory is served (regist
 2. The advisory takes the ranking score and its level, not a probability.
 3. Attributions use reference substitution computed from the ONNX model, not SHAP: the production image has no SHAP, and SHAP on the exported tree model is not verified.
 4. A validated level layer is added. The roadmap names HIGH in Phase G but never defines or validates levels.
+
+## 8. Amendment r1 (2026-10-28, before any E1 number exists): shared locations
+
+- The registered artifact was fitted on every mappable training row. Block A contains locations that also occur in the training frame (D20 protocol Section 12.1: 236 Block A locations, 288 of the 3,475 mappable training rows). Scoring Block A rows at those locations with the artifact would test the model on places it has already seen.
+- Rule: Block A rows whose location also occurs in the training frame are excluded from the validation of Section 4, as D20 and Phase C exclude shared locations. The numbers of rows and locations excluded and kept are reported with the results. Gates V1 to V3 apply to the kept rows only.
+- Nothing else in Sections 1 to 7 changes. The cutpoints stay fixed, and no E1 number was computed before this amendment.
