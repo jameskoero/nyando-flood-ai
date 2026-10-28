@@ -1,0 +1,468 @@
+{
+ "block_a": {
+  "artifact_mean_event_auc_kept_micro": 970548,
+  "artifact_mean_event_auc_mappable_micro": 971748,
+  "locations_excluded": 236,
+  "locations_kept": 2531,
+  "locations_mappable": 2767,
+  "rows_excluded": 300,
+  "rows_kept": 2762,
+  "rows_mappable": 3062,
+  "rows_total": 3780
+ },
+ "bootstrap": {
+  "ci_high": 0.9627466669063616,
+  "ci_low": 0.7558263104618853,
+  "diff": 0.8792845460556078,
+  "draws_used": 10000
+ },
+ "commit": "7d08a0b74c2e7ee7f342c63631a46b81bb2d036c",
+ "cutpoints": {
+  "high": 0.8279308563518766,
+  "low": 0.2257334754068833
+ },
+ "environment": {
+  "numpy": "1.26.4",
+  "onnxruntime": "1.30.0",
+  "pandas": "3.0.6",
+  "python": "3.11.17",
+  "sklearn": "1.6.1"
+ },
+ "gates": {
+  "V1": true,
+  "V2": true,
+  "V3": true
+ },
+ "mlflow": {
+  "metrics_logged": 18,
+  "run_id": "218ee0ed6c064f369918c4d99c077811",
+  "tracking_uri": "https://dagshub.com/jmskoero/nyando-flood-ai.mlflow"
+ },
+ "model_sha256": "5ae81ad8b0303c8a8bef79f177199e34f1d3cad87cb609afc6825a4b9980b723",
+ "outcome": "LEVELS VALIDATED",
+ "per_event": {
+  "date-2020-02-09": {
+   "HIGH": [
+    56,
+    54
+   ],
+   "LOW": [
+    32,
+    0
+   ],
+   "MEDIUM": [
+    7,
+    0
+   ]
+  },
+  "date-2020-03-04": {
+   "HIGH": [
+    53,
+    52
+   ],
+   "LOW": [
+    25,
+    0
+   ],
+   "MEDIUM": [
+    16,
+    3
+   ]
+  },
+  "date-2020-06-08": {
+   "HIGH": [
+    67,
+    64
+   ],
+   "LOW": [
+    22,
+    0
+   ],
+   "MEDIUM": [
+    17,
+    0
+   ]
+  },
+  "date-2020-12-01": {
+   "HIGH": [
+    54,
+    52
+   ],
+   "LOW": [
+    16,
+    0
+   ],
+   "MEDIUM": [
+    25,
+    2
+   ]
+  },
+  "date-2021-05-10": {
+   "HIGH": [
+    54,
+    53
+   ],
+   "LOW": [
+    21,
+    0
+   ],
+   "MEDIUM": [
+    30,
+    11
+   ]
+  },
+  "date-2021-07-05": {
+   "HIGH": [
+    39,
+    39
+   ],
+   "LOW": [
+    40,
+    0
+   ],
+   "MEDIUM": [
+    5,
+    3
+   ]
+  },
+  "date-2021-10-13": {
+   "HIGH": [
+    47,
+    45
+   ],
+   "LOW": [
+    26,
+    0
+   ],
+   "MEDIUM": [
+    16,
+    6
+   ]
+  },
+  "date-2021-11-18": {
+   "HIGH": [
+    0,
+    0
+   ],
+   "LOW": [
+    104,
+    67
+   ],
+   "MEDIUM": [
+    6,
+    3
+   ]
+  },
+  "date-2022-02-22": {
+   "HIGH": [
+    45,
+    41
+   ],
+   "LOW": [
+    21,
+    0
+   ],
+   "MEDIUM": [
+    19,
+    3
+   ]
+  },
+  "date-2022-08-21": {
+   "HIGH": [
+    34,
+    31
+   ],
+   "LOW": [
+    26,
+    0
+   ],
+   "MEDIUM": [
+    47,
+    35
+   ]
+  },
+  "date-2023-02-17": {
+   "HIGH": [
+    66,
+    64
+   ],
+   "LOW": [
+    41,
+    0
+   ],
+   "MEDIUM": [
+    5,
+    0
+   ]
+  },
+  "date-2023-05-24": {
+   "HIGH": [
+    55,
+    55
+   ],
+   "LOW": [
+    30,
+    0
+   ],
+   "MEDIUM": [
+    16,
+    4
+   ]
+  },
+  "date-2023-07-23": {
+   "HIGH": [
+    60,
+    58
+   ],
+   "LOW": [
+    35,
+    0
+   ],
+   "MEDIUM": [
+    8,
+    0
+   ]
+  },
+  "date-2023-08-28": {
+   "HIGH": [
+    59,
+    57
+   ],
+   "LOW": [
+    36,
+    0
+   ],
+   "MEDIUM": [
+    8,
+    3
+   ]
+  },
+  "date-2023-10-15": {
+   "HIGH": [
+    63,
+    60
+   ],
+   "LOW": [
+    19,
+    0
+   ],
+   "MEDIUM": [
+    20,
+    0
+   ]
+  },
+  "date-2024-01-07": {
+   "HIGH": [
+    62,
+    58
+   ],
+   "LOW": [
+    22,
+    0
+   ],
+   "MEDIUM": [
+    27,
+    5
+   ]
+  },
+  "date-2024-01-31": {
+   "HIGH": [
+    55,
+    51
+   ],
+   "LOW": [
+    27,
+    0
+   ],
+   "MEDIUM": [
+    25,
+    7
+   ]
+  },
+  "date-2024-08-10": {
+   "HIGH": [
+    35,
+    33
+   ],
+   "LOW": [
+    26,
+    0
+   ],
+   "MEDIUM": [
+    40,
+    27
+   ]
+  },
+  "date-2024-09-03": {
+   "HIGH": [
+    39,
+    39
+   ],
+   "LOW": [
+    38,
+    0
+   ],
+   "MEDIUM": [
+    22,
+    15
+   ]
+  },
+  "date-2024-09-27": {
+   "HIGH": [
+    52,
+    51
+   ],
+   "LOW": [
+    38,
+    0
+   ],
+   "MEDIUM": [
+    8,
+    4
+   ]
+  },
+  "date-2025-11-09": {
+   "HIGH": [
+    38,
+    38
+   ],
+   "LOW": [
+    43,
+    1
+   ],
+   "MEDIUM": [
+    31,
+    25
+   ]
+  },
+  "date-2025-11-29": {
+   "HIGH": [
+    58,
+    58
+   ],
+   "LOW": [
+    43,
+    1
+   ],
+   "MEDIUM": [
+    8,
+    4
+   ]
+  },
+  "date-2026-02-13": {
+   "HIGH": [
+    43,
+    42
+   ],
+   "LOW": [
+    43,
+    6
+   ],
+   "MEDIUM": [
+    15,
+    11
+   ]
+  },
+  "date-2026-05-08": {
+   "HIGH": [
+    58,
+    54
+   ],
+   "LOW": [
+    26,
+    0
+   ],
+   "MEDIUM": [
+    18,
+    5
+   ]
+  },
+  "date-2026-05-28": {
+   "HIGH": [
+    63,
+    62
+   ],
+   "LOW": [
+    41,
+    0
+   ],
+   "MEDIUM": [
+    10,
+    6
+   ]
+  },
+  "date-2026-06-13": {
+   "HIGH": [
+    59,
+    59
+   ],
+   "LOW": [
+    39,
+    1
+   ],
+   "MEDIUM": [
+    12,
+    4
+   ]
+  },
+  "date-2026-08-31": {
+   "HIGH": [
+    50,
+    50
+   ],
+   "LOW": [
+    47,
+    6
+   ],
+   "MEDIUM": [
+    10,
+    5
+   ]
+  }
+ },
+ "protocol": "docs/PHASE_E_PROTOCOL.md",
+ "protocol_sha256": "81bd17d3e0949a5c6dd511ad27cf124c7cd9ed303db1c161b0189be91c3e1904",
+ "provenance": {
+  "note": "AUC values are stored in millionths, as in the Phase D record; reference.reproduces is the run's own flag",
+  "result_line_sha256": "b880bd77fad652779ffac2921bf7f93240aa1227f7a6a8e8f844c685e8c960fc",
+  "run_id": 40630420773,
+  "workflow": ".github/workflows/e1.yml"
+ },
+ "rates": {
+  "HIGH": {
+   "flood": 1320,
+   "rows": 1364,
+   "share": 0.967741935483871
+  },
+  "LOW": {
+   "flood": 82,
+   "rows": 927,
+   "share": 0.08845738942826321
+  },
+  "MEDIUM": {
+   "flood": 191,
+   "rows": 471,
+   "share": 0.40552016985138006
+  }
+ },
+ "reference": {
+  "mean_event_auc_micro": 945245,
+  "reproduces": false,
+  "rows": 3475,
+  "rows_never_tested": 0,
+  "rows_per_level": {
+   "HIGH": 1159,
+   "LOW": 1156,
+   "MEDIUM": 1160
+  },
+  "stored": 0.943,
+  "tolerance": 0.001
+ },
+ "registered_params": {
+  "max_depth": 4,
+  "max_iter": 100,
+  "min_samples_leaf": 20
+ },
+ "schema": 1,
+ "training_data_sha256": "0b9283540d91154c0dda55b0d92cae7aa3cae6aeffad0390bbf77e028dd2063a"
+}

@@ -328,3 +328,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-28: Phase E E1 run script and workflow (D49)
 
 - E1 for the validated levels (D49): src/advisory/e1.py (shared-location exclusion, per-event counts, gates summary), scripts/run_phase_e1.py (reference scores, cutpoints, one scoring pass over the kept Block A rows, three gates, one MLflow run, one RESULT_JSON line), a manual read-only workflow .github/workflows/e1.yml and tests/test_phase_e1.py. Not run yet.
+
+## 2026-10-28: Phase E E1 results (D49)
+
+- docs/PHASE_E_RESULTS.json records the E1 run (GitHub Actions run 40630420773, MLflow run 218ee0ed6c064f369918c4d99c077811): all three gates passed and the recorded outcome is LEVELS VALIDATED, as a ranking claim on held-out Block A rows outside the training locations. tests/test_phase_e_results.py recomputes every figure from the stored per-event counts; tests/test_environment_parity.py checks that the CI environment reproduces the per-event AUCs Phase D stored for the fixed-parameter hgb:con on the full frame.
