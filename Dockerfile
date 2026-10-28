@@ -25,7 +25,11 @@ m, _ = load_verified_pickle('backend/models/nyando_xgb_v1.pkl', '/app', joblib.l
 r = load_registered('/app'); \
 print('Legacy model verified and loaded:', type(m).__name__); \
 print('Registered model:', r.describe()); \
-assert r.session is not None, r.reason"
+assert r.session is not None, r.reason; \
+from backend.advisory import AdvisoryService; \
+a = AdvisoryService(r, '/app', {}); \
+print('Advisory ready; levels bound to the registered model:', a.levels_bound); \
+assert a.levels_bound, 'the cutpoints were not validated on this model'"
 
 RUN useradd --system --uid 10001 --no-create-home --shell /usr/sbin/nologin nyando
 USER nyando
