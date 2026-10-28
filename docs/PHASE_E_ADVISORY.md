@@ -42,3 +42,9 @@ Gemini first, then Groq, then the deterministic template (protocol Section 5). E
 A key is sent only in a request header. An error carries only its kind (timeout, http, network or shape) and an HTTP status, never a key, a URL or a response body. Provider text goes through the output guard before it is used.
 
 An accepted provider answer is cached in memory for one hour by the hash of the prompt version and the categorical context. A template fallback is not cached, so the next request tries the providers again and an outage ends as soon as the providers answer.
+
+## 7. Reference values
+
+The reference for the attribution is the median of each numeric feature and the most common land-cover class (the smallest class code on a tie) of the mappable training frame: the flood rows and the controls outside the exclusion mask, the frame the E1 cutpoints were built on. The values are stored in docs/PHASE_E_REFERENCE.json with the training file's SHA-256, and are built from the real file by scripts/build_advisory_reference.py, which uses the standard library only.
+
+tests/test_advisory_reference.py rebuilds them in CI and computes them a second way with pandas and the repository's own restrict_to_mappable; a difference fails the build. The builder writes nothing if the file's hash, its counts (4,420 rows, 1,970 floods, 3,475 mappable), its columns or its alignment with the layer-flag file differ from the verified ones.

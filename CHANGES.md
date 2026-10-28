@@ -348,3 +348,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-28: advisory providers and orchestrator built (E2b, D49)
 
 - Phase E2b adds src/advisory/providers.py (Gemini and Groq over urllib, key only in a header, errors carry only a kind and a status) and src/advisory/orchestrator.py (providers in order, each answer through the guard, then the template; 8 s per provider, 12 s in all, one hour cache of accepted answers only). Tested against local stand-in servers and a fake clock; no endpoint or key yet (E3). docs/PHASE_E_ADVISORY.md Section 6 records it.
+
+## 2026-10-28: advisory reference values built from the real training data (D49)
+
+- docs/PHASE_E_REFERENCE.json holds the median of each numeric feature and the most common land-cover class of the mappable training frame (3475 rows, training file found by its SHA-256), built by scripts/build_advisory_reference.py with the standard library only and read by src/advisory/reference.py. tests/test_advisory_reference.py rebuilds it from the real file and recomputes it with pandas and restrict_to_mappable; the builder writes nothing if the hash, the counts, the columns or the alignment with the layer-flag file differ from the verified ones.
