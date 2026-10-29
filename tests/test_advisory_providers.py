@@ -58,7 +58,7 @@ def test_gemini_sends_the_documented_request_and_reads_the_documented_answer():
         p = providers.gemini("KEY-G", "test-model", base=base + "/v1beta/models/")
         assert p.call("SYSTEM TEXT", "USER TEXT", 5) == "{\"a\": 1}"
     assert seen["path"] == "/v1beta/models/test-model:generateContent" and "KEY-G" not in seen["path"]
-    assert seen["headers"]["x-goog-api-key"] == "KEY-G" and seen["headers"]["content-type"] == "application/json"
+    assert seen["headers"]["x-goog-api-key"] == "KEY-G" and seen["headers"]["content-type"] == "application/json" and seen["headers"]["user-agent"] == providers.USER_AGENT
     b = seen["body"]
     assert b["systemInstruction"]["parts"][0]["text"] == "SYSTEM TEXT" and b["contents"][0]["parts"][0]["text"] == "USER TEXT"
     assert b["generationConfig"]["responseMimeType"] == "application/json" and "KEY-G" not in json.dumps(b)
@@ -68,7 +68,7 @@ def test_groq_sends_the_documented_request_and_reads_the_documented_answer():
     with stand_in(body=groq_reply("{\"a\": 1}")) as (base, seen):
         p = providers.groq("KEY-Q", "test-model", url=base + "/openai/v1/chat/completions")
         assert p.call("SYSTEM TEXT", "USER TEXT", 5) == "{\"a\": 1}"
-    assert seen["path"] == "/openai/v1/chat/completions" and seen["headers"]["authorization"] == "Bearer KEY-Q"
+    assert seen["path"] == "/openai/v1/chat/completions" and seen["headers"]["authorization"] == "Bearer KEY-Q" and seen["headers"]["user-agent"] == providers.USER_AGENT and not seen["headers"]["user-agent"].startswith("Python-urllib")
     b = seen["body"]
     assert b["model"] == "test-model" and b["messages"] == [{"role": "system", "content": "SYSTEM TEXT"}, {"role": "user", "content": "USER TEXT"}]
     assert b["response_format"] == {"type": "json_object"} and "KEY-Q" not in json.dumps(b)
