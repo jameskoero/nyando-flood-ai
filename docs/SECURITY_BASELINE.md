@@ -39,7 +39,7 @@ Trust boundaries: the internet to the API (unauthenticated by design: it returns
 
 ## Open items
 
-- Per-client rate limit: the cause of the earlier leak is not established. The limiter keys on the connection address, which behind Render's proxy may be the proxy's, and a client-set forwarding header may be trusted somewhere; neither is verified. The global cap depends on neither and protects availability. A fix needs the cause first, from a two-address measurement against the live API, because trusting a forwarding header blindly can make the limit easier to evade.
+- Per-client rate limit: fixed and measured on 2026-10-29 (PR #89, tools/burst_check.py on nyando-flood-v2). The limiter keys on a valid CF-Connecting-IP and otherwise on the socket address. One client was limited to 10 requests per minute (10 admitted, 1 refused, where the earlier bursts admitted 17 to 21 of 25). A client-set CF-Connecting-IP was answered 403 (the sender of that 403 is not established) and a client-set X-Forwarded-For was refused 429, which is what the code does with it. The cause of the earlier leak was not isolated: the fix was measured, not derived. The shared 15 per minute cap still bounds the whole service.
 - CORS stays `*` by an earlier decision: the API is public, takes no cookies or credentials and returns ranking scores; CORS is a browser rule, not access control.
 - The dashboard's own security headers are not set: a Vercel preview build failed on a `vercel.json` change earlier and the project settings were never seen. Vercel already sends HSTS.
 - D32 stays open for its other half: installs are pinned but not hash-verified.

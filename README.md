@@ -94,7 +94,7 @@ The flood share of the file (44.6%) is set by the sampling design and is not the
 - **CI hygiene:** every workflow declares read-only token permissions and pins each action to a commit SHA, and Dependabot keeps those pins current. The gate workflows use no secrets and run on every pull request; the gate installs exact versions (`requirements-gate.txt`) and the test job installs under exact version constraints (`constraints-ci.txt`), both with a retried install. Fork and Dependabot pull requests have no Actions secrets, so the tests that need an Earth Engine session are skipped there with a visible notice; a trusted run without the key fails with a clear message, and runs with the key execute everything.
 - **Live-data tests:** tests that call the live EODC GFM catalogue run in a separate `live-data` job that is not a required check, so a slow third-party service cannot block merges; the required `test` job runs the rest (register row D44).
 - **Sealed test block:** Block B of the D20 selection stays unbuilt and unscored; `tests/test_phase_d.py` fails if a Block B file appears before the Phase D freeze file is merged.
-- **Not built yet:** the scheduled `train-check` and `drift-monitor` workflows and a gated `deploy` workflow (register row D13).
+- **Not built yet:** the `drift-monitor` and a gated `deploy` workflow (register row D13); the scheduled `train-check` is built (`.github/workflows/train-check.yml`).
 
 ## Quick start
 

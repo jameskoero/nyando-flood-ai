@@ -388,3 +388,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-29: frontend workflow, lint and build plus a Lighthouse measurement
 
 - Adds .github/workflows/frontend.yml: the dashboard is linted and built (Node 24, which the engines of vite, eslint and the React plugin in package-lock.json accept) on every pull request and push to main, and measured with Lighthouse 13.5.0 on mobile with the report kept as an artifact; the Lighthouse job fails below a performance score of 90. Neither job is a required check yet. tests/test_frontend_workflow.py checks the SHA pins, the read-only permissions, the step order and the engines.
+
+## 2026-10-29: security record
+
+- Records the measured rate-limit fix in docs/SECURITY_BASELINE.md (10 admitted and 1 refused per client per minute on nyando-flood-v2, against 17 to 21 of 25 before; the cause of the earlier leak was not isolated) and corrects the README's not-built list, which still named the built train-check. tests/test_security_record.py checks both.
