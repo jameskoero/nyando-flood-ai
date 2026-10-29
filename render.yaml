@@ -1,0 +1,23 @@
+# Render Blueprint for a parallel serving instance of the Nyando Flood AI API
+# (docs/PHASE_E_ADVISORY.md Section 10). The service name is new on purpose:
+# Render applies a Blueprint to an existing service of the same name.
+# The four provider settings use sync: false, so the Render dashboard asks for
+# them when the Blueprint is first created and no value is stored here.
+services:
+  - type: web
+    name: nyando-flood-v2
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: PORT
+        value: "8000"
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GROQ_MODEL
+        sync: false

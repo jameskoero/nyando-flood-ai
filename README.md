@@ -179,6 +179,7 @@ CONTRIBUTING.md  LICENSE  SECURITY.md    contribution rules, license, security p
 MODEL_CARD.md                            model card
 Dockerfile  docker-compose.yml           API image (python:3.11-slim, pinned versions) and a compose file
 vercel.json                              Vercel settings for the dashboard
+render.yaml                              Render Blueprint for a parallel serving instance (docs/PHASE_E_ADVISORY.md Section 10)
 requirements.txt                         project and CI dependencies
 requirements-gate.txt                    exact pins for the data-gate job
 requirements-onnx.txt                    ONNX export and scoring dependencies, installed by CI
