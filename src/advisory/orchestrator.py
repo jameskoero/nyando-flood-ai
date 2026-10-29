@@ -54,7 +54,8 @@ class Advisor:
         key = prompt.cache_key(context)
         hit = self.cache.get(key, self.now())
         if hit is not None:
-            return dict(hit, cached=True)
+            fresh = dict(hit["advisory"], drivers=template.render(context)["drivers"])
+            return dict(hit, advisory=fresh, cached=True)
         started, attempts, chosen = self.now(), [], None
         for p in self.providers:
             remaining = TOTAL_S - (self.now() - started)
@@ -69,7 +70,7 @@ class Advisor:
             except Exception as e:
                 attempts.append({"provider": p.name, "status": "error: " + type(e).__name__})
                 continue
-            reasons = guard.check(text)
+            reasons = guard.check(text, provider=True)
             if reasons:
                 attempts.append({"provider": p.name, "status": "rejected", "reasons": reasons})
                 continue
@@ -77,7 +78,7 @@ class Advisor:
             chosen = (p, text)
             break
         if chosen:
-            body, source, model = {k: chosen[1][k] for k in guard.KEYS}, chosen[0].name, chosen[0].model
+            body, source, model = {"summary": chosen[1]["summary"], "drivers": template.render(context)["drivers"], "meaning": chosen[1]["meaning"]}, chosen[0].name, chosen[0].model
         else:
             body, source, model = template.render(context), "template", None
         result = {"advisory": template.with_limits(body), "source": source, "model": model, "prompt_version": prompt.PROMPT_VERSION, "attempts": attempts, "cached": False}

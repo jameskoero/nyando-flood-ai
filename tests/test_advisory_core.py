@@ -107,7 +107,7 @@ def test_the_prompt_is_versioned_and_holds_no_number():
         assert must in prompt.SYSTEM, must
     ctx = to_context("Ahero", "HIGH", substitution_attribution(toy, VALUES, REF))
     uc = prompt.user_content(ctx)
-    assert not re.search(r"\d", uc) and json.loads(uc) == {"ward": "Ahero", "score_band": "HIGH", "drivers": [{"feature": "rainfall over the previous three days", "effect": "raises", "position": "above"}, {"feature": "elevation", "effect": "raises", "position": "below"}]}
+    assert not re.search(r"\d", uc) and json.loads(uc) == {"ward": "Ahero", "score_band": "HIGH", "factors": ["rainfall over the previous three days", "elevation"]}
     assert prompt.cache_key(ctx) == prompt.cache_key(json.loads(json.dumps(ctx))) and prompt.cache_key(dict(ctx, level="LOW")) != prompt.cache_key(ctx)
 
 
@@ -120,3 +120,38 @@ def test_the_advisory_document_lists_every_guard_rule():
 
 def test_the_advisory_reuses_the_protocol_constants():
     assert context_module.LEVELS is rules.LEVELS and rules.CLAIM in template.LIMITS and rules.PROVIDERS == ("gemini", "groq")
+
+
+PROSE = {"summary": "For Ahero: this location's score is in the highest third of the reference scores.", "meaning": "This ranks locations; it does not forecast an event."}
+
+
+def test_the_provider_sees_factors_without_any_direction_and_the_cache_key_ignores_directions():
+    ctx = to_context("Ahero", "HIGH", substitution_attribution(toy, VALUES, REF))
+    uc = prompt.user_content(ctx)
+    for w in ("raises", "lowers", "above", "below", "position", "effect"):
+        assert w not in uc, w
+    flipped = copy.deepcopy(ctx)
+    for d in flipped["drivers"]:
+        d["effect"] = "lowers" if d["effect"] == "raises" else "raises"
+        d["position"] = "below" if d["position"] == "above" else "above"
+    assert prompt.cache_key(flipped) == prompt.cache_key(ctx) and prompt.cache_key(dict(ctx, ward=None)) != prompt.cache_key(ctx)
+    for must in ("never say that a factor raises", "exactly these keys"):
+        assert must in prompt.SYSTEM, must
+
+
+def test_provider_text_is_checked_on_summary_and_meaning_only_and_never_states_a_direction():
+    assert guard.check(PROSE, provider=True) == []
+    assert guard.check(dict(PROSE, drivers=["The elevation is below the typical location, which lowers the score."]), provider=True) == []
+    for text in ("Elevation is above a typical location.", "This raises the score.", "Clay is lower than usual.", "It reduces the ranking."):
+        assert "direction_word" in guard.check(dict(PROSE, meaning=text), provider=True), text
+    assert any(r.startswith("structure") for r in guard.check({"summary": "x"}, provider=True))
+    assert any(r.startswith("structure") for r in guard.check(dict(PROSE, extra="x"), provider=True))
+    for name, text in BAD.items():
+        assert name in guard.check(dict(PROSE, summary=text), provider=True), name
+    assert guard.check(GOOD) == [] and guard.check(PROSE) != []
+
+
+def test_the_advisory_document_records_the_provider_text_rule():
+    doc = (ROOT / "docs" / "PHASE_E_ADVISORY.md").read_text(encoding="utf-8")
+    for must in ("`direction_word`", "## 11.", "factors"):
+        assert must in doc, must

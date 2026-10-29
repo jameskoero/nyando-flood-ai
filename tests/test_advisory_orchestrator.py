@@ -104,3 +104,26 @@ def test_the_advisory_document_names_the_settings_and_the_cache_rule():
     doc = (ROOT / "docs" / "PHASE_E_ADVISORY.md").read_text(encoding="utf-8")
     for must in ("GEMINI_API_KEY", "GEMINI_MODEL", "GROQ_API_KEY", "GROQ_MODEL", "is not cached", "8 s", "12 s", "one hour"):
         assert must in doc, must
+
+
+CTX_FLIPPED = {"ward": "Ahero", "level": "HIGH", "drivers": [{"feature": "rainfall_3day", "effect": "lowers", "position": "below"}]}
+
+
+def test_the_drivers_always_come_from_the_template_never_from_the_provider():
+    wrong = dict(GOOD, drivers=["The rainfall here is below the typical location, which lowers the score."])
+    r = Advisor([fake("gemini", wrong)], now=Clock()).advise(CTX)
+    assert r["source"] == "gemini" and r["advisory"]["drivers"] == template.render(CTX)["drivers"] and r["advisory"]["summary"] == GOOD["summary"]
+
+
+def test_a_cached_answer_keeps_its_prose_but_gets_the_drivers_of_the_new_request():
+    a = fake("gemini", GOOD)
+    adv = Advisor([a], now=Clock())
+    first, second = adv.advise(CTX), adv.advise(CTX_FLIPPED)
+    assert second["cached"] is True and len(a.calls) == 1 and second["advisory"]["summary"] == first["advisory"]["summary"]
+    assert first["advisory"]["drivers"] == template.render(CTX)["drivers"] and second["advisory"]["drivers"] == template.render(CTX_FLIPPED)["drivers"]
+    assert first["advisory"]["drivers"] != second["advisory"]["drivers"]
+
+
+def test_provider_prose_that_states_a_direction_is_refused():
+    r = Advisor([fake("gemini", dict(GOOD, meaning="Elevation is above typical, which lowers the score."))], now=Clock()).advise(CTX)
+    assert r["source"] == "template" and r["attempts"][0]["status"] == "rejected" and "direction_word" in r["attempts"][0]["reasons"]
