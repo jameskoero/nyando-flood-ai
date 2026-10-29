@@ -1,0 +1,60 @@
+name: frontend
+
+# Lints and builds the dashboard on every pull request and push to main, and measures it with Lighthouse (mobile), keeping the report as an artifact. Read-only; every action is pinned by commit SHA.
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  frontend:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+
+  lighthouse:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run build
+      - name: Serve the build
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 &
+          for i in $(seq 1 30); do curl -sf http://127.0.0.1:4173/ > /dev/null && break; sleep 1; done
+      - name: Lighthouse (mobile)
+        run: npx --yes lighthouse@13.5.0 http://127.0.0.1:4173/ --quiet --form-factor=mobile --chrome-flags="--headless=new --no-sandbox" --output=json --output=html --output-path=lh/report
+      - name: Scores
+        run: |
+          node -e "const r=require('./lh/report.report.json'); const s={}; for (const [k,v] of Object.entries(r.categories)) s[k]=Math.round(v.score*100); console.log(JSON.stringify(s)); if (!(s.performance>=90)) { console.error('performance below 90'); process.exit(1); }"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        if: always()
+        with:
+          name: lighthouse-report
+          path: frontend/lh
+          if-no-files-found: warn
