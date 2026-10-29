@@ -1,51 +1,66 @@
 import { useState } from "react";
 
-const API_URL = "https://nyando-flood-api.onrender.com/predict";
+const API_URL = "https://nyando-flood-v2.onrender.com/v2/advisory";
+// Client-side guard that matches the API limit of 5 assessments per minute per user.
+const CALL_LOG = [];
 
 const WARDS = ["Ahero", "Awasi/Onjiko", "East Kano/Wawidhi", "Kabonyo/Kanyagwal", "Kobura"];
 
+// ESA WorldCover v100 classes present in the V2 training data; the API accepts only these.
 const LAND_COVER_LABELS = {
-  0: "Open Water",
-  1: "Cropland",
-  2: "Grassland",
-  3: "Shrubland",
-  4: "Wetland",
-  5: "Built-up",
+  10: "Tree cover",
+  20: "Shrubland",
+  30: "Grassland",
+  40: "Cropland",
+  50: "Built-up (few training examples)",
+  60: "Bare / sparse vegetation (few training examples)",
+  80: "Permanent water bodies",
+  90: "Herbaceous wetland",
 };
 
+// Defaults are the medians of the training locations (docs/PHASE_E_REFERENCE.json), rounded to the slider step.
 const DEFAULTS = {
-  elevation: 1185,
-  slope: 2.4,
-  rainfall_3day: 48,
-  distance_river: 320,
-  clay_percent: 38,
-  land_cover: 1,
+  elevation: 1141.8,
+  slope: 0.17,
+  rainfall_3day: 22.5,
+  distance_river: 1437,
+  clay_percent: 45.4,
+  land_cover: 30,
   ward: "Ahero",
 };
 
+// Slider ranges cover the real training range of each input, rounded outward.
 const FEATURE_META = {
-  elevation:      { label: "Elevation", unit: "m", min: 1100, max: 1400, step: 5, desc: "Terrain height above sea level" },
-  slope:          { label: "Slope", unit: "°", min: 0, max: 25, step: 0.1, desc: "Ground gradient angle" },
-  rainfall_3day:  { label: "3-Day Rainfall", unit: "mm", min: 0, max: 200, step: 1, desc: "Cumulative rainfall last 3 days" },
-  distance_river: { label: "Distance to River", unit: "m", min: 0, max: 2000, step: 10, desc: "Proximity to nearest waterway" },
-  clay_percent:   { label: "Clay Content", unit: "%", min: 0, max: 80, step: 1, desc: "Soil clay percentage (affects drainage)" },
+  elevation:      { label: "Elevation", unit: "m", min: 1130, max: 1350, step: 0.1, desc: "Terrain height above sea level" },
+  slope:          { label: "Slope", unit: "°", min: 0, max: 16, step: 0.01, desc: "Ground gradient angle" },
+  rainfall_3day:  { label: "3-Day Rainfall", unit: "mm", min: 0, max: 83, step: 0.1, desc: "Cumulative rainfall last 3 days" },
+  distance_river: { label: "Distance to River", unit: "m", min: 0, max: 7300, step: 1, desc: "Proximity to nearest waterway" },
+  clay_percent:   { label: "Clay Content", unit: "%", min: 25, max: 58, step: 0.1, desc: "Soil clay percentage (affects drainage)" },
 };
 
-function getRiskLevel(prediction) {
-  if (!prediction) return null;
-  const p = typeof prediction === "object" ? prediction.flood_probability ?? prediction.probability ?? null : null;
-  const label = typeof prediction === "object" ? prediction.flood_risk ?? prediction.prediction ?? prediction.label ?? null : prediction;
+const BAND_LOOK = {
+  HIGH: { color: "#E84040", bg: "#2D0A0A", label: "High susceptibility band", emoji: "🔴" },
+  MEDIUM: { color: "#F5A623", bg: "#2D1A00", label: "Medium susceptibility band", emoji: "🟠" },
+  LOW: { color: "#27AE60", bg: "#0A2D0F", label: "Low susceptibility band", emoji: "🟢" },
+};
 
-  if (p !== null) {
-    if (p >= 0.65) return { level: "HIGH", color: "#E84040", bg: "#2D0A0A", label: "High Flood Risk", emoji: "🔴", prob: p };
-    if (p >= 0.35) return { level: "MEDIUM", color: "#F5A623", bg: "#2D1A00", label: "Moderate Flood Risk", emoji: "🟡", prob: p };
-    return { level: "LOW", color: "#27AE60", bg: "#0A2D0F", label: "Low Flood Risk", emoji: "🟢", prob: p };
-  }
-
-  const str = String(label).toLowerCase();
-  if (str.includes("high") || str === "1" || str === "true") return { level: "HIGH", color: "#E84040", bg: "#2D0A0A", label: "High Flood Risk", emoji: "🔴", prob: null };
-  if (str.includes("med")) return { level: "MEDIUM", color: "#F5A623", bg: "#2D1A00", label: "Moderate Flood Risk", emoji: "🟡", prob: null };
-  return { level: "LOW", color: "#27AE60", bg: "#0A2D0F", label: "Low Flood Risk", emoji: "🟢", prob: null };
+function getRiskLevel(resp) {
+  if (!resp || typeof resp !== "object" || typeof resp.score !== "number") return null;
+  const known = Object.prototype.hasOwnProperty.call(BAND_LOOK, resp.level);
+  const look = known ? BAND_LOOK[resp.level] : { color: "#C9A84C", bg: "#0A1628", label: "Band not available", emoji: "⚪" };
+  return {
+    ...look,
+    level: known ? resp.level : null,
+    score: resp.score,
+    scoreMeaning: resp.score_meaning || "",
+    levelBasis: resp.level_basis || "",
+    advisory: resp.advisory || null,
+    notice: resp.notice || "",
+    source: resp.advisory_source || "",
+    sourceModel: resp.advisory_model || "",
+    model: resp.model || null,
+    warnings: Array.isArray(resp.warnings) ? resp.warnings : [],
+  };
 }
 
 function NyandoMap({ ward }) {
@@ -137,45 +152,50 @@ function Slider({ name, value, onChange, meta }) {
 function RiskGauge({ risk, loading }) {
   const levels = ["LOW", "MEDIUM", "HIGH"];
   const idx = risk ? levels.indexOf(risk.level) : -1;
+  const adv = risk ? risk.advisory : null;
 
   return (
     <div style={{ textAlign: "center", padding: "24px 16px" }}>
       {loading ? (
         <div style={{ color: "#5B7A9A", fontSize: "14px" }}>
           <div style={{ display: "inline-block", width: "32px", height: "32px", border: "3px solid #1E3A5F", borderTopColor: "#C9A84C", borderRadius: "50%", animation: "spin 0.8s linear infinite", marginBottom: "12px" }} />
-          <div>Querying model…</div>
+          <div>Querying model… the first request after a pause can take about a minute.</div>
         </div>
       ) : risk ? (
         <>
           <div style={{ fontSize: "52px", lineHeight: 1, marginBottom: "8px" }}>{risk.emoji}</div>
-          <div style={{ fontSize: "22px", fontWeight: "800", color: risk.color, letterSpacing: "0.06em", marginBottom: "4px" }}>
+          <div style={{ fontSize: "22px", fontWeight: "800", color: risk.color, letterSpacing: "0.06em", marginBottom: "6px" }}>
             {risk.label.toUpperCase()}
           </div>
-          {risk.prob !== null && (
-            <div style={{ fontSize: "13px", color: "#aaa", marginBottom: "16px" }}>
-              Model score: <span style={{ color: risk.color, fontWeight: "700" }}>{(risk.prob * 100).toFixed(1)}%</span>
-            </div>
-          )}
+          <div style={{ fontSize: "13px", color: "#aaa", marginBottom: "4px" }}>
+            Ranking score: <span style={{ color: risk.color, fontWeight: "700" }}>{risk.score.toFixed(4)}</span>
+          </div>
+          <div style={{ fontSize: "11px", color: "#5B7A9A", marginBottom: "12px" }}>{risk.scoreMeaning}</div>
           <div style={{ display: "flex", gap: "6px", justifyContent: "center", margin: "12px 0" }}>
             {levels.map((l, i) => (
-              <div key={l} style={{
-                flex: 1, maxWidth: "80px", height: "8px", borderRadius: "4px",
-                background: i <= idx ? (l === "HIGH" ? "#E84040" : l === "MEDIUM" ? "#F5A623" : "#27AE60") : "#1E3A5F",
-                transition: "background 0.4s",
-              }} />
+              <div key={l} style={{ flex: 1, maxWidth: "80px", height: "8px", borderRadius: "4px", background: i <= idx ? (l === "HIGH" ? "#E84040" : l === "MEDIUM" ? "#F5A623" : "#27AE60") : "#1E3A5F", transition: "background 0.4s" }} />
             ))}
           </div>
           <div style={{ fontSize: "10px", color: "#5B7A9A", letterSpacing: "0.08em" }}>LOW · MEDIUM · HIGH</div>
-          <div style={{ marginTop: "16px", padding: "10px 14px", background: "rgba(201,168,76,0.08)", borderRadius: "8px", border: `1px solid ${risk.color}33`, fontSize: "12px", color: "#C0C0C0", lineHeight: 1.5 }}>
-            {risk.level === "HIGH" && "Legacy model output, not validated. Do not use for safety decisions."}
-            {risk.level === "MEDIUM" && "Legacy model output, not validated. Do not use for safety decisions."}
-            {risk.level === "LOW" && "Legacy model output, not validated. Do not use for safety decisions."}
+          {risk.levelBasis && <div style={{ fontSize: "10px", color: "#5B7A9A", marginTop: "4px" }}>Band basis: {risk.levelBasis}</div>}
+          {adv && (
+            <div style={{ marginTop: "16px", padding: "12px 14px", background: "rgba(201,168,76,0.08)", border: "1px solid #1E3A5F", borderRadius: "8px", textAlign: "left", fontSize: "12px", lineHeight: 1.6, color: "#cfd8e3" }}>
+              <div style={{ fontWeight: "700", marginBottom: "6px" }}>{adv.summary}</div>
+              {Array.isArray(adv.drivers) && adv.drivers.map((d) => <div key={d} style={{ marginBottom: "4px" }}>• {d}</div>)}
+              <div style={{ marginTop: "6px" }}>{adv.meaning}</div>
+              <div style={{ marginTop: "8px", color: "#E8C27A" }}>{adv.limits}</div>
+            </div>
+          )}
+          {risk.warnings.map((w) => <div key={w} style={{ marginTop: "8px", fontSize: "11px", color: "#E8C27A" }}>{w}</div>)}
+          <div style={{ marginTop: "10px", fontSize: "10px", color: "#5B7A9A", lineHeight: 1.5 }}>
+            {risk.notice} Text source: {risk.source === "template" ? "built-in template" : risk.source + (risk.sourceModel ? " (" + risk.sourceModel + ")" : "")}.
+            {risk.model ? " Model: " + risk.model.arm + " · " + risk.model.file : ""}
           </div>
         </>
       ) : (
         <div style={{ color: "#5B7A9A", fontSize: "13px", lineHeight: 1.7 }}>
           <div style={{ fontSize: "32px", marginBottom: "8px", opacity: 0.4 }}>◎</div>
-          Adjust parameters and click<br /><strong style={{ color: "#C9A84C" }}>Run Prediction</strong> to assess flood risk
+          Adjust the inputs and click<br /><strong style={{ color: "#C9A84C" }}>Assess susceptibility</strong> to rank this location.
         </div>
       )}
     </div>
@@ -193,24 +213,50 @@ export default function NyandoFloodDashboard() {
   const handleChange = (name, value) => setInputs(p => ({ ...p, [name]: value }));
 
   const runPrediction = async () => {
+    const now = Date.now();
+    while (CALL_LOG.length && now - CALL_LOG[0] > 60000) CALL_LOG.shift();
+    if (CALL_LOG.length >= 5) {
+      setError("At most 5 assessments per minute are allowed. Please wait a moment and try again.");
+      return;
+    }
+    CALL_LOG.push(now);
     setLoading(true);
     setError(null);
     setRisk(null);
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), 90000);
     try {
-      const body = { ...inputs };
+      const body = {
+        elevation: Number(inputs.elevation),
+        slope: Number(inputs.slope),
+        rainfall_3day: Number(inputs.rainfall_3day),
+        distance_river: Number(inputs.distance_river),
+        clay_percent: Number(inputs.clay_percent),
+        land_cover: Number(inputs.land_cover),
+        ward: inputs.ward,
+      };
       const res = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Accept": "application/json" },
         body: JSON.stringify(body),
+        signal: ctl.signal,
       });
-      const data = await res.json();
+      let data = null;
+      try {
+        data = await res.json();
+      } catch {
+        data = null;
+      }
       setRawResp(data);
-      if (!res.ok) throw new Error(data?.detail?.[0]?.msg || JSON.stringify(data));
+      if (res.status === 429) throw new Error("Too many requests: the service allows 5 assessments per minute per user. Wait a minute and try again.");
+      if (res.status === 503) throw new Error("The service is starting or its model is not loaded yet. Try again in a minute.");
+      if (!res.ok) throw new Error(data?.detail?.[0]?.msg || "The service refused the request (HTTP " + res.status + ").");
       setRisk(getRiskLevel(data));
       setLastRun(new Date().toLocaleTimeString());
     } catch (e) {
-      setError(e.message);
+      setError(e.name === "AbortError" ? "The service did not answer within 90 seconds. Its free tier may be waking up; try again." : e.message);
     } finally {
+      clearTimeout(timer);
       setLoading(false);
     }
   };
@@ -246,7 +292,7 @@ export default function NyandoFloodDashboard() {
               Nyando Flood AI
             </div>
             <div style={{ fontSize: "11px", color: "#5B7A9A", letterSpacing: "0.06em", marginTop: "2px", fontFamily: "'Lato', sans-serif" }}>
-              FLOOD SUSCEPTIBILITY · KISUMU COUNTY, KENYA<br />DEMONSTRATION ONLY · LEGACY MODEL · NOT VALIDATED
+              FLOOD SUSCEPTIBILITY · KISUMU COUNTY, KENYA<br />RANKING SCORE · NOT A FLOOD PROBABILITY · NOT AN OFFICIAL WARNING
             </div>
           </div>
         </div>
@@ -305,7 +351,7 @@ export default function NyandoFloodDashboard() {
         {/* Run button */}
         <button className="run-btn" onClick={runPrediction} disabled={loading}
           style={{ width: "100%", padding: "16px", background: loading ? "#1E3A5F" : "linear-gradient(135deg, #0A4A8A, #C9A84C)", border: "none", borderRadius: "10px", color: "#fff", fontSize: "15px", fontWeight: "700", letterSpacing: "0.1em", cursor: loading ? "not-allowed" : "pointer", transition: "all 0.2s", fontFamily: "'Lato', sans-serif", marginBottom: "16px" }}>
-          {loading ? "⏳  RUNNING MODEL…" : "🚀  RUN FLOOD PREDICTION"}
+          {loading ? "⏳  RUNNING MODEL…" : "🚀  ASSESS SUSCEPTIBILITY"}
         </button>
 
         {/* Risk result */}
@@ -342,7 +388,7 @@ export default function NyandoFloodDashboard() {
             {[
               { icon: "🛰️", text: "Open satellite data (V2 dataset in progress)" },
               { icon: "🏘️", text: "161,000+ residents covered" },
-              { icon: "📊", text: "Legacy model, under re-validation" },
+              { icon: "📊", text: "Ranking score, not a probability" },
               { icon: "🏛️", text: "Open-source code, MIT license" },
             ].map(d => (
               <div key={d.text} style={{ display: "flex", gap: "6px", alignItems: "center", fontSize: "11px", color: "#7A9AB0", fontFamily: "'Lato', sans-serif" }}>
@@ -355,8 +401,8 @@ export default function NyandoFloodDashboard() {
         {/* Footer */}
         <div style={{ textAlign: "center", fontSize: "10px", color: "#2A4A6A", fontFamily: "monospace", paddingBottom: "24px", lineHeight: 1.8 }}>
           Built by James Koero · github.com/jameskoero/nyando-flood-ai<br />
-          Model: legacy GradientBoostingClassifier · metrics retracted, V2 rebuild in progress<br />
-          API: nyando-flood-api.onrender.com
+          Model: the registered V2 model (identity shown with every result) · ranking score, not a flood probability<br />
+          API: nyando-flood-v2.onrender.com
         </div>
       </div>
     </div>
