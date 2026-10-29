@@ -368,3 +368,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-29: Render Blueprint for a parallel serving instance (D45, D13)
 
 - render.yaml defines a new web service nyando-flood-v2 (Docker, free plan, deploys only after CI checks pass, health check /health, PORT matching the Dockerfile) with the four provider settings prompted for in the dashboard (sync: false), so no existing service is touched and no secret is stored. tests/test_render_blueprint.py checks the file and scans tracked text for key-shaped strings (AIza and gsk_ prefixes). docs/PHASE_E_ADVISORY.md Section 10 records why.
+
+## 2026-10-29: provider writes prose only, drivers always from the template (E2-E3, D49)
+
+- A benchmark on the real contexts (6 trials per model) showed the guard alone does not make an advisory accurate: gemini-3.1-flash-lite passed the guard 6 of 6 and matched the real drivers 0 of 6; gemini-flash-lite-latest 3 of 6; qwen/qwen3.8-27b 6 of 6. The driver sentences now always come from the deterministic template; a provider writes only the summary and the meaning, is shown the factor names without any direction, and its text is refused if it states one (provider-only rule direction_word); the cache keeps the prose and rebuilds the drivers per request. docs/PHASE_E_ADVISORY.md Section 11 records it.

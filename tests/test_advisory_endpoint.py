@@ -68,7 +68,7 @@ def test_the_endpoint_returns_the_score_level_drivers_and_the_provider_text():
     assert b["advisory_source"] == "gemini" and b["advisory_model"] == "fake-model" and b["advisory"]["summary"] == GOOD["summary"] and b["providers_configured"] == ["gemini"]
     assert b["advisory"]["limits"] == template.LIMITS and b["notice"].endswith("not an official warning.") and b["ward"] == "Ahero"
     sent = json.loads(calls[0])
-    assert sent["ward"] == "Ahero" and sent["score_band"] == b["level"] and 1 <= len(sent["drivers"]) <= 3
+    assert sent["ward"] == "Ahero" and sent["score_band"] == b["level"] and 1 <= len(sent["factors"]) <= 3
 
 
 def test_with_no_provider_the_endpoint_answers_from_the_template():
