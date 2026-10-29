@@ -48,7 +48,9 @@ jobs:
           npm run preview -- --host 127.0.0.1 --port 4173 &
           for i in $(seq 1 30); do curl -sf http://127.0.0.1:4173/ > /dev/null && break; sleep 1; done
       - name: Lighthouse (mobile)
-        run: npx --yes lighthouse@13.5.0 http://127.0.0.1:4173/ --quiet --form-factor=mobile --chrome-flags="--headless=new --no-sandbox" --output=json --output=html --output-path=lh/report
+        run: |
+          mkdir -p lh
+          npx --yes lighthouse@13.5.0 http://127.0.0.1:4173/ --quiet --form-factor=mobile --chrome-flags="--headless=new --no-sandbox" --output=json --output=html --output-path=lh/report
       - name: Scores
         run: |
           node -e "const r=require('./lh/report.report.json'); const s={}; for (const [k,v] of Object.entries(r.categories)) s[k]=Math.round(v.score*100); console.log(JSON.stringify(s)); if (!(s.performance>=90)) { console.error('performance below 90'); process.exit(1); }"

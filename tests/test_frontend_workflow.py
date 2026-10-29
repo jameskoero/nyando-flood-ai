@@ -50,3 +50,7 @@ def test_the_node_version_satisfies_the_engines_of_the_build_tools():
     for name in ("vite", "eslint", "@vitejs/plugin-react"):
         spec = lock["node_modules/" + name]["engines"]["node"]
         assert accepts((24, 0, 0), spec), (name, spec)
+
+
+def test_the_report_folder_exists_before_lighthouse_writes_to_it():
+    assert TEXT.index("mkdir -p lh") < TEXT.index("lighthouse@13.5.0 http")
