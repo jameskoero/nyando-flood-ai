@@ -356,3 +356,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-28: advisory endpoint built (E3, D49)
 
 - POST /v2/advisory (backend/advisory.py, route appended to backend/main.py): score and level from the registered model and the cutpoints of docs/PHASE_E_RESULTS.json (level shown only if the live model's SHA-256 is in that file), three drivers by reference substitution against docs/PHASE_E_REFERENCE.json, text from Gemini then Groq then the template, only the five ward names accepted, 5 requests per minute per client plus the shared 15. The Docker build imports the service and stops if the levels are not bound to the registered model. tests/test_advisory_service.py and tests/test_advisory_endpoint.py (real model, real training rows, fake provider, import graph without mlflow or xgboost) check it. Live check with real keys is next; D49 stays open until then.
+
+## 2026-10-29: provider requests send a User-Agent (D49)
+
+- Groq's edge answered HTTP 403 (error code 1010) to Python's default User-Agent while the same key worked with an explicit one, found by the key check before any key was set in Render. src/advisory/providers.py now sends User-Agent nyando-flood-ai/2.0 on every provider call; the provider tests check the header.

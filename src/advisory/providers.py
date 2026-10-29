@@ -12,6 +12,7 @@ GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 MAX_RESPONSE_BYTES = 1000000
 MAX_OUTPUT_TOKENS = 400
 TEMPERATURE = 0.2
+USER_AGENT = "nyando-flood-ai/2.0"
 
 
 class ProviderError(Exception):
@@ -31,7 +32,7 @@ class Provider:
 
 
 def post_json(url, headers, payload, timeout_s):
-    req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"), headers=dict(headers, **{"Content-Type": "application/json"}), method="POST")
+    req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"), headers=dict({"User-Agent": USER_AGENT, "Content-Type": "application/json"}, **headers), method="POST")
     try:
         with urllib.request.urlopen(req, timeout=timeout_s) as resp:
             return json.loads(resp.read(MAX_RESPONSE_BYTES).decode("utf-8"))
