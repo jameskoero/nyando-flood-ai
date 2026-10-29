@@ -49,4 +49,5 @@ class AdvisoryService:
             "model": self.registered.describe(),
             "claim_limit": self.registered.meta.get("claim_limit"),
             "warnings": list(warnings),
+            "providers_configured": [p.name for p in getattr(self.advisor, "providers", [])],
         }
