@@ -64,6 +64,16 @@ def test_only_the_five_ward_names_reach_the_advisor():
 
 def test_the_response_has_the_agreed_fields_and_carries_the_limits():
     out = AdvisoryService(Registered(), ROOT, {}, advisor=Advisor()).respond(location(0.9), ["a warning"])
-    assert set(out) == {"score", "score_meaning", "level", "level_basis", "ward", "advisory", "notice", "advisory_source", "advisory_model", "cached", "prompt_version", "attempts", "model", "claim_limit", "warnings"}
+    assert set(out) == {"score", "score_meaning", "level", "level_basis", "ward", "advisory", "notice", "advisory_source", "advisory_model", "cached", "prompt_version", "attempts", "model", "claim_limit", "warnings", "providers_configured"}
     assert out["score"] == 0.9 and out["warnings"] == ["a warning"] and out["claim_limit"] == "test claim" and out["notice"].endswith("not an official warning.")
     assert out["advisory"]["limits"] == template.LIMITS and rules.CLAIM in out["advisory"]["limits"]
+
+
+def test_the_response_names_the_configured_providers_and_never_a_key():
+    from src.advisory.orchestrator import Advisor as Real
+    from src.advisory.providers import Provider
+    none = AdvisoryService(Registered(), ROOT, {}, advisor=Real([])).respond(location(0.5))
+    one = AdvisoryService(Registered(), ROOT, {}, advisor=Real([Provider("gemini", "m", lambda s, u, t: "not json")])).respond(location(0.5))
+    assert none["providers_configured"] == [] and one["providers_configured"] == ["gemini"] and one["advisory_source"] == "template"
+    doc = (ROOT / "docs" / "PHASE_E_ADVISORY.md").read_text(encoding="utf-8")
+    assert "## 9. Implementation choices" in doc

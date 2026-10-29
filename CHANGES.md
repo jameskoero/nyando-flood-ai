@@ -360,3 +360,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-29: provider requests send a User-Agent (D49)
 
 - Groq's edge answered HTTP 403 (error code 1010) to Python's default User-Agent while the same key worked with an explicit one, found by the key check before any key was set in Render. src/advisory/providers.py now sends User-Agent nyando-flood-ai/2.0 on every provider call; the provider tests check the header.
+
+## 2026-10-29: providers made visible, E2-E3 choices recorded, D48 closed
+
+- /v2/advisory returns providers_configured (names of providers that have both a key and a model, never a key). Needed because the live service answered from the template with attempts [] for more than an hour after the settings were entered and the cause could not be read from outside. docs/PHASE_E_ADVISORY.md Section 9 records the E2 and E3 implementation choices with their reasons. Register row D48 is closed: its verification test is unchanged and the live check of Oct 10 showed all six security headers and HTTP 200 on the v2 routes. D49 stays open until a provider answers live.

@@ -65,7 +65,7 @@ def test_the_endpoint_returns_the_score_level_drivers_and_the_provider_text():
     b = r.json()
     s = main.REGISTERED.score(payload(FLOOD_ROW))
     assert b["score"] == round(s, 4) and b["level"] == rules.level_of(s, (CUTS["low"], CUTS["high"]))
-    assert b["advisory_source"] == "gemini" and b["advisory_model"] == "fake-model" and b["advisory"]["summary"] == GOOD["summary"]
+    assert b["advisory_source"] == "gemini" and b["advisory_model"] == "fake-model" and b["advisory"]["summary"] == GOOD["summary"] and b["providers_configured"] == ["gemini"]
     assert b["advisory"]["limits"] == template.LIMITS and b["notice"].endswith("not an official warning.") and b["ward"] == "Ahero"
     sent = json.loads(calls[0])
     assert sent["ward"] == "Ahero" and sent["score_band"] == b["level"] and 1 <= len(sent["drivers"]) <= 3
@@ -75,7 +75,7 @@ def test_with_no_provider_the_endpoint_answers_from_the_template():
     with advisor_set(Advisor([])):
         r = CLIENT.post("/v2/advisory", json=payload(FLOOD_ROW))
     b = r.json()
-    assert r.status_code == 200 and b["advisory_source"] == "template" and b["advisory_model"] is None
+    assert r.status_code == 200 and b["advisory_source"] == "template" and b["advisory_model"] is None and b["providers_configured"] == []
     assert guard.check({k: b["advisory"][k] for k in guard.KEYS}) == [] and b["advisory"]["limits"] == template.LIMITS
 
 

@@ -54,3 +54,16 @@ tests/test_advisory_reference.py rebuilds them in CI and computes them a second 
 POST /v2/advisory takes the same fields as /v2/score and returns the score, the level, the drivers, the advisory text, where the text came from (gemini, groq or template) and the fixed limits text. The level is shown only if the live model's SHA-256 appears in docs/PHASE_E_RESULTS.json, the file that validated the cutpoints; otherwise it is withheld. The ward is used only if it is one of the five ward names in data/external/nyando_wards.geojson; anything else is treated as no ward, so free text never reaches a provider.
 
 The endpoint allows 5 requests per minute per client and the shared 15 per minute, because a request can reach a provider; /v2/score never calls a provider. With no provider settings the endpoint answers from the deterministic template. The Docker build imports the service and stops if the levels are not bound to the registered model, so a mismatch keeps the previous deploy.
+
+## 9. Implementation choices and why
+
+These are choices the roadmap and the protocol leave open. Each has its reason.
+
+- The guard is stricter than the protocol (ten rules, not three). The score is a case-control ranking, so a digit, a timing word or a severity word would claim more than the evidence supports.
+- The context holds no number, so the prompt, the cache key and the template cannot leak or invent a figure.
+- Only a guard-accepted provider answer is cached, so a template fallback cannot hide a recovered provider for an hour.
+- Only the five ward names are accepted, so free text cannot enter a provider prompt.
+- The level is withheld unless the live model's SHA-256 appears in docs/PHASE_E_RESULTS.json, because the cutpoints were validated for that model only.
+- A fixed User-Agent is sent, because Groq's edge refused the default Python one (HTTP 403, error code 1010, seen on 2026-10-29).
+- /v2/advisory allows 5 requests per minute per client against 10 on /v2/score, because a request can reach a provider with its own quota.
+- The response names the configured providers (names only, never a key), so a missing setting is visible from the API.
