@@ -160,7 +160,7 @@ models/nyando_xgb_v1.pkl                 pre-V2 model file, recorded as legacy
 src/data/                                GFM client, terrain, case-control sampler, raw features, audit and validation helpers
 src/features/                            build_features.py
 src/models/                              Phase C modules: cv (evaluation harness), baseline, boosters, constrained, decision, registration, export_onnx, robustness (battery), closure (record), promotion (gates), export_hgb (tree exporter), phase_d (Phase D rules), mlp_pre and mlp (Phase D model); also train_model.py and evaluate_model.py
-src/advisory/                            Phase E rules as code: levels, gates and the advisory contract (no model, network or data files)
+src/advisory/                            Phase E: rules as code (levels, gates), the advisory core (attribution, guard, template, prompt, reference values), the Gemini and Groq providers and the orchestrator
 src/utils/                               geo_utils.py
 src/visualization/                       shap_plots.py
 src/tracking.py                          MLflow tracking wrapper
@@ -204,7 +204,7 @@ gee_extract_nyando.py                    v1 Earth Engine extraction script (lega
 - [x] **D. Stage 1:** the model code and its offline tests are committed (`src/models/mlp.py`, `src/models/mlp_pre.py`); nothing is trained.
 - [x] **D. Stage 2 and conclusion:** selection and evaluation on the existing events are recorded (`docs/PHASE_D_RESULTS.json`, one MLflow run). Phase D ends not promoted: the selected MLP has monotonicity violations and cannot pass export gate X3, so `hgb:con` stays registered and Block B stays sealed (register rows D46 and D47).
 - [ ] **D. (optional, future):** a second candidate with a stronger or hard constraint mechanism, under its own protocol; it may use Block B. Serving through ONNX Runtime is already done (register row D33).
-- [ ] **E. LLM advisory layer**, cached and rate-limited, never on the `/predict` path.
+- [x] **E. LLM advisory layer**, cached and rate-limited, never on the `/predict` path.
 - [ ] **F. Dashboard:** no hard-coded metrics, loading and error states, accessibility.
 - [ ] **G-H. SMS alerts** (only after a public WARMA feed is confirmed; sandbox and shadow mode only while the service stays on Render's free tier, register row D45) and an MCP/LangGraph showcase.
 - [x] **K (part):** the model card and the datasheet (`data/DATA_SOURCES.md`) are rewritten to V2 (register row D38).

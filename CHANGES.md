@@ -372,3 +372,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-29: provider writes prose only, drivers always from the template (E2-E3, D49)
 
 - A benchmark on the real contexts (6 trials per model) showed the guard alone does not make an advisory accurate: gemini-3.1-flash-lite passed the guard 6 of 6 and matched the real drivers 0 of 6; gemini-flash-lite-latest 3 of 6; qwen/qwen3.8-27b 6 of 6. The driver sentences now always come from the deterministic template; a provider writes only the summary and the meaning, is shown the factor names without any direction, and its text is refused if it states one (provider-only rule direction_word); the cache keeps the prose and rebuilds the drivers per request. docs/PHASE_E_ADVISORY.md Section 11 records it.
+
+## 2026-10-29: Phase E closed on the live evidence (D49 closed, D50 added)
+
+- The advisory answered live from the parallel Render service nyando-flood-v2 (HTTP 200, gemini and groq configured, prose from gemini-3.1-flash-lite, attempt accepted) and an acceptance check passed 18 of 18, with the fallback to groq exercised live on one row, so register row D49 is closed on its existing test; row D50 records the second service and stays open until Phase F switches the dashboard and the README to it. The README now ticks Phase E and its layout line for src/advisory/ no longer says there is no network or data file code. docs/PHASE_E_ADVISORY.md Section 12 holds the evidence and the model measurements (small samples) and tests/test_phase_e_closure.py checks the records.
