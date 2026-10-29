@@ -384,3 +384,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-29: per-client rate limit keyed on the client address header
 
 - The per-client limit keyed on get_remote_address, which behind the host's proxy was measured admitting 17 to 21 of 25 requests against a limit of 10 (cause unproven). It now keys on a valid CF-Connecting-IP and on the socket address otherwise (backend/main.py _client_key); the shared 15 per minute cap is unchanged. tools/burst_check.py measures the live effect and whether a client can choose its key; tests/test_rate_limit_key.py covers the key function.
+
+## 2026-10-29: frontend workflow, lint and build plus a Lighthouse measurement
+
+- Adds .github/workflows/frontend.yml: the dashboard is linted and built (Node 24, which the engines of vite, eslint and the React plugin in package-lock.json accept) on every pull request and push to main, and measured with Lighthouse 13.5.0 on mobile with the report kept as an artifact; the Lighthouse job fails below a performance score of 90. Neither job is a required check yet. tests/test_frontend_workflow.py checks the SHA pins, the read-only permissions, the step order and the engines.
