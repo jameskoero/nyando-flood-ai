@@ -392,3 +392,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-29: security record
 
 - Records the measured rate-limit fix in docs/SECURITY_BASELINE.md (10 admitted and 1 refused per client per minute on nyando-flood-v2, against 17 to 21 of 25 before; the cause of the earlier leak was not isolated) and corrects the README's not-built list, which still named the built train-check. tests/test_security_record.py checks both.
+
+## 2026-10-29: Lighthouse report folder
+
+- The Lighthouse job of the frontend workflow failed with: --output-path (lh/report) cannot be written to, because the folder did not exist. The step now creates it first; tests/test_frontend_workflow.py checks the order.
