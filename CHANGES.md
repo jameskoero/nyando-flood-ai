@@ -364,3 +364,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-29: providers made visible, E2-E3 choices recorded, D48 closed
 
 - /v2/advisory returns providers_configured (names of providers that have both a key and a model, never a key). Needed because the live service answered from the template with attempts [] for more than an hour after the settings were entered and the cause could not be read from outside. docs/PHASE_E_ADVISORY.md Section 9 records the E2 and E3 implementation choices with their reasons. Register row D48 is closed: its verification test is unchanged and the live check of Oct 10 showed all six security headers and HTTP 200 on the v2 routes. D49 stays open until a provider answers live.
+
+## 2026-10-29: Render Blueprint for a parallel serving instance (D45, D13)
+
+- render.yaml defines a new web service nyando-flood-v2 (Docker, free plan, deploys only after CI checks pass, health check /health, PORT matching the Dockerfile) with the four provider settings prompted for in the dashboard (sync: false), so no existing service is touched and no secret is stored. tests/test_render_blueprint.py checks the file and scans tracked text for key-shaped strings (AIza and gsk_ prefixes). docs/PHASE_E_ADVISORY.md Section 10 records why.
