@@ -18,6 +18,26 @@ if gh pr merge --auto --merge >/dev/null 2>&1; then echo "auto-merge armed"; els
 flags=""; if gh pr checks --help 2>&1 | grep -q -- "--required"; then flags="--required"; fi
 for i in 1 2 3 4 5 6 7 8; do
   out=$(gh pr checks $flags 2>&1 || true)
-  case "$out" in *"no checks reported"*|*"no required checks"*) echo "waiting for GitHub to register the checks ($i/8)"; sleep 15;; *) break;; esac
+  case "$out" in *"no checks reported"*|*"no required checks"*) echo "waiting for GitHub to register the checks ($i/8)"; sleep "${SHIP_NAP:-15}";; *) break;; esac
 done
-if gh pr checks $flags --watch --interval 30; then echo "CI green"; else echo "CI FAILED: the failing tests follow"; "$(dirname "$0")/ci_failures.sh" || true; exit 1; fi
+# A dropped connection or a pending check is not a failed check: the verdict is read from the check states, and "unknown" is said when GitHub cannot confirm them.
+nap=${SHIP_NAP:-15}
+verdict() {
+  local o rc=0
+  o=$(gh pr checks $flags 2>&1) || rc=$?
+  if printf '%s\n' "$o" | awk -F'\t' '$2=="fail"{f=1} END{exit !f}'; then echo failed
+  elif [ "$rc" -eq 0 ]; then echo green
+  elif printf '%s\n' "$o" | awk -F'\t' '$2=="pending"{p=1} END{exit !p}'; then echo pending
+  else echo unknown; fi
+}
+result=unknown
+for round in 1 2 3 4 5 6; do
+  gh pr checks $flags --watch --interval 30 || true
+  result=$(verdict)
+  case "$result" in pending|unknown) echo "checks not settled ($result), looking again ($round/6)"; sleep "$nap";; *) break;; esac
+done
+case "$result" in
+  green) echo "CI green";;
+  failed) echo "CI FAILED: the failing tests follow"; "$(dirname "$0")/ci_failures.sh" || true; exit 1;;
+  *) echo "CI UNKNOWN: GitHub could not confirm the checks (last state: $result); look with: gh pr checks"; exit 2;;
+esac
