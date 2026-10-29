@@ -380,3 +380,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-29: ship.sh reads the verdict from the check states; pre-push check and live check as tools
 
 - tools/ship.sh no longer reports a dropped connection or a pending check as CI FAILED: it reads the verdict from the check states, looks again up to six times, prints CI FAILED (exit 1) only when a check shows fail and CI UNKNOWN (exit 2) when GitHub cannot confirm the checks. tools/check.sh, which ship.sh already ran when present, now replays the structural rules (README layout, register rows, syntax, workflow permissions, key-shaped text) before anything is committed. tools/live_check.py is the acceptance check of a deployed service (18 checks passed on nyando-flood-v2). tests/test_ship_tools.py proves each ship.sh case against a scripted GitHub CLI and each check.sh rule on a stand-in repository; docs/DEV_WORKFLOW.md records it.
+
+## 2026-10-29: per-client rate limit keyed on the client address header
+
+- The per-client limit keyed on get_remote_address, which behind the host's proxy was measured admitting 17 to 21 of 25 requests against a limit of 10 (cause unproven). It now keys on a valid CF-Connecting-IP and on the socket address otherwise (backend/main.py _client_key); the shared 15 per minute cap is unchanged. tools/burst_check.py measures the live effect and whether a client can choose its key; tests/test_rate_limit_key.py covers the key function.

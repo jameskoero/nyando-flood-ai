@@ -14,7 +14,17 @@ from slowapi.errors import RateLimitExceeded
 from backend.integrity import load_verified_pickle
 from backend.registered import LAND_COVER_CLASSES, load_registered, metrics_payload
 
-limiter = Limiter(key_func=get_remote_address)
+def _client_key(request):
+    # The per-client limit keys on the connecting client's address header when it holds a valid IP address and on the socket address otherwise; tools/burst_check.py measures the effect on the live service.
+    import ipaddress
+    raw = request.headers.get("cf-connecting-ip", "").strip()
+    try:
+        return str(ipaddress.ip_address(raw))
+    except ValueError:
+        return get_remote_address(request)
+
+
+limiter = Limiter(key_func=_client_key)
 
 # One shared counter for /predict, independent of client address and of any header a client sets.
 GLOBAL_PREDICT_LIMIT = 15
