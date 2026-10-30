@@ -34,3 +34,22 @@ def test_d51_records_the_legacy_endpoint_as_an_open_row():
 
 def test_the_readme_names_the_v2_host_and_not_the_old_one():
     assert "nyando-flood-v2.onrender.com" in README and "nyando-flood-api" not in README
+
+
+def test_d13_is_closed_and_records_what_replaced_the_drift_monitor_and_the_gated_deploy():
+    cells = _cells("D13")
+    assert cells[6] == "closed" and cells[5].startswith("tests/")
+    rel, name = cells[5].split("::")
+    assert name in _functions(ROOT / rel)
+    text = " ".join(cells)
+    for must in ("applicability", "checksPass", "train-check", "D45"):
+        assert must in text, must
+
+
+def test_the_readme_gates_name_the_required_checks_and_the_closure():
+    assert "`test` and `frontend` are required checks" in README
+    assert "- [x] **Gates (remainder):**" in README and "applicability indicator" in README
+
+
+def test_the_readme_ticks_phase_f():
+    assert "- [x] **F. Dashboard:**" in README and "- [ ] **F. Dashboard:**" not in README

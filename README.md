@@ -94,7 +94,7 @@ The flood share of the file (44.6%) is set by the sampling design and is not the
 - **CI hygiene:** every workflow declares read-only token permissions and pins each action to a commit SHA, and Dependabot keeps those pins current. The gate workflows use no secrets and run on every pull request; the gate installs exact versions (`requirements-gate.txt`) and the test job installs under exact version constraints (`constraints-ci.txt`), both with a retried install. Fork and Dependabot pull requests have no Actions secrets, so the tests that need an Earth Engine session are skipped there with a visible notice; a trusted run without the key fails with a clear message, and runs with the key execute everything.
 - **Live-data tests:** tests that call the live EODC GFM catalogue run in a separate `live-data` job that is not a required check, so a slow third-party service cannot block merges; the required `test` job runs the rest (register row D44).
 - **Sealed test block:** Block B of the D20 selection stays unbuilt and unscored; `tests/test_phase_d.py` fails if a Block B file appears before the Phase D freeze file is merged.
-- **Not built yet:** the `drift-monitor` and a gated `deploy` workflow (register row D13); the scheduled `train-check` is built (`.github/workflows/train-check.yml`).
+- **Not built yet:** a `drift-monitor`; it is replaced by the per-request applicability indicator because the free tier keeps no live inputs (register rows D13 and D45). The scheduled `train-check` is built (`.github/workflows/train-check.yml`).
 
 ## Quick start
 
@@ -197,15 +197,15 @@ gee_extract_nyando.py                    v1 Earth Engine extraction script (lega
 - [x] A (remainder). The OSM check of the 15 zero-distance rows is recorded (`docs/D11_OSM_CHECK.json`, register row D11). The monotonicity test is in CI; the permutation audit and the temporal holdout ran in Phase C (see the closure record), and leakage in `land_cover` is not excluded.
 - [x] **B. Experiment tracking:** MLflow on DagsHub, with the data hash logged on every run.
 - [x] **C. Model suite:** logistic regression, gradient boosting and XGBoost with monotonic constraints, evaluated leave-one-event-out. Closed with the registered model `logistic:con` (replaced below); see the [closure record](docs/PHASE_C_CLOSURE.md) for what the boosters did and did not show. D20 then tested these results on new events ([D20 protocol](docs/D20_PROTOCOL.md), Section 13): the advantage over elevation only did not replicate and both boosters beat `logistic:con`; the [promotion protocol](docs/PROMOTION_PROTOCOL.md) then registered `hgb:con` ("D20 PROMOTED", record: [docs/REGISTRATION.json](docs/REGISTRATION.json)).
-- [x] **Gates:** `data-gate`, `manifest-check` and `test` are required checks on protected `main`.
+- [x] **Gates:** `data-gate`, `manifest-check`, `test` and `frontend` are required checks on protected `main`.
 - [x] **Gates (train-check):** the weekly `train-check` workflow reruns the parity refit and the E1 recompute and fails the run on drift (PR #77, register row D13).
-- [ ] **Gates (remainder):** `drift-monitor` and a gated `deploy` workflow, both in Phase F (register row D13).
+- [x] **Gates (remainder):** the `drift-monitor` is replaced by the per-request applicability indicator (the free tier keeps no live inputs, register row D45), and the deploy is gated by Render's `checksPass` and by the required checks on `main`, with no workflow (register row D13).
 - [x] **D. Stage 0:** the physics-constrained MLP protocol and its rules as code are committed ([protocol](docs/PHASE_D_PROTOCOL.md), register row D46); nothing is trained.
 - [x] **D. Stage 1:** the model code and its offline tests are committed (`src/models/mlp.py`, `src/models/mlp_pre.py`); nothing is trained.
 - [x] **D. Stage 2 and conclusion:** selection and evaluation on the existing events are recorded (`docs/PHASE_D_RESULTS.json`, one MLflow run). Phase D ends not promoted: the selected MLP has monotonicity violations and cannot pass export gate X3, so `hgb:con` stays registered and Block B stays sealed (register rows D46 and D47).
 - [ ] **D. (optional, future):** a second candidate with a stronger or hard constraint mechanism, under its own protocol; it may use Block B. Serving through ONNX Runtime is already done (register row D33).
 - [x] **E. LLM advisory layer**, cached and rate-limited, never on the `/predict` path.
-- [ ] **F. Dashboard:** no hard-coded metrics, loading and error states, accessibility.
+- [x] **F. Dashboard:** no hard-coded metrics, loading and error states, accessibility.
 - [ ] **G-H. SMS alerts** (only after a public WARMA feed is confirmed; sandbox and shadow mode only while the service stays on Render's free tier, register row D45) and an MCP/LangGraph showcase.
 - [x] **K (part):** the model card and the datasheet (`data/DATA_SOURCES.md`) are rewritten to V2 (register row D38).
 - [ ] **J-K (remainder):** ward-level fairness slices, the paper, and a Zenodo erratum before any new numbers are cited.

@@ -35,7 +35,7 @@ def test_the_frontend_job_installs_lints_and_builds_in_that_order():
 
 
 def test_lighthouse_runs_on_mobile_gates_performance_and_keeps_the_report():
-    for must in ("lighthouse@13.5.0", "--form-factor=mobile", "s.performance>=90", "upload-artifact", "if: always()", "name: lighthouse-report"):
+    for must in ("lighthouse@13.5.0", "--form-factor=mobile", "!(s[k]>=90)", "'accessibility'", "'seo'", "upload-artifact", "if: always()", "name: lighthouse-report"):
         assert must in TEXT, must
 
 
