@@ -141,7 +141,7 @@ The deployed service serves the registered V2 model at `POST /v2/score` and stil
 
 Legacy risk classes (from the code): LOW below 0.35, MEDIUM 0.35 to 0.60, HIGH 0.60 to 0.80, CRITICAL 0.80 and above. The score is a legacy-model output, not a validated flood probability.
 
-The API runs on Render's free tier, so the first request after idle can take about a minute. It stays on the free tier by the owner's decision (register row D45). Live services: [dashboard](https://nyando-flood-ai.vercel.app) and [API health](https://nyando-flood-api.onrender.com/health).
+The API runs on Render's free tier, so the first request after idle can take about a minute. It stays on the free tier by the owner's decision (register row D45). Live services: [dashboard](https://nyando-flood-ai.vercel.app) and [API health](https://nyando-flood-v2.onrender.com/health).
 
 ## Repository layout
 

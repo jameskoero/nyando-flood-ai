@@ -16,7 +16,7 @@ def _row(row_id):
 def test_d49_is_closed_on_its_existing_test_and_d50_records_the_second_service():
     d49, d50 = _row("D49"), _row("D50")
     assert d49.rstrip().endswith("| closed |") and "tests/test_phase_e.py::test_the_protocol_states_the_frozen_rules_and_the_four_deviations" in d49
-    assert "nyando-flood-v2" in d50 and "render.yaml" in d50 and d50.rstrip().endswith("| open |")
+    assert "nyando-flood-v2" in d50 and "render.yaml" in d50 and d50.rstrip().endswith("| closed |")
 
 
 def test_the_readme_ticks_phase_e_and_describes_the_advisory_package_truthfully():

@@ -406,3 +406,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-30: dashboard accessibility and page metadata
 
 - Lighthouse on the dashboard (mobile, 2026-10-30) scored accessibility 66 and SEO 82. The slider inputs and the two selects now have accessible names, the page has a main landmark, the muted text colour moves from #5B7A9A (contrast 3.37 to 4.33 on the dashboard backgrounds) to #7F9BBB (at least 5.24), the page title and description say it is a susceptibility ranking and not a prediction, and a valid robots.txt replaces the app page that was served at /robots.txt. tests/test_dashboard_accessibility.py checks each of these, including the contrast ratios.
+
+## 2026-10-30: Phase F closure, part 1
+
+- Register rows D35 and D50 are closed on tests that exist, and D51 records that the legacy POST /predict is still in the code and on the old host. D35: the dashboard calls /v2/advisory (D49), shows the band only when the API returns one and flags inputs in the sparse tail of the training data. D50: the dashboard and the README name nyando-flood-v2. tests/test_phase_f_closure.py checks the rows and the README; tests/test_phase_e_closure.py now expects D50 closed. D13 stays open until its tests are updated in the next step.
