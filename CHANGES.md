@@ -410,3 +410,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-30: Phase F closure, part 1
 
 - Register rows D35 and D50 are closed on tests that exist, and D51 records that the legacy POST /predict is still in the code and on the old host. D35: the dashboard calls /v2/advisory (D49), shows the band only when the API returns one and flags inputs in the sparse tail of the training data. D50: the dashboard and the README name nyando-flood-v2. tests/test_phase_f_closure.py checks the rows and the README; tests/test_phase_e_closure.py now expects D50 closed. D13 stays open until its tests are updated in the next step.
+
+## 2026-10-30: Phase F closure, part 2
+
+- Register row D13 is closed as a recorded deviation: train-check is built; the drift-monitor is replaced by the per-request applicability indicator (the free tier keeps no live inputs, D45); the deploy is gated by Render's checksPass and by the required checks on main. The README names frontend among the required checks and its gates line records the closure; tests/test_train_check.py now checks the closure instead of keeping D13 open. Phase F is ticked on the measured Lighthouse mobile scores (performance 98, accessibility 95, best-practices 100, seo 100), and the Lighthouse job now fails when any of the four scores is below 90.

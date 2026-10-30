@@ -29,11 +29,11 @@ def test_the_workflow_runs_the_two_measured_tests_under_the_ci_pins():
     assert "python -m pytest -q -p no:cacheprovider tests/test_environment_parity.py tests/test_phase_e_results.py" in WF
 
 
-def test_the_register_and_the_readme_record_train_check_and_keep_d13_open():
+def test_the_register_and_the_readme_record_train_check_and_the_d13_closure():
     root = Path(__file__).resolve().parent.parent
     row = [l for l in (root / "docs" / "ROADMAP_DEVIATIONS.md").read_text(encoding="utf-8").splitlines() if l.startswith("| D13 |")]
     assert len(row) == 1 and "train-check built" in row[0] and "PR #77" in row[0]
     cells = [c.strip() for c in row[0].strip().strip("|").split("|")]
-    assert cells[-1] == "open" and cells[-2].startswith("open:") and "drift-monitor and deploy" in cells[-2]
+    assert cells[-1] == "closed" and cells[-2].startswith("tests/") and "applicability" in row[0] and "checksPass" in row[0]
     readme = (root / "README.md").read_text(encoding="utf-8")
-    assert "- [x] **Gates (train-check):**" in readme and "- [ ] **Gates (remainder):** `drift-monitor` and a gated `deploy` workflow" in readme
+    assert "- [x] **Gates (train-check):**" in readme and "- [x] **Gates (remainder):**" in readme and "applicability indicator" in readme
