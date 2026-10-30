@@ -414,3 +414,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-30: Phase F closure, part 2
 
 - Register row D13 is closed as a recorded deviation: train-check is built; the drift-monitor is replaced by the per-request applicability indicator (the free tier keeps no live inputs, D45); the deploy is gated by Render's checksPass and by the required checks on main. The README names frontend among the required checks and its gates line records the closure; tests/test_train_check.py now checks the closure instead of keeping D13 open. Phase F is ticked on the measured Lighthouse mobile scores (performance 98, accessibility 95, best-practices 100, seo 100), and the Lighthouse job now fails when any of the four scores is below 90.
+
+## 2026-10-30: Phase K protocol
+
+- Phase K starts with its protocol and its rules as code, fixed before any ward metric exists: docs/PHASE_K_PROTOCOL.md, src/models/phase_k.py and tests/test_phase_k.py, register row D52. The primary frame is the E1 Block A frame scored by the registered artifact, the secondary the out-of-fold reference frame. A ward is estimable in a frame only with at least 30 flood rows, 30 control rows and 5 events that contain both classes (Awasi/Onjiko has 2 flood rows in 1 event in the whole training file); intervals use the E1 event-clustered bootstrap; the flags are descriptive and the outcome is PHASE K REPORTED. The thresholds were chosen after the per-ward counts were seen and before any ward metric.
