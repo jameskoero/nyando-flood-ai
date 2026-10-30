@@ -17,6 +17,48 @@ Outcome of `docs/PROMOTION_PROTOCOL.md`: "D20 PROMOTED". Statistical gates S1 to
 - Not shown: with neighbours within 1,000 m removed, against the previous model -0.0088 [-0.0296, 0.0091]; out of time +0.0039 [-0.0130, 0.0195]. The advantage is shown within the mapped area and period, not at locations without training neighbours or in later years.
 - Export: the artifact reproduces scikit-learn to 3.3e-16 through the production feed, with zero monotonicity violations.
 
+<!-- phase-k:begin -->
+### Ward-level slices (Phase K, register rows D52 and D53)
+
+Protocol `docs/PHASE_K_PROTOCOL.md` (SHA-256 `2b096b44b68111352c35cb6579c4cf1727cc8d32e908c86a0a15670ee42e32a1`); results `docs/PHASE_K_RESULTS.json` (K1 run: GitHub Actions run 41033394658, MLflow run `cdda081a5bc9477ea7db64199fe162b2`, commit `0c30961e7af53e4c484489dc5ce7c565da0924ce`). The scores are ranking scores, not flood probabilities, and the result is not an official warning. The training and Block A samples are case-control, so a ward's share of flood rows describes the sampling and is not a flood rate.
+
+Intervals are event-clustered percentile bootstrap intervals: the 2.5th to 97.5th percentile of 10,000 resamples of events with seed 42, a two-sided 95% interval. Earlier sections of this card and earlier protocols call the same interval a 97.5% interval; the code takes the 2.5th and 97.5th percentiles (register row D53).
+
+**Primary frame** (the 2762 Block A rows kept after excluding rows at training locations, scored by the registered artifact; this frame decides what the card may say):
+
+| Ward | Flood rows | Control rows | Events with both classes | HIGH minus LOW | Mean per-event AUC | AUC minus pooled | Flags |
+|---|---|---|---|---|---|---|---|
+| Ahero | 196 | 181 | 14 | +0.795 [+0.553, +0.939] | 0.829 [0.691, 0.945] | -0.141 [-0.283, -0.029] | `differs_from_pooled` |
+| Awasi/Onjiko | 4 | 247 | 1 | not estimable | not estimable | not estimable | `not_estimable` |
+| East Kano/Wawidhi | 83 | 266 | 6 | +0.916 [-0.022, +0.996] | 0.780 [0.563, 0.980] | -0.191 [-0.445, +0.016] | `bands_not_separated` |
+| Kabonyo/Kanyagwal | 1218 | 260 | 25 | +0.955 [+0.928, +0.977] | 0.959 [0.941, 0.975] | -0.012 [-0.031, +0.009] | none |
+| Kobura | 92 | 215 | 8 | +0.724 [+0.407, +1.000] | 0.984 [0.961, 1.000] | +0.013 [-0.013, +0.031] | none |
+
+- Ahero: `differs_from_pooled` (the interval of the ward's AUC minus the pooled AUC excludes 0; below the pooled value).
+- Awasi/Onjiko: no claim possible (flood rows 4 below 30; the rule needs 30 flood rows, 30 control rows and 5 events with both classes).
+- East Kano/Wawidhi: `bands_not_separated` (the interval of HIGH minus LOW reaches 0 or below).
+- Kabonyo/Kanyagwal: no flag raised.
+- Kobura: no flag raised.
+
+**Secondary frame** (the 3475 mappable training rows, out-of-fold scores; context only):
+
+| Ward | Flood rows | Control rows | Events with both classes | HIGH minus LOW | Mean per-event AUC | AUC minus pooled | Flags |
+|---|---|---|---|---|---|---|---|
+| Ahero | 334 | 225 | 13 | +0.479 [+0.154, +0.731] | 0.868 [0.748, 0.967] | -0.078 [-0.185, +0.006] | none |
+| Awasi/Onjiko | 2 | 207 | 1 | not estimable | not estimable | not estimable | `not_estimable` |
+| East Kano/Wawidhi | 502 | 389 | 9 | +0.953 [+0.440, +0.981] | 0.968 [0.931, 0.993] | +0.023 [-0.021, +0.061] | none |
+| Kabonyo/Kanyagwal | 1008 | 412 | 20 | +0.352 [+0.150, +0.944] | 0.920 [0.854, 0.970] | -0.025 [-0.062, +0.003] | none |
+| Kobura | 124 | 272 | 8 | +0.618 [+0.290, +0.924] | 0.903 [0.797, 0.984] | -0.042 [-0.137, +0.029] | none |
+
+- Ahero: no flag raised.
+- Awasi/Onjiko: no claim possible (flood rows 2 below 30; the rule needs 30 flood rows, 30 control rows and 5 events with both classes).
+- East Kano/Wawidhi: no flag raised.
+- Kabonyo/Kanyagwal: no flag raised.
+- Kobura: no flag raised.
+
+What this does not show: no causal reading, no real flood prevalence, nothing outside the GFM-mappable areas, and no test of lead time, so no early-warning claim follows. The DEM-floor rows of Kabonyo/Kanyagwal and the land-cover question (register row D14) are not separated here. The reference check of K1 reads `reference_reproduces: False` (mean event AUC 0.945), as in E1; the cutpoints equal E1's, so no band changed.
+<!-- phase-k:end -->
+
 ## Previous registered model: logistic:con (Phase C, retired on 2026-10-07)
 
 ### Model details
