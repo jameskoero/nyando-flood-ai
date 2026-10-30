@@ -154,14 +154,14 @@ function Slider({ name, value, onChange, meta }) {
       </div>
       <div style={{ position: "relative", height: "6px", background: "#1E3A5F", borderRadius: "3px" }}>
         <div style={{ position: "absolute", left: 0, width: `${pct}%`, height: "100%", background: "linear-gradient(90deg, #0A4A8A, #C9A84C)", borderRadius: "3px", transition: "width 0.1s" }} />
-        <input
+        <input aria-label={meta.label + " (" + meta.unit + ")"}
           type="range" min={meta.min} max={meta.max} step={meta.step}
           value={value}
           onChange={e => onChange(name, parseFloat(e.target.value))}
           style={{ position: "absolute", inset: 0, width: "100%", opacity: 0, cursor: "pointer", height: "100%", margin: 0 }}
         />
       </div>
-      <div style={{ fontSize: "10px", color: "#5B7A9A", marginTop: "3px" }}>{meta.desc}</div>
+      <div style={{ fontSize: "10px", color: "#7F9BBB", marginTop: "3px" }}>{meta.desc}</div>
     </div>
   );
 }
@@ -174,7 +174,7 @@ function RiskGauge({ risk, loading }) {
   return (
     <div style={{ textAlign: "center", padding: "24px 16px" }}>
       {loading ? (
-        <div style={{ color: "#5B7A9A", fontSize: "14px" }}>
+        <div style={{ color: "#7F9BBB", fontSize: "14px" }}>
           <div style={{ display: "inline-block", width: "32px", height: "32px", border: "3px solid #1E3A5F", borderTopColor: "#C9A84C", borderRadius: "50%", animation: "spin 0.8s linear infinite", marginBottom: "12px" }} />
           <div>Querying model… the first request after a pause can take about a minute.</div>
         </div>
@@ -187,16 +187,16 @@ function RiskGauge({ risk, loading }) {
           <div style={{ fontSize: "13px", color: "#aaa", marginBottom: "4px" }}>
             Ranking score: <span style={{ color: risk.color, fontWeight: "700" }}>{risk.score.toFixed(4)}</span>
           </div>
-          <div style={{ fontSize: "11px", color: "#5B7A9A", marginBottom: "12px" }}>{risk.scoreMeaning}</div>
+          <div style={{ fontSize: "11px", color: "#7F9BBB", marginBottom: "12px" }}>{risk.scoreMeaning}</div>
           <div style={{ display: "flex", gap: "6px", justifyContent: "center", margin: "12px 0" }}>
             {levels.map((l, i) => (
               <div key={l} style={{ flex: 1, maxWidth: "80px", height: "8px", borderRadius: "4px", background: i <= idx ? (l === "HIGH" ? "#E84040" : l === "MEDIUM" ? "#F5A623" : "#27AE60") : "#1E3A5F", transition: "background 0.4s" }} />
             ))}
           </div>
-          <div style={{ fontSize: "10px", color: "#5B7A9A", letterSpacing: "0.08em" }}>LOW · MEDIUM · HIGH</div>
-          {risk.levelBasis && <div style={{ fontSize: "10px", color: "#5B7A9A", marginTop: "4px" }}>Band basis: {risk.levelBasis}</div>}
+          <div style={{ fontSize: "10px", color: "#7F9BBB", letterSpacing: "0.08em" }}>LOW · MEDIUM · HIGH</div>
+          {risk.levelBasis && <div style={{ fontSize: "10px", color: "#7F9BBB", marginTop: "4px" }}>Band basis: {risk.levelBasis}</div>}
           {risk.tails && (
-            <div style={{ fontSize: "10px", color: risk.tails.length ? "#E8C27A" : "#5B7A9A", marginTop: "4px" }}>
+            <div style={{ fontSize: "10px", color: risk.tails.length ? "#E8C27A" : "#7F9BBB", marginTop: "4px" }}>
               {risk.tails.length
                 ? "Applicability: " + risk.tails.join(", ") + (risk.tails.length > 1 ? " are" : " is") + " in the sparse tail of the training data (outside its 5th to 95th percentile), so the score rests on fewer examples."
                 : "Applicability: every input is inside the central 90% of the training locations."}
@@ -211,13 +211,13 @@ function RiskGauge({ risk, loading }) {
             </div>
           )}
           {risk.warnings.map((w) => <div key={w} style={{ marginTop: "8px", fontSize: "11px", color: "#E8C27A" }}>{w}</div>)}
-          <div style={{ marginTop: "10px", fontSize: "10px", color: "#5B7A9A", lineHeight: 1.5 }}>
+          <div style={{ marginTop: "10px", fontSize: "10px", color: "#7F9BBB", lineHeight: 1.5 }}>
             {risk.notice} Text source: {risk.source === "template" ? "built-in template" : risk.source + (risk.sourceModel ? " (" + risk.sourceModel + ")" : "")}.
             {risk.model ? " Model: " + risk.model.arm + " · " + risk.model.file : ""}
           </div>
         </>
       ) : (
-        <div style={{ color: "#5B7A9A", fontSize: "13px", lineHeight: 1.7 }}>
+        <div style={{ color: "#7F9BBB", fontSize: "13px", lineHeight: 1.7 }}>
           <div style={{ fontSize: "32px", marginBottom: "8px", opacity: 0.4 }}>◎</div>
           Adjust the inputs and click<br /><strong style={{ color: "#C9A84C" }}>Assess susceptibility</strong> to rank this location.
         </div>
@@ -286,7 +286,7 @@ export default function NyandoFloodDashboard() {
   };
 
   return (
-    <div style={{
+    <div role="main" style={{
       minHeight: "100vh",
       background: "#060E1A",
       fontFamily: "'Georgia', 'Times New Roman', serif",
@@ -315,7 +315,7 @@ export default function NyandoFloodDashboard() {
             <div style={{ fontFamily: "'Playfair Display', serif", fontSize: "20px", fontWeight: "900", color: "#C9A84C", letterSpacing: "0.02em", lineHeight: 1.1 }}>
               Nyando Flood AI
             </div>
-            <div style={{ fontSize: "11px", color: "#5B7A9A", letterSpacing: "0.06em", marginTop: "2px", fontFamily: "'Lato', sans-serif" }}>
+            <div style={{ fontSize: "11px", color: "#7F9BBB", letterSpacing: "0.06em", marginTop: "2px", fontFamily: "'Lato', sans-serif" }}>
               FLOOD SUSCEPTIBILITY · KISUMU COUNTY, KENYA<br />RANKING SCORE · NOT A FLOOD PROBABILITY · NOT AN OFFICIAL WARNING
             </div>
           </div>
@@ -330,7 +330,7 @@ export default function NyandoFloodDashboard() {
           ].map(s => (
             <div key={s.label} style={{ background: "rgba(201,168,76,0.07)", border: "1px solid rgba(201,168,76,0.2)", borderRadius: "8px", padding: "8px 10px", textAlign: "center" }}>
               <div style={{ fontFamily: "'Playfair Display', serif", fontSize: "15px", fontWeight: "700", color: "#C9A84C" }}>{s.val}</div>
-              <div style={{ fontSize: "9px", color: "#5B7A9A", letterSpacing: "0.06em", fontFamily: "'Lato', sans-serif" }}>{s.label}</div>
+              <div style={{ fontSize: "9px", color: "#7F9BBB", letterSpacing: "0.06em", fontFamily: "'Lato', sans-serif" }}>{s.label}</div>
             </div>
           ))}
         </div>
@@ -348,15 +348,15 @@ export default function NyandoFloodDashboard() {
           <div style={{ fontSize: "11px", color: "#C9A84C", letterSpacing: "0.1em", marginBottom: "12px", fontFamily: "'Lato', sans-serif", fontWeight: "700" }}>📍 LOCATION & LAND USE</div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
             <div>
-              <label style={{ fontSize: "11px", color: "#5B7A9A", display: "block", marginBottom: "6px", fontFamily: "'Lato', sans-serif" }}>Ward</label>
-              <select value={inputs.ward} onChange={e => handleChange("ward", e.target.value)}
+              <label style={{ fontSize: "11px", color: "#7F9BBB", display: "block", marginBottom: "6px", fontFamily: "'Lato', sans-serif" }}>Ward</label>
+              <select aria-label="Ward" value={inputs.ward} onChange={e => handleChange("ward", e.target.value)}
                 style={{ width: "100%", background: "#0D2137", border: "1px solid #1E3A5F", color: "#E8E8E8", borderRadius: "6px", padding: "8px 10px", fontSize: "13px", fontFamily: "'Lato', sans-serif" }}>
                 {WARDS.map(w => <option key={w}>{w}</option>)}
               </select>
             </div>
             <div>
-              <label style={{ fontSize: "11px", color: "#5B7A9A", display: "block", marginBottom: "6px", fontFamily: "'Lato', sans-serif" }}>Land Cover</label>
-              <select value={inputs.land_cover} onChange={e => handleChange("land_cover", parseInt(e.target.value))}
+              <label style={{ fontSize: "11px", color: "#7F9BBB", display: "block", marginBottom: "6px", fontFamily: "'Lato', sans-serif" }}>Land Cover</label>
+              <select aria-label="Land cover class" value={inputs.land_cover} onChange={e => handleChange("land_cover", parseInt(e.target.value))}
                 style={{ width: "100%", background: "#0D2137", border: "1px solid #1E3A5F", color: "#E8E8E8", borderRadius: "6px", padding: "8px 10px", fontSize: "13px", fontFamily: "'Lato', sans-serif" }}>
                 {Object.entries(LAND_COVER_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
               </select>
@@ -381,21 +381,21 @@ export default function NyandoFloodDashboard() {
         {/* Risk result */}
         <div className="card" style={{ background: risk ? risk.bg : "#0A1628", border: `1px solid ${risk ? risk.color + "44" : "#1E3A5F"}`, borderRadius: "12px", marginBottom: "16px", transition: "all 0.4s" }}>
           <RiskGauge risk={risk} loading={loading} />
-          {lastRun && !loading && <div style={{ textAlign: "center", fontSize: "10px", color: "#5B7A9A", paddingBottom: "12px", fontFamily: "monospace" }}>Last run: {lastRun}</div>}
+          {lastRun && !loading && <div style={{ textAlign: "center", fontSize: "10px", color: "#7F9BBB", paddingBottom: "12px", fontFamily: "monospace" }}>Last run: {lastRun}</div>}
         </div>
 
         {/* Error */}
         {error && (
           <div style={{ background: "#2D0A0A", border: "1px solid #E84040", borderRadius: "10px", padding: "12px 14px", marginBottom: "16px", fontSize: "12px", color: "#FF8080", fontFamily: "monospace" }}>
             ⚠️ API Error: {error}
-            <div style={{ marginTop: "6px", color: "#5B7A9A", fontSize: "11px" }}>Note: Render free tier may take 30–60s to cold-start. Try again.</div>
+            <div style={{ marginTop: "6px", color: "#7F9BBB", fontSize: "11px" }}>Note: Render free tier may take 30–60s to cold-start. Try again.</div>
           </div>
         )}
 
         {/* Raw response debug */}
         {rawResp && (
           <details style={{ marginBottom: "16px" }}>
-            <summary style={{ fontSize: "11px", color: "#5B7A9A", cursor: "pointer", padding: "8px 0", fontFamily: "monospace" }}>🔍 Raw API Response</summary>
+            <summary style={{ fontSize: "11px", color: "#7F9BBB", cursor: "pointer", padding: "8px 0", fontFamily: "monospace" }}>🔍 Raw API Response</summary>
             <pre style={{ background: "#0D1F30", border: "1px solid #1E3A5F", borderRadius: "8px", padding: "10px", fontSize: "11px", color: "#7EB8F7", overflow: "auto", marginTop: "8px" }}>
               {JSON.stringify(rawResp, null, 2)}
             </pre>
