@@ -426,3 +426,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-30: Phase K, K2
 
 - K2 stores the K1 results (docs/PHASE_K_RESULTS.json, with the MLflow run and the GitHub Actions run) and generates the Model Card and Datasheet sections from them (scripts/render_phase_k.py, src/models/phase_k_report.py); tests/test_phase_k_results.py pins the protocol, model and training hashes, recomputes every estimability decision and flag, and requires the sections to equal the generated text. Register row D52 is closed; D53 records that the frozen protocol names the Model Card at the wrong path and that the percentile interval is a 2.5th to 97.5th percentile (95%) interval, without editing any frozen document.
+
+## 2026-10-30: security, code scanning
+
+- A failed load of the registered model is now reported with a fixed message (the model file failed its SHA-256 check, the manifest or input contract check failed, or the model could not be loaded with the exception type); the exception text goes to the server log only. This closes code scanning alerts 1 to 4 (py/stack-trace-exposure in backend/main.py, all from the reason string built in backend/registered.py). The README host test compares parsed hosts, which closes alert 6 (register row D54).

@@ -27,6 +27,15 @@ class Registered:
         return float(self.session.run([OUTPUT], feed)[0][0][1])
 
 
+def _public_reason(e):
+    """A fixed reason that is safe to send in a response; the exception text goes to the server log only."""
+    if "SHA-256" in str(e):
+        return "the model file failed its SHA-256 check"
+    if isinstance(e, (ValueError, KeyError)):
+        return "the model manifest or input contract check failed"
+    return "the model could not be loaded (%s)" % type(e).__name__
+
+
 def load_registered(root, ort_loader=None):
     """Verify the active manifest entry's file, then build the session from the verified bytes. Never raises: a failure leaves session None and says why."""
     r = Registered()
@@ -52,7 +61,9 @@ def load_registered(root, ort_loader=None):
             raise ValueError("the model's embedded training-data hash differs from models/MANIFEST.json")
         r.session, r.file, r.entry, r.meta, r.sha256, r.reason = session, os.path.basename(rel), entry, meta, hashlib.sha256(blob).hexdigest(), "loaded"
     except Exception as e:
-        r.reason = "%s: %s" % (type(e).__name__, str(e)[:200])
+        import logging
+        logging.getLogger("nyando.registered").warning("registered model not loaded: %s: %s", type(e).__name__, str(e)[:500])
+        r.reason = _public_reason(e)
     return r
 
 
