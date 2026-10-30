@@ -33,7 +33,11 @@ def test_d51_records_the_legacy_endpoint_as_an_open_row():
 
 
 def test_the_readme_names_the_v2_host_and_not_the_old_one():
-    assert "nyando-flood-v2.onrender.com" in README and "nyando-flood-api" not in README
+    import re
+    from urllib.parse import urlparse
+    hosts = {urlparse(u).hostname for u in re.findall(r'https?://[^\s)\]>"`]+', README)}
+    assert "nyando-flood-v2.onrender.com" in hosts
+    assert not re.search(r"nyando-flood-api", README)
 
 
 def test_d13_is_closed_and_records_what_replaced_the_drift_monitor_and_the_gated_deploy():
