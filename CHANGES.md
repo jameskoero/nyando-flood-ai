@@ -442,3 +442,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-30: dashboard, cold-start status
 
 - After 6 seconds of waiting the dashboard shows a status line, announced to screen readers, that the free-tier server may be waking up and that the first assessment can take up to a minute. The 90-second limit, the V2 endpoint and every other behaviour are unchanged; the timer is cleared in the finally block. The free tier itself stays an owner decision (register row D45).
+
+## 2026-10-30: Phase L, L0
+
+- L0 fixes the leakage audit before any metric exists: docs/PHASE_L_PROTOCOL.md and its rules as code (src/models/phase_l.py) define the within-class concordance for land_cover (D14) and the split of clay's contribution into its observed value and its missingness (new row D55), the estimability rule (the Phase K thresholds), the decision rules and the claims each outcome allows. The counts of the training file in the protocol are generated from it and checked by a test; every figure cited from earlier documents is checked against its source. No run and no result yet (L1, L2).
