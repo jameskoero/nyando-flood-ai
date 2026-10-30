@@ -230,6 +230,7 @@ export default function NyandoFloodDashboard() {
   const [inputs, setInputs] = useState(DEFAULTS);
   const [risk, setRisk] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [waking, setWaking] = useState(false);
   const [error, setError] = useState(null);
   const [rawResp, setRawResp] = useState(null);
   const [lastRun, setLastRun] = useState(null);
@@ -249,6 +250,7 @@ export default function NyandoFloodDashboard() {
     setRisk(null);
     const ctl = new AbortController();
     const timer = setTimeout(() => ctl.abort(), 90000);
+    const wake = setTimeout(() => setWaking(true), 6000);
     try {
       const body = {
         elevation: Number(inputs.elevation),
@@ -281,6 +283,8 @@ export default function NyandoFloodDashboard() {
       setError(e.name === "AbortError" ? "The service did not answer within 90 seconds. Its free tier may be waking up; try again." : e.message);
     } finally {
       clearTimeout(timer);
+      clearTimeout(wake);
+      setWaking(false);
       setLoading(false);
     }
   };
@@ -380,6 +384,11 @@ export default function NyandoFloodDashboard() {
 
         {/* Risk result */}
         <div className="card" style={{ background: risk ? risk.bg : "#0A1628", border: `1px solid ${risk ? risk.color + "44" : "#1E3A5F"}`, borderRadius: "12px", marginBottom: "16px", transition: "all 0.4s" }}>
+          {loading && waking && (
+            <div role="status" style={{ marginTop: "10px", color: "#7F9BBB", fontSize: "12px", textAlign: "center" }}>
+              Waking the free-tier server. After a quiet period the first assessment can take up to a minute; the result appears here as soon as it is ready.
+            </div>
+          )}
           <RiskGauge risk={risk} loading={loading} />
           {lastRun && !loading && <div style={{ textAlign: "center", fontSize: "10px", color: "#7F9BBB", paddingBottom: "12px", fontFamily: "monospace" }}>Last run: {lastRun}</div>}
         </div>
