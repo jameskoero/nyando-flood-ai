@@ -422,3 +422,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-30: Phase K, K1
 
 - K1 adds the fairness run: scripts/run_phase_k.py, the statistics in src/models/phase_k_stats.py and a manual, read-only workflow (k1.yml). The run recomputes the E1 reference and cutpoints and stops if they are not the ones in docs/PHASE_E_RESULTS.json; it scores the two frames, applies the estimability rule, computes M1 to M4 and the descriptive flags, prints one RESULT_JSON line and logs one MLflow run. No result exists until the run has been made and its file is committed (K2).
+
+## 2026-10-30: Phase K, K2
+
+- K2 stores the K1 results (docs/PHASE_K_RESULTS.json, with the MLflow run and the GitHub Actions run) and generates the Model Card and Datasheet sections from them (scripts/render_phase_k.py, src/models/phase_k_report.py); tests/test_phase_k_results.py pins the protocol, model and training hashes, recomputes every estimability decision and flag, and requires the sections to equal the generated text. Register row D52 is closed; D53 records that the frozen protocol names the Model Card at the wrong path and that the percentile interval is a 2.5th to 97.5th percentile (95%) interval, without editing any frozen document.

@@ -1,0 +1,405 @@
+{
+ "commit": "0c30961e7af53e4c484489dc5ce7c565da0924ce",
+ "e1": {
+  "cutpoints": {
+   "high": 0.8279308563518766,
+   "low": 0.2257334754068833
+  },
+  "cutpoints_match": true,
+  "reference_mean_event_auc": 0.9452450434782609,
+  "reference_reproduces": false,
+  "rows_kept_match": true
+ },
+ "environment": {
+  "numpy": "1.26.4",
+  "onnxruntime": "1.30.0",
+  "pandas": "3.0.6",
+  "python": "3.11.17",
+  "sklearn": "1.6.1"
+ },
+ "frames": {
+  "primary": {
+   "rows": 2762,
+   "wards": {
+    "Ahero": {
+     "auc": {
+      "ci_high": 0.9448034285714285,
+      "ci_low": 0.6912633053571428,
+      "events": 14,
+      "mean": 0.8291030714285713
+     },
+     "bands": {
+      "ci_high": 0.9393726989521382,
+      "ci_low": 0.5529061934234349,
+      "diff": 0.7947890818858561,
+      "draws_used": 10000
+     },
+     "control_rows": 181,
+     "estimable": true,
+     "events_both": 14,
+     "flags": [
+      "differs_from_pooled"
+     ],
+     "flood_rows": 196,
+     "gap": {
+      "ci_high": -0.02911803913943354,
+      "ci_low": -0.2826944801851854,
+      "gap": -0.14144522486772482
+     },
+     "rates": {
+      "HIGH": {
+       "flood": 118,
+       "rows": 130,
+       "share": 0.9076923076923077
+      },
+      "LOW": {
+       "flood": 14,
+       "rows": 124,
+       "share": 0.11290322580645161
+      },
+      "MEDIUM": {
+       "flood": 64,
+       "rows": 123,
+       "share": 0.5203252032520326
+      }
+     },
+     "reason": ""
+    },
+    "Awasi/Onjiko": {
+     "control_rows": 247,
+     "estimable": false,
+     "events_both": 1,
+     "flags": [
+      "not_estimable"
+     ],
+     "flood_rows": 4,
+     "reason": "flood rows 4 below 30"
+    },
+    "East Kano/Wawidhi": {
+     "auc": {
+      "ci_high": 0.9800018333333332,
+      "ci_low": 0.5633101666666667,
+      "events": 6,
+      "mean": 0.7795263333333332
+     },
+     "bands": {
+      "ci_high": 0.9957319512638662,
+      "ci_low": -0.02197802197802198,
+      "diff": 0.9155077801999549,
+      "draws_used": 9949
+     },
+     "control_rows": 266,
+     "estimable": true,
+     "events_both": 6,
+     "flags": [
+      "bands_not_separated"
+     ],
+     "flood_rows": 83,
+     "gap": {
+      "ci_high": 0.01604738842592592,
+      "ci_low": -0.44455863833333337,
+      "gap": -0.1910219629629628
+     },
+     "rates": {
+      "HIGH": {
+       "flood": 50,
+       "rows": 53,
+       "share": 0.9433962264150944
+      },
+      "LOW": {
+       "flood": 7,
+       "rows": 251,
+       "share": 0.027888446215139442
+      },
+      "MEDIUM": {
+       "flood": 26,
+       "rows": 45,
+       "share": 0.5777777777777777
+      }
+     },
+     "reason": ""
+    },
+    "Kabonyo/Kanyagwal": {
+     "auc": {
+      "ci_high": 0.9749835649999999,
+      "ci_low": 0.9410658749999999,
+      "events": 25,
+      "mean": 0.958903
+     },
+     "bands": {
+      "ci_high": 0.9772925962503322,
+      "ci_low": 0.9283427987668184,
+      "diff": 0.9552862811791383,
+      "draws_used": 10000
+     },
+     "control_rows": 260,
+     "estimable": true,
+     "events_both": 25,
+     "flags": [],
+     "flood_rows": 1218,
+     "gap": {
+      "ci_high": 0.009291112175523208,
+      "ci_low": -0.03059290266203709,
+      "gap": -0.011645296296296404
+     },
+     "rates": {
+      "HIGH": {
+       "flood": 1124,
+       "rows": 1152,
+       "share": 0.9756944444444444
+      },
+      "LOW": {
+       "flood": 2,
+       "rows": 98,
+       "share": 0.02040816326530612
+      },
+      "MEDIUM": {
+       "flood": 92,
+       "rows": 228,
+       "share": 0.40350877192982454
+      }
+     },
+     "reason": ""
+    },
+    "Kobura": {
+     "auc": {
+      "ci_high": 1.0,
+      "ci_low": 0.96106,
+      "events": 8,
+      "mean": 0.98378725
+     },
+     "bands": {
+      "ci_high": 1.0,
+      "ci_low": 0.40700579373371454,
+      "diff": 0.7242891712038718,
+      "draws_used": 9997
+     },
+     "control_rows": 215,
+     "estimable": true,
+     "events_both": 8,
+     "flags": [],
+     "flood_rows": 92,
+     "gap": {
+      "ci_high": 0.03130813134259253,
+      "ci_low": -0.012809300185185135,
+      "gap": 0.01323895370370376
+     },
+     "rates": {
+      "HIGH": {
+       "flood": 28,
+       "rows": 29,
+       "share": 0.9655172413793104
+      },
+      "LOW": {
+       "flood": 55,
+       "rows": 228,
+       "share": 0.2412280701754386
+      },
+      "MEDIUM": {
+       "flood": 9,
+       "rows": 50,
+       "share": 0.18
+      }
+     },
+     "reason": ""
+    }
+   }
+  },
+  "secondary": {
+   "rows": 3475,
+   "wards": {
+    "Ahero": {
+     "auc": {
+      "ci_high": 0.967033,
+      "ci_low": 0.7476886923076923,
+      "events": 13,
+      "mean": 0.8676291538461539
+     },
+     "bands": {
+      "ci_high": 0.730608273685427,
+      "ci_low": 0.15414179708740666,
+      "diff": 0.4791461412151067,
+      "draws_used": 10000
+     },
+     "control_rows": 225,
+     "estimable": true,
+     "events_both": 13,
+     "flags": [],
+     "flood_rows": 334,
+     "gap": {
+      "ci_high": 0.0061906394598155124,
+      "ci_low": -0.18468621926630435,
+      "gap": -0.07761588963210697
+     },
+     "rates": {
+      "HIGH": {
+       "flood": 96,
+       "rows": 126,
+       "share": 0.7619047619047619
+      },
+      "LOW": {
+       "flood": 41,
+       "rows": 145,
+       "share": 0.2827586206896552
+      },
+      "MEDIUM": {
+       "flood": 197,
+       "rows": 288,
+       "share": 0.6840277777777778
+      }
+     },
+     "reason": ""
+    },
+    "Awasi/Onjiko": {
+     "control_rows": 207,
+     "estimable": false,
+     "events_both": 1,
+     "flags": [
+      "not_estimable"
+     ],
+     "flood_rows": 2,
+     "reason": "flood rows 2 below 30"
+    },
+    "East Kano/Wawidhi": {
+     "auc": {
+      "ci_high": 0.9928557777777777,
+      "ci_low": 0.9310947777777776,
+      "events": 9,
+      "mean": 0.9682238888888889
+     },
+     "bands": {
+      "ci_high": 0.9806094182825484,
+      "ci_low": 0.43954321319612494,
+      "diff": 0.9526135967966574,
+      "draws_used": 9999
+     },
+     "control_rows": 389,
+     "estimable": true,
+     "events_both": 9,
+     "flags": [],
+     "flood_rows": 502,
+     "gap": {
+      "ci_high": 0.060518449654150396,
+      "ci_low": -0.020742259918478362,
+      "gap": 0.022978845410628113
+     },
+     "rates": {
+      "HIGH": {
+       "flood": 251,
+       "rows": 256,
+       "share": 0.98046875
+      },
+      "LOW": {
+       "flood": 10,
+       "rows": 359,
+       "share": 0.027855153203342618
+      },
+      "MEDIUM": {
+       "flood": 241,
+       "rows": 276,
+       "share": 0.8731884057971014
+      }
+     },
+     "reason": ""
+    },
+    "Kabonyo/Kanyagwal": {
+     "auc": {
+      "ci_high": 0.96982106625,
+      "ci_low": 0.8535676425000001,
+      "events": 20,
+      "mean": 0.9202841000000002
+     },
+     "bands": {
+      "ci_high": 0.9439084522633997,
+      "ci_low": 0.1498634148246714,
+      "diff": 0.35209043250327654,
+      "draws_used": 10000
+     },
+     "control_rows": 412,
+     "estimable": true,
+     "events_both": 20,
+     "flags": [],
+     "flood_rows": 1008,
+     "gap": {
+      "ci_high": 0.0030402416475973208,
+      "ci_low": -0.06195919034679084,
+      "gap": -0.02496094347826061
+     },
+     "rates": {
+      "HIGH": {
+       "flood": 715,
+       "rows": 763,
+       "share": 0.9370904325032765
+      },
+      "LOW": {
+       "flood": 117,
+       "rows": 200,
+       "share": 0.585
+      },
+      "MEDIUM": {
+       "flood": 176,
+       "rows": 457,
+       "share": 0.3851203501094092
+      }
+     },
+     "reason": ""
+    },
+    "Kobura": {
+     "auc": {
+      "ci_high": 0.98425925,
+      "ci_low": 0.7965795,
+      "events": 8,
+      "mean": 0.902763
+     },
+     "bands": {
+      "ci_high": 0.9240028490028459,
+      "ci_low": 0.2904290429042904,
+      "diff": 0.6180124223602483,
+      "draws_used": 9988
+     },
+     "control_rows": 272,
+     "estimable": true,
+     "events_both": 8,
+     "flags": [],
+     "flood_rows": 124,
+     "gap": {
+      "ci_high": 0.029006890652173833,
+      "ci_low": -0.13657410706521733,
+      "gap": -0.04248204347826079
+     },
+     "rates": {
+      "HIGH": {
+       "flood": 12,
+       "rows": 14,
+       "share": 0.8571428571428571
+      },
+      "LOW": {
+       "flood": 66,
+       "rows": 276,
+       "share": 0.2391304347826087
+      },
+      "MEDIUM": {
+       "flood": 46,
+       "rows": 106,
+       "share": 0.4339622641509434
+      }
+     },
+     "reason": ""
+    }
+   }
+  }
+ },
+ "github_run_id": 41033394658,
+ "mlflow": {
+  "metrics_logged": 136,
+  "run_id": "cdda081a5bc9477ea7db64199fe162b2",
+  "tracking_uri": "https://dagshub.com/jmskoero/nyando-flood-ai.mlflow"
+ },
+ "model_sha256": "5ae81ad8b0303c8a8bef79f177199e34f1d3cad87cb609afc6825a4b9980b723",
+ "outcome": "PHASE K REPORTED",
+ "protocol": "docs/PHASE_K_PROTOCOL.md",
+ "protocol_sha256": "2b096b44b68111352c35cb6579c4cf1727cc8d32e908c86a0a15670ee42e32a1",
+ "schema": 1,
+ "step": "K1",
+ "training_data_sha256": "0b9283540d91154c0dda55b0d92cae7aa3cae6aeffad0390bbf77e028dd2063a"
+}

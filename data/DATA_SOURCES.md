@@ -46,6 +46,22 @@ The training files contain values derived from MERIT Hydro (elevation, slope, HA
 - 23 events can be scored, because the 12 flood-free dates cannot give a per-event AUC.
 - Confirmatory replication on new dates is planned (register row D20).
 
+<!-- phase-k:begin -->
+### 6.1 Ward-level coverage (Phase K)
+
+Counts by ward in the two frames of `docs/PHASE_K_RESULTS.json`. They are counts only: the samples are case-control, so they are not flood rates.
+
+| Ward | Primary: flood / control rows | Primary: events with both classes | Secondary: flood / control rows | Secondary: events with both classes | Estimable (primary / secondary) |
+|---|---|---|---|---|---|
+| Ahero | 196 / 181 | 14 | 334 / 225 | 13 | yes / yes |
+| Awasi/Onjiko | 4 / 247 | 1 | 2 / 207 | 1 | no / no |
+| East Kano/Wawidhi | 83 / 266 | 6 | 502 / 389 | 9 | yes / yes |
+| Kabonyo/Kanyagwal | 1218 / 260 | 25 | 1008 / 412 | 20 | yes / yes |
+| Kobura | 92 / 215 | 8 | 124 / 272 | 8 | yes / yes |
+
+Awasi/Onjiko: not estimable in either frame, so no per-ward statement is made for it. Metrics and flags are in MODEL_CARD.md, section "Ward-level slices (Phase K, register rows D52 and D53)".
+<!-- phase-k:end -->
+
 ## 7. Maintenance
 Rebuild with `scripts/build_initial_dataset.py`. Hashes live in `data/MANIFEST.json` and are recomputed by CI (`data-gate`, `manifest-check`). Changes go through pull requests and `docs/ROADMAP_DEVIATIONS.md`.
 
