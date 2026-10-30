@@ -418,3 +418,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-30: Phase K protocol
 
 - Phase K starts with its protocol and its rules as code, fixed before any ward metric exists: docs/PHASE_K_PROTOCOL.md, src/models/phase_k.py and tests/test_phase_k.py, register row D52. The primary frame is the E1 Block A frame scored by the registered artifact, the secondary the out-of-fold reference frame. A ward is estimable in a frame only with at least 30 flood rows, 30 control rows and 5 events that contain both classes (Awasi/Onjiko has 2 flood rows in 1 event in the whole training file); intervals use the E1 event-clustered bootstrap; the flags are descriptive and the outcome is PHASE K REPORTED. The thresholds were chosen after the per-ward counts were seen and before any ward metric.
+
+## 2026-10-30: Phase K, K1
+
+- K1 adds the fairness run: scripts/run_phase_k.py, the statistics in src/models/phase_k_stats.py and a manual, read-only workflow (k1.yml). The run recomputes the E1 reference and cutpoints and stops if they are not the ones in docs/PHASE_E_RESULTS.json; it scores the two frames, applies the estimability rule, computes M1 to M4 and the descriptive flags, prints one RESULT_JSON line and logs one MLflow run. No result exists until the run has been made and its file is committed (K2).
