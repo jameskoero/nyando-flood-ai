@@ -438,3 +438,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-30: D51, the legacy /predict is gone by default
 
 - The legacy POST /predict now answers 410 Gone by default (option C of register row D51): it runs only when the service is started with LEGACY_PREDICT=on, answers before the body is validated, calls no model, uses no rate limit and logs each attempt as legacy_predict_attempt without naming the caller. The 410 body points to /v2/score and /v2/advisory and carries a Link header. The old audit tests switch the route on for themselves. D51 stays open until the legacy code is deleted after the observation window; the old host nyando-flood-api is a separate task.
+
+## 2026-10-30: dashboard, cold-start status
+
+- After 6 seconds of waiting the dashboard shows a status line, announced to screen readers, that the free-tier server may be waking up and that the first assessment can take up to a minute. The 90-second limit, the V2 endpoint and every other behaviour are unchanged; the timer is cleared in the finally block. The free tier itself stays an owner decision (register row D45).
