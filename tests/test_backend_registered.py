@@ -144,3 +144,8 @@ def test_the_api_land_cover_classes_equal_the_model_graph():
 def test_protocol_section_17_exists():
     text = (ROOT / "docs" / "PHASE_C_PROTOCOL.md").read_text(encoding="utf-8")
     assert "## 17. Serving the registered model" in text and "/v2/score" in text
+
+import os as _os  # noqa: E402
+
+# Register row D51: these tests use the legacy route as a test vehicle until its code is deleted, so they switch it on for the session; tests/test_legacy_predict_gate.py sets the variable per test.
+_os.environ.setdefault("LEGACY_PREDICT", "on")

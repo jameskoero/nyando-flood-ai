@@ -141,3 +141,8 @@ def test_predict_has_a_global_cap_across_client_addresses(api):
         codes.append(c.post('/predict', json=BODY).status_code)
     assert codes.count(200) == api.GLOBAL_PREDICT_LIMIT, codes
     assert set(codes) <= {200, 429}, codes
+
+import os as _os  # noqa: E402
+
+# Register row D51: these tests use the legacy route as a test vehicle until its code is deleted, so they switch it on for the session; tests/test_legacy_predict_gate.py sets the variable per test.
+_os.environ.setdefault("LEGACY_PREDICT", "on")
