@@ -60,8 +60,9 @@ def test_the_dashboard_calls_the_v2_advisory_endpoint_and_nothing_legacy():
 
 
 def test_no_legacy_wording_thresholds_or_hardcoded_metrics():
-    for bad in ("Legacy model", "LEGACY MODEL", "NOT VALIDATED", "not validated", "GradientBoosting", "flood_probability", "0.65", "0.35"):
+    for bad in ("Legacy model", "LEGACY MODEL", "NOT VALIDATED", "not validated", "GradientBoosting", "flood_probability"):
         assert bad not in APP, bad
+    assert not re.search(r"(>=|<=|>|<)\s*0\.(35|60|65|80)\b", APP), "a legacy probability cutoff"
     assert not re.search(r"\b(AUC|F1|accuracy|precision|recall)\b", APP, re.I)
 
 
@@ -114,3 +115,17 @@ def test_errors_and_the_client_rate_guard_follow_the_api():
     assert "res.status === 429" in APP and "res.status === 503" in APP and "CALL_LOG.length >= 5" in APP
     main = (ROOT / "backend" / "main.py").read_text(encoding="utf-8")
     assert re.search(r'@app\.post\("/v2/advisory"\)\s*\n@limiter\.limit\("5/minute"\)', main)
+
+
+def test_the_applicability_tails_are_the_real_5th_and_95th_percentiles():
+    import statistics
+
+    tails = {}
+    for m in re.finditer(r"^\s*(\w+):\s*\[([\d.]+),\s*([\d.]+)\],?", block("const TRAINING_TAILS = {"), re.M):
+        tails[m.group(1)] = (float(m.group(2)), float(m.group(3)))
+    assert set(tails) == set(FEATURES), tails
+    rows = training_rows()
+    for k in FEATURES:
+        q = statistics.quantiles(sorted(float(x[k]) for x in rows if x[k] != ""), n=20)
+        for got, want in zip(tails[k], (q[0], q[-1])):
+            assert abs(got - want) <= 0.001 * max(1.0, abs(want)), (k, got, want)

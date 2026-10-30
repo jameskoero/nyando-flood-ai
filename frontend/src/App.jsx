@@ -38,13 +38,29 @@ const FEATURE_META = {
   clay_percent:   { label: "Clay Content", unit: "%", min: 25, max: 58, step: 0.1, desc: "Soil clay percentage (affects drainage)" },
 };
 
+// 5th and 95th percentiles of the training locations, used only to say when an input is in the sparse tail of the training data.
+const TRAINING_TAILS = {
+  elevation: [1130.5, 1268.8],
+  slope: [0, 2.3917],
+  rainfall_3day: [0, 51.7854],
+  distance_river: [67.082, 5249.8109],
+  clay_percent: [31.9, 49.8],
+};
+
+function sparseInputs(inputs) {
+  if (!inputs) return [];
+  return Object.keys(TRAINING_TAILS)
+    .filter((k) => Number(inputs[k]) < TRAINING_TAILS[k][0] || Number(inputs[k]) > TRAINING_TAILS[k][1])
+    .map((k) => FEATURE_META[k].label);
+}
+
 const BAND_LOOK = {
   HIGH: { color: "#E84040", bg: "#2D0A0A", label: "High susceptibility band", emoji: "🔴" },
   MEDIUM: { color: "#F5A623", bg: "#2D1A00", label: "Medium susceptibility band", emoji: "🟠" },
   LOW: { color: "#27AE60", bg: "#0A2D0F", label: "Low susceptibility band", emoji: "🟢" },
 };
 
-function getRiskLevel(resp) {
+function getRiskLevel(resp, inputs) {
   if (!resp || typeof resp !== "object" || typeof resp.score !== "number") return null;
   const known = Object.prototype.hasOwnProperty.call(BAND_LOOK, resp.level);
   const look = known ? BAND_LOOK[resp.level] : { color: "#C9A84C", bg: "#0A1628", label: "Band not available", emoji: "⚪" };
@@ -60,6 +76,7 @@ function getRiskLevel(resp) {
     sourceModel: resp.advisory_model || "",
     model: resp.model || null,
     warnings: Array.isArray(resp.warnings) ? resp.warnings : [],
+    tails: sparseInputs(inputs),
   };
 }
 
@@ -178,6 +195,13 @@ function RiskGauge({ risk, loading }) {
           </div>
           <div style={{ fontSize: "10px", color: "#5B7A9A", letterSpacing: "0.08em" }}>LOW · MEDIUM · HIGH</div>
           {risk.levelBasis && <div style={{ fontSize: "10px", color: "#5B7A9A", marginTop: "4px" }}>Band basis: {risk.levelBasis}</div>}
+          {risk.tails && (
+            <div style={{ fontSize: "10px", color: risk.tails.length ? "#E8C27A" : "#5B7A9A", marginTop: "4px" }}>
+              {risk.tails.length
+                ? "Applicability: " + risk.tails.join(", ") + (risk.tails.length > 1 ? " are" : " is") + " in the sparse tail of the training data (outside its 5th to 95th percentile), so the score rests on fewer examples."
+                : "Applicability: every input is inside the central 90% of the training locations."}
+            </div>
+          )}
           {adv && (
             <div style={{ marginTop: "16px", padding: "12px 14px", background: "rgba(201,168,76,0.08)", border: "1px solid #1E3A5F", borderRadius: "8px", textAlign: "left", fontSize: "12px", lineHeight: 1.6, color: "#cfd8e3" }}>
               <div style={{ fontWeight: "700", marginBottom: "6px" }}>{adv.summary}</div>
@@ -251,7 +275,7 @@ export default function NyandoFloodDashboard() {
       if (res.status === 429) throw new Error("Too many requests: the service allows 5 assessments per minute per user. Wait a minute and try again.");
       if (res.status === 503) throw new Error("The service is starting or its model is not loaded yet. Try again in a minute.");
       if (!res.ok) throw new Error(data?.detail?.[0]?.msg || "The service refused the request (HTTP " + res.status + ").");
-      setRisk(getRiskLevel(data));
+      setRisk(getRiskLevel(data, body));
       setLastRun(new Date().toLocaleTimeString());
     } catch (e) {
       setError(e.name === "AbortError" ? "The service did not answer within 90 seconds. Its free tier may be waking up; try again." : e.message);
