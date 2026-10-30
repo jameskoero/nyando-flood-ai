@@ -430,3 +430,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-30: security, code scanning
 
 - A failed load of the registered model is now reported with a fixed message (the model file failed its SHA-256 check, the manifest or input contract check failed, or the model could not be loaded with the exception type); the exception text goes to the server log only. This closes code scanning alerts 1 to 4 (py/stack-trace-exposure in backend/main.py, all from the reason string built in backend/registered.py). The README host test compares parsed hosts, which closes alert 6 (register row D54).
+
+## 2026-10-30: security, code scanning alert 7
+
+- The README host test states the V2 host as a subset check on the parsed hosts, because CodeQL flags any host name used with the in operator (py/incomplete-url-substring-sanitization, alert 7). The check is the same; register row D54 stands.

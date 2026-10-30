@@ -36,7 +36,7 @@ def test_the_readme_names_the_v2_host_and_not_the_old_one():
     import re
     from urllib.parse import urlparse
     hosts = {urlparse(u).hostname for u in re.findall(r'https?://[^\s)\]>"`]+', README)}
-    assert "nyando-flood-v2.onrender.com" in hosts
+    assert {"nyando-flood-v2.onrender.com"} <= hosts
     assert not re.search(r"nyando-flood-api", README)
 
 
