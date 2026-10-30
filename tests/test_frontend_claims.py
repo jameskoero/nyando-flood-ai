@@ -42,8 +42,9 @@ def test_dashboard_has_no_hardcoded_model_metrics():
 
 
 def test_dashboard_says_the_model_is_not_validated():
-    n = sum(s.lower().count("not validated") for s in _sources().values())
-    assert n >= 2, "the dashboard must say, in the header and in each result message, that the legacy model is not validated"
+    text = " ".join(x.lower() for x in _sources().values())
+    for must in ("ranking score", "not a flood probability", "not an official warning"):
+        assert must in text, "the dashboard must say: " + must
 
 
 def test_no_legacy_dashboard_folder():

@@ -396,3 +396,9 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-29: Lighthouse report folder
 
 - The Lighthouse job of the frontend workflow failed with: --output-path (lh/report) cannot be written to, because the folder did not exist. The step now creates it first; tests/test_frontend_workflow.py checks the order.
+
+## 2026-10-29: dashboard on /v2
+
+- The dashboard now calls POST /v2/advisory on nyando-flood-v2 instead of the legacy /predict on the old host. It offers only the eight ESA WorldCover classes the model was trained on (the API rejects any other with a 422; the old dropdown offered codes 0 to 5), takes its defaults from the training medians and its slider ranges from the real training range (distance to river now reaches 7300 m where the old slider stopped at 2000), shows the band only when the API returns one, shows the ranking score as a ranking score with the advisory text, its source and its limits, handles 429, 503, 422 and cold starts, and drops the legacy notices and the old probability cutoffs. tests/test_dashboard_contract.py ties the dashboard to the backend and the training data.
+
+- The dashboard also says when an input lies in the sparse tail of the training data (outside the 5th to 95th percentile of the real training locations), which is the applicability indicator register row D35 asks for. The contract test no longer treats a CSS number as a legacy cutoff, and checks the percentiles against the training file.
