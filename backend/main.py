@@ -7,6 +7,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import Depends, HTTPException
 from pydantic import BaseModel, Field
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
@@ -165,7 +166,20 @@ def metrics():
     out["cache_ttl_seconds"] = _METRICS_TTL
     return out
 
-@app.post("/predict")
+def _legacy_gate(request: Request):
+    """Register row D51: the legacy /predict answers 410 Gone unless the service is started with LEGACY_PREDICT=on. Every attempt is logged, without the caller's address, so the Render logs show whether anyone still calls it."""
+    import logging
+    on = os.environ.get("LEGACY_PREDICT", "off").strip().lower() == "on"
+    logging.getLogger("nyando.legacy").warning("legacy_predict_attempt enabled=%s", on)
+    if not on:
+        raise HTTPException(
+            status_code=410,
+            detail={"error": "gone", "message": "POST /predict served a retracted v1 model and has been retired; use POST /v2/score (a ranking score) or POST /v2/advisory.", "use": ["/v2/score", "/v2/advisory"]},
+            headers={"Link": '</v2/score>; rel="successor-version"'},
+        )
+
+
+@app.post("/predict", dependencies=[Depends(_legacy_gate)])
 @limiter.limit("10/minute")
 @limiter.limit(str(GLOBAL_PREDICT_LIMIT) + "/minute", key_func=_global_key)
 def predict(request: Request, data: FloodInput):
