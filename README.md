@@ -216,7 +216,7 @@ gee_extract_nyando.py                    v1 Earth Engine extraction script (lega
 
 ## License and data terms
 
-Code: MIT ([LICENSE](LICENSE)). The training data is derived from third-party products that keep their own terms. `elevation`, `slope` and `hand` come from MERIT/Hydro, which is dual-licensed CC BY-NC 4.0 or ODbL 1.0, so the dataset **cannot be published under CC BY 4.0**. A dataset license is still to be chosen (ODbL 1.0 is the natural fit for an open project); until then, treat the data as non-commercial and check each source's terms.
+Code: MIT ([LICENSE](LICENSE)). The V2 data files (the training, Block A and derived files under data/) are licensed under ODbL 1.0, an owner decision of 2026-10-31 recorded as register row D37: `elevation`, `slope` and `hand` come from MERIT/Hydro, which is dual-licensed CC BY-NC 4.0 or ODbL 1.0, so the dataset **cannot be published under CC BY 4.0**, and ODbL lets anyone use the files, commercially too, if they credit the sources and share adapted versions under ODbL. The five ward polygons keep their creators' CC BY 4.0 licence and the legacy v1 files are not covered. The credits and notices are in [data/DATA_SOURCES.md](data/DATA_SOURCES.md) (Sections 4 and 5). This is not legal advice.
 
 ## Citation, security and contributing
 

@@ -28,18 +28,41 @@ Training data for a research model that ranks locations, inside the areas the Gl
 ## 4. Sources
 | Quantity | Source | Earth Engine asset or endpoint | Terms |
 |---|---|---|---|
-| flooded (label) | Copernicus Global Flood Monitoring flood extent, via EODC | `https://stac.eodc.eu/api/v1`, collection `GFM` | see the provider's terms |
-| elevation, slope, HAND | MERIT Hydro | `MERIT/Hydro/v1_0_1` | CC-BY-NC 4.0 or ODbL 1.0 (dual licence, applied to derived data) |
-| distance_river | JRC Global Surface Water, band `occurrence` | `JRC/GSW1_4/GlobalSurfaceWater` | see the catalogue entry |
-| clay_percent | SoilGrids clay, band `clay_0-5cm_mean` | `projects/soilgrids-isric/clay_mean` | see the catalogue entry |
+| flooded (label) | Copernicus Global Flood Monitoring flood extent, via EODC | `https://stac.eodc.eu/api/v1`, collection `GFM` | Copernicus Emergency Management Service terms: free reproduction, distribution, adaptation and combination with other data, with the notice in Section 4.1; not an early warning |
+| elevation, slope, HAND | MERIT Hydro | `MERIT/Hydro/v1_0_1` | ODbL 1.0 chosen from the dual licence CC-BY-NC 4.0 or ODbL 1.0 (applied to derived data); citation in Section 4.1 |
+| distance_river | JRC Global Surface Water, band `occurrence` | `JRC/GSW1_4/GlobalSurfaceWater` | Copernicus Programme: free of charge, without restriction of use; acknowledge and cite (Section 4.1) |
+| clay_percent | SoilGrids clay, band `clay_0-5cm_mean` | `projects/soilgrids-isric/clay_mean` | CC BY 4.0 (ISRIC); citation in Section 4.1 |
 | land_cover | ESA WorldCover 10 m 2020 (v100) | `ESA/WorldCover/v100` | CC-BY-4.0 |
-| rainfall_3day and the rainfall aggregates | CHIRPS daily precipitation | `UCSB-CHG/CHIRPS/DAILY` | see the catalogue entry |
-| upstream basin for the rainfall aggregates | HydroSHEDS basins, level 8 | `WWF/HydroSHEDS/v1/Basins/hybas_8` | see the catalogue entry |
+| rainfall_3day and the rainfall aggregates | CHIRPS daily precipitation | `UCSB-CHG/CHIRPS/DAILY` | public domain, copyright waived (Earth Engine catalogue entry); citation in Section 4.1 |
+| upstream basin for the rainfall aggregates | HydroSHEDS basins, level 8 | `WWF/HydroSHEDS/v1/Basins/hybas_8` | HydroSHEDS version 1 licence agreement: free for commercial use, notice in Section 4.1; the layers themselves are not distributed here |
 
 The land cover map is the 2020 product, so the April 2020 event shares a year with it. Whether that leaks label information is not excluded (register row D14).
 
-## 5. Licence of the data files in this repository (open decision)
-The training files contain values derived from MERIT Hydro (elevation, slope, HAND). Its terms apply to derived data: CC-BY-NC 4.0, or ODbL 1.0, under which derived data must be publicly available under ODbL. Which licence this repository's data files are distributed under is an owner decision, recorded as register row D37 (open). This page is not legal advice.
+### 4.1 Required credits and notices
+
+Anyone who shares these data, or works made from them, should keep these credits.
+
+- Copernicus Global Flood Monitoring (flood labels): Contains modified Copernicus Emergency Management Service information 2020-2026. The years are those of the scene dates in the training and Block A files. The service terms allow free reproduction, distribution, adaptation and combination with other data, and say the data are not an early warning.
+- MERIT Hydro (elevation, slope, HAND): Yamazaki, D., et al. (2019), MERIT Hydro: a high-resolution global hydrography map based on latest topography datasets, Water Resources Research 55, 5053-5073, doi:10.1029/2019WR024873.
+- JRC Global Surface Water (distance_river): Pekel, J.-F., Cottam, A., Gorelick, N., Belward, A. S. (2016), High-resolution mapping of global surface water and its long-term changes, Nature 540, 418-422, doi:10.1038/nature20584. Source: EC JRC/Google.
+- SoilGrids (clay_percent): Poggio, L., et al. (2021), SoilGrids 2.0: producing soil information for the globe with quantified spatial uncertainty, SOIL 7, 217-240, doi:10.5194/soil-7-217-2021. CC BY 4.0, ISRIC.
+- ESA WorldCover 10 m 2020 v100 (land_cover): CC BY 4.0, credit the ESA WorldCover project.
+- CHIRPS (rainfall): Funk, C., et al. (2015), The climate hazards infrared precipitation with stations, a new environmental record for monitoring extremes, Scientific Data 2, 150066, doi:10.1038/sdata.2015.66. In the public domain.
+- HydroSHEDS (basins for the rainfall aggregates): the HydroSHEDS version 1 licence agreement requires this notice with any product that incorporates its data: "This product (the Nyando Flood AI data files) incorporates data from the HydroSHEDS version 1 database which is (c) World Wildlife Fund, Inc. (2006-2022) and has been used herein under license. WWF has not evaluated the data as altered and incorporated within the Nyando Flood AI data files, and therefore gives no warranty regarding its accuracy, completeness, currency or suitability for any particular purpose. Portions of the HydroSHEDS v1 database incorporate data which are the intellectual property rights of (c) USGS (2006-2008), NASA (2000-2005), ESRI (1992-1998), CIAT (2004-2006), UNEP-WCMC (1993), WWF (2004), Commonwealth of Australia (2007), and Her Royal Majesty and the British Crown and are used under license. The HydroSHEDS v1 database and more information are available at https://www.hydrosheds.org." The citation is Lehner, B., Verdin, K., Jarvis, A. (2008), New global hydrography derived from spaceborne elevation data, Eos, Transactions, AGU 89(10), 93-94. The licence does not allow its layers to be distributed as a stand-alone product, so the files here hold only rainfall aggregates computed over the basins: no HydroSHEDS layer, geometry or basin identifier.
+
+### 4.2 Ward polygons
+
+data/external/nyando_wards.geojson holds five ward polygons (Ahero, Awasi/Onjiko, East Kano/Wawidhi, Kabonyo/Kanyagwal, Kobura; Nyando constituency, Kisumu county), committed on 2026-09-25 (commit 5765ef5). They are a modified subset, filtered to Kisumu county and Nyando constituency, of the Kenya County Assembly Boundaries dataset by Benedict Aboki Omare and George Omare (2017), https://github.com/benaboki/Kenya-County-Assembly-Boundaries, licensed CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/). The dataset's own README lists the IEBC 2012 delimitation review, KNBS and SID 2013 and OpenStreetMap among its references. The commit message records no source; the source is recorded from the owner's working session of 25 and 26 September 2026 and agrees with the file's attribute names, which are those of that dataset.
+
+## 5. Licence of the data files in this repository
+
+Decision of the repository owner on 2026-10-31, recorded as register row D37 (closed). This page is not legal advice.
+
+- ODbL 1.0 (https://opendatacommons.org/licenses/odbl/1.0/): the V2 data files, that is data/training/nyando_training_v2_multidate.csv and its sets file, the four data/confirmatory/nyando_block_a files and the files in data/derived/. They contain values derived from MERIT Hydro (elevation, slope, HAND), whose terms offer CC-BY-NC 4.0 or ODbL 1.0 and ask that derived data made public go under ODbL. ODbL was chosen: anyone may use these files, commercially too, if they credit the sources in Section 4.1, share adapted versions under ODbL and keep them open.
+- CC BY 4.0: data/external/nyando_wards.geojson, five ward polygons taken from another creator's dataset (Section 4.2). They keep that licence and are not relicensed here.
+- Not covered by this statement: the legacy v1 files data/training/nyando_training_v1.csv and data/training/nyando_training_v1_raw_gee.csv (data of the retracted v1 model). Their sources are in data/external/sources.md, an older list that this datasheet supersedes for V2 data (it lists CHIRPS as CC-BY, while the Earth Engine catalogue entry gives public domain).
+- Code: MIT (LICENSE).
+- The ODbL files hold derived values and ward names only: no MERIT Hydro raster and no HydroSHEDS layer, geometry or basin identifier.
 
 ## 6. Known limitations
 - All labels come from one product (GFM). No independent flood-extent check exists yet.
