@@ -60,7 +60,7 @@ def test_model_card_has_no_retracted_or_unverified_claims():
 
 def test_register_records_the_data_licence_decision():
     rows = {l.split("|")[1].strip(): l for l in (ROOT / "docs" / "ROADMAP_DEVIATIONS.md").read_text(encoding="utf-8").splitlines() if l.startswith("| D")}
-    assert "MERIT" in rows["D37"] and rows["D37"].rstrip().endswith("| open |") and rows["D38"].rstrip().endswith("| closed |")
+    assert "MERIT" in rows["D37"] and rows["D37"].rstrip().endswith("| closed |") and rows["D38"].rstrip().endswith("| closed |")
 
 
 def test_every_four_decimal_figure_in_the_model_card_is_a_stored_result():
