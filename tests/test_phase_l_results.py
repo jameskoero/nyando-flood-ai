@@ -122,7 +122,7 @@ def test_the_register_closes_d14_and_d55_on_this_file_and_opens_d56():
     d14, d55, d56 = _row(register, "D14"), _row(register, "D55"), _row(register, "D56")
     assert d14.rstrip().endswith("| closed |") and "outcome %s" % p["d14_outcome"] in d14 and "tests/test_phase_l_results.py" in d14 and "no such claim is made" in d14
     assert d55.rstrip().endswith("| closed |") and "outcome %s" % p["d55_outcome"] in d55 and "tests/test_phase_l_results.py" in d55
-    assert d56.rstrip().endswith("| open |") and repr(K1["e1"]["reference_mean_event_auc"]) in d56 and "never a gate" in d56
+    assert d56.rstrip().endswith("| closed |") and repr(K1["e1"]["reference_mean_event_auc"]) in d56 and "never a gate" in d56
 
 
 def test_the_readme_ticks_phase_l_and_keeps_the_paper_open():
