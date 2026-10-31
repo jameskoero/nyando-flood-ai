@@ -446,3 +446,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-30: Phase L, L0
 
 - L0 fixes the leakage audit before any metric exists: docs/PHASE_L_PROTOCOL.md and its rules as code (src/models/phase_l.py) define the within-class concordance for land_cover (D14) and the split of clay's contribution into its observed value and its missingness (new row D55), the estimability rule (the Phase K thresholds), the decision rules and the claims each outcome allows. The counts of the training file in the protocol are generated from it and checked by a test; every figure cited from earlier documents is checked against its source. No run and no result yet (L1, L2).
+
+## 2026-10-31: Phase L, L1
+
+- L1 is the manual run of the leakage audit fixed in L0 (docs/PHASE_L_PROTOCOL.md): scripts/run_phase_l.py and the hand-started workflow l1.yml train the registered arm and the two audit arms (without land_cover, without clay_percent) with the registered fixed parameters, stop unless the registered artifact, the training file and the E1 cutpoints match the records, and compute the protocol's contrasts. src/models/phase_l_stats.py holds the vectorised within-class concordance bootstrap, tested against the brute-force definition. No run and no result yet (L2).
