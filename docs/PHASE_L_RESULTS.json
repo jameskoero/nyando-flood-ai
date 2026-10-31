@@ -1,0 +1,293 @@
+{
+ "arms": {
+  "no_clay": [
+   "elevation",
+   "slope",
+   "rainfall_3day",
+   "distance_river",
+   "land_cover"
+  ],
+  "no_land_cover": [
+   "elevation",
+   "slope",
+   "rainfall_3day",
+   "distance_river",
+   "clay_percent"
+  ],
+  "six": [
+   "elevation",
+   "slope",
+   "rainfall_3day",
+   "distance_river",
+   "clay_percent",
+   "land_cover"
+  ]
+ },
+ "checks": {
+  "cutpoints_match": true,
+  "parity_tolerance": 1e-09,
+  "reference_mean_auc": 0.9452450434782609,
+  "reference_recorded_by_k1": 0.9452450434782609,
+  "registered_parity_max_abs_diff": 2.7755575615628914e-16,
+  "rows_kept_match": true
+ },
+ "claims": {
+  "d14": "In Block A land_cover does not add discrimination between rows of the same land-cover class; its contribution comes from how land-cover classes differ in the sample, a limit the Model Card states.",
+  "d55": "Where clay is observed, its value adds discrimination in Block A.",
+  "limits": "The audit models are not registered, promoted or served; no causal reading, no real flood prevalence and no lead-time or early-warning claim follows."
+ },
+ "commit": "8ef910cbb461f2f53e52e363f625c43714f9ac17",
+ "environment": {
+  "numpy": "1.26.4",
+  "onnxruntime": "1.30.0",
+  "pandas": "3.0.6",
+  "python": "3.11.17",
+  "sklearn": "1.6.1"
+ },
+ "fixed_params": {
+  "max_depth": 4,
+  "max_iter": 100,
+  "min_samples_leaf": 20
+ },
+ "frames": {
+  "primary": {
+   "classes": {
+    "10": {
+     "control_rows": 15,
+     "estimable": false,
+     "events_both": 10,
+     "flood_rows": 313,
+     "reason": "control rows 15 below 30"
+    },
+    "20": {
+     "control_rows": 67,
+     "estimable": false,
+     "events_both": 7,
+     "flood_rows": 18,
+     "reason": "flood rows 18 below 30"
+    },
+    "30": {
+     "control_rows": 856,
+     "estimable": true,
+     "events_both": 20,
+     "flood_rows": 139,
+     "reason": ""
+    },
+    "40": {
+     "control_rows": 155,
+     "estimable": true,
+     "events_both": 6,
+     "flood_rows": 139,
+     "reason": ""
+    },
+    "50": {
+     "control_rows": 4,
+     "estimable": false,
+     "events_both": 0,
+     "flood_rows": 0,
+     "reason": "flood rows 0 below 30"
+    },
+    "60": {
+     "control_rows": 3,
+     "estimable": false,
+     "events_both": 0,
+     "flood_rows": 0,
+     "reason": "flood rows 0 below 30"
+    },
+    "80": {
+     "control_rows": 16,
+     "estimable": false,
+     "events_both": 13,
+     "flood_rows": 572,
+     "reason": "control rows 16 below 30"
+    },
+    "90": {
+     "control_rows": 53,
+     "estimable": true,
+     "events_both": 21,
+     "flood_rows": 412,
+     "reason": ""
+    }
+   },
+   "classes_used": [
+    30,
+    40,
+    90
+   ],
+   "clay": {
+    "observed_control_rows": 1151,
+    "observed_estimable": true,
+    "observed_events_both": 24,
+    "observed_flood_rows": 678,
+    "reason": "",
+    "rows_blank": 933,
+    "rows_observed": 1829
+   },
+   "d14_outcome": "between_class_only",
+   "d55_outcome": "value_gain",
+   "delta_t_clay_all": {
+    "ci_high": 0.01084730185185186,
+    "ci_low": 0.0005823120370370531,
+    "losses": 6,
+    "mean_diff": 0.005454814814814822,
+    "n_events": 27,
+    "ties": 2,
+    "wins": 19
+   },
+   "delta_t_clay_present": {
+    "ci_high": 0.02773189583333332,
+    "ci_low": 0.0034548260416666717,
+    "losses": 8,
+    "mean_diff": 0.014750749999999998,
+    "n_events": 24,
+    "ties": 1,
+    "wins": 15
+   },
+   "delta_t_land_cover": {
+    "ci_high": 0.023779293518518534,
+    "ci_low": 0.0025943018518518653,
+    "losses": 9,
+    "mean_diff": 0.01197570370370372,
+    "n_events": 27,
+    "ties": 3,
+    "wins": 15
+   },
+   "delta_w_land_cover": {
+    "ci_high": 0.0019815037141017837,
+    "ci_low": -0.011336737365677457,
+    "delta": -0.005309025960028357,
+    "draws_used": 10000,
+    "pairs": 162365,
+    "w_a": 0.8535152280355988,
+    "w_b": 0.8588242539956271
+   },
+   "rows": 2762
+  },
+  "secondary": {
+   "classes": {
+    "10": {
+     "control_rows": 27,
+     "estimable": false,
+     "events_both": 11,
+     "flood_rows": 269,
+     "reason": "control rows 27 below 30"
+    },
+    "20": {
+     "control_rows": 80,
+     "estimable": false,
+     "events_both": 3,
+     "flood_rows": 4,
+     "reason": "flood rows 4 below 30"
+    },
+    "30": {
+     "control_rows": 1083,
+     "estimable": true,
+     "events_both": 16,
+     "flood_rows": 327,
+     "reason": ""
+    },
+    "40": {
+     "control_rows": 235,
+     "estimable": true,
+     "events_both": 11,
+     "flood_rows": 678,
+     "reason": ""
+    },
+    "50": {
+     "control_rows": 2,
+     "estimable": false,
+     "events_both": 0,
+     "flood_rows": 0,
+     "reason": "flood rows 0 below 30"
+    },
+    "60": {
+     "control_rows": 1,
+     "estimable": false,
+     "events_both": 1,
+     "flood_rows": 1,
+     "reason": "flood rows 1 below 30"
+    },
+    "80": {
+     "control_rows": 11,
+     "estimable": false,
+     "events_both": 6,
+     "flood_rows": 327,
+     "reason": "control rows 11 below 30"
+    },
+    "90": {
+     "control_rows": 66,
+     "estimable": true,
+     "events_both": 14,
+     "flood_rows": 364,
+     "reason": ""
+    }
+   },
+   "classes_used": [
+    30,
+    40,
+    90
+   ],
+   "clay": {
+    "observed_control_rows": 1483,
+    "observed_estimable": true,
+    "observed_events_both": 22,
+    "observed_flood_rows": 1416,
+    "reason": "",
+    "rows_blank": 576,
+    "rows_observed": 2899
+   },
+   "d14_outcome": "between_class_only",
+   "d55_outcome": "value_gain",
+   "delta_t_clay_all": {
+    "ci_high": 0.012379970652173914,
+    "ci_low": 0.0014024195652173718,
+    "losses": 6,
+    "mean_diff": 0.006537391304347819,
+    "n_events": 23,
+    "ties": 4,
+    "wins": 13
+   },
+   "delta_t_clay_present": {
+    "ci_high": 0.022518919318181802,
+    "ci_low": 0.001283945454545449,
+    "losses": 6,
+    "mean_diff": 0.0109205,
+    "n_events": 22,
+    "ties": 5,
+    "wins": 11
+   },
+   "delta_t_land_cover": {
+    "ci_high": 0.0343333652173913,
+    "ci_low": 0.007174283695652148,
+    "losses": 3,
+    "mean_diff": 0.020191521739130424,
+    "n_events": 23,
+    "ties": 3,
+    "wins": 17
+   },
+   "delta_w_land_cover": {
+    "ci_high": 0.02360066171768616,
+    "ci_low": -0.02109513992964513,
+    "delta": -0.00199536739876649,
+    "draws_used": 10000,
+    "pairs": 537495,
+    "w_a": 0.7654564228504451,
+    "w_b": 0.7674517902492116
+   },
+   "rows": 3475
+  }
+ },
+ "github_run_id": 41162667185,
+ "mlflow": {
+  "metrics_logged": 134,
+  "run_id": "68376e62c30846f498fc6aec78b93be7",
+  "tracking_uri": "https://dagshub.com/jmskoero/nyando-flood-ai.mlflow"
+ },
+ "model_sha256": "5ae81ad8b0303c8a8bef79f177199e34f1d3cad87cb609afc6825a4b9980b723",
+ "outcome": "PHASE L REPORTED",
+ "protocol": "docs/PHASE_L_PROTOCOL.md",
+ "protocol_sha256": "6860b45efe08ccd4ec806628df3cafa6aa1fe80accacffee6aea43832066f227",
+ "schema": 1,
+ "step": "L1",
+ "training_data_sha256": "0b9283540d91154c0dda55b0d92cae7aa3cae6aeffad0390bbf77e028dd2063a"
+}
