@@ -450,3 +450,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-10-31: Phase L, L1
 
 - L1 is the manual run of the leakage audit fixed in L0 (docs/PHASE_L_PROTOCOL.md): scripts/run_phase_l.py and the hand-started workflow l1.yml train the registered arm and the two audit arms (without land_cover, without clay_percent) with the registered fixed parameters, stop unless the registered artifact, the training file and the E1 cutpoints match the records, and compute the protocol's contrasts. src/models/phase_l_stats.py holds the vectorised within-class concordance bootstrap, tested against the brute-force definition. No run and no result yet (L2).
+
+## 2026-10-31: Phase L, L1 fix
+
+- The first L1 run stopped before computing any result: a guard I added compared the E1 reference mean AUC (0.9452) with the README and Phase C figure 0.943 (D.REPRODUCE in src/models/phase_d.py), which is not the E1 reference. K1 had already recorded the E1 reference, 0.9452450434782609, with reference_reproduces false, and L1 reproduces it. The guard now requires the reference to equal the K1 record to 1e-9, which is stricter and is the stop the protocol names (the E1 reference and cutpoints). The environment was checked: the CI install and its versions equal the registration environment. No result existed, so nothing was selected or changed.

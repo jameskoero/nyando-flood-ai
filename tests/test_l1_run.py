@@ -27,7 +27,7 @@ def test_the_l1_script_is_wired_to_the_protocol_rules():
 
 
 def test_the_l1_script_stops_instead_of_guessing():
-    for message in ("the recomputed cutpoints", "Block A keeps", "the training file is not the one E1 used", "differs from the registered artifact on Block A", "the registered model file is not the artifact named in docs/REGISTRATION.json", "is not the registered",
+    for message in ("the recomputed cutpoints", "Block A keeps", "the training file is not the one E1 used", "differs from the registered artifact on Block A", "the registered model file is not the artifact named in docs/REGISTRATION.json", "recorded by K1",
                     "the six features are not the ones the protocol names", "the out-of-fold arms do not cover the same rows", "DAGSHUB_TOKEN is not set"):
         assert message in SCRIPT, message
     assert "PARITY_TOLERANCE = 1e-9" in SCRIPT
