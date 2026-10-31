@@ -59,6 +59,52 @@ Intervals are event-clustered percentile bootstrap intervals: the 2.5th to 97.5t
 What this does not show: no causal reading, no real flood prevalence, nothing outside the GFM-mappable areas, and no test of lead time, so no early-warning claim follows. The DEM-floor rows of Kabonyo/Kanyagwal and the land-cover question (register row D14) are not separated here. The reference check of K1 reads `reference_reproduces: False` (mean event AUC 0.945), as in E1; the cutpoints equal E1's, so no band changed.
 <!-- phase-k:end -->
 
+<!-- phase-l:begin -->
+### Leakage audit of land_cover and clay_percent (Phase L, register rows D14 and D55)
+
+Protocol `docs/PHASE_L_PROTOCOL.md` (SHA-256 `6860b45efe08ccd4ec806628df3cafa6aa1fe80accacffee6aea43832066f227`); results `docs/PHASE_L_RESULTS.json` (L1 run: GitHub Actions run 41162667185, MLflow run `68376e62c30846f498fc6aec78b93be7`, commit `8ef910cbb461f2f53e52e363f625c43714f9ac17`). The two audit arms are the registered model trained without land_cover and without clay_percent, with the registered fixed parameters, on the mappable training rows; they are not registered, promoted or served, and the registered model is unchanged. The scores are ranking scores, not flood probabilities.
+
+Intervals are event-clustered percentile bootstrap intervals: the 2.5th to 97.5th percentile of 10,000 resamples of events with seed 42, a two-sided 95% interval. Every contrast is the registered model minus the audit arm, so a positive value means the feature helps. W is the share of flood and control row pairs of the same land-cover class in which the flood row scores higher (ties count one half); T is the mean per-event AUC.
+
+**Primary frame** (the 2762 Block A rows kept after excluding rows at training locations, scored by the registered artifact; this frame decides what the card may say):
+
+| Contrast (registered model minus audit arm) | Estimate | Interval |
+|---|---|---|
+| W, land_cover: within-class concordance (classes 30, 40, 90 of 8) | -0.0053 | [-0.0113, +0.0020] |
+| T, land_cover: mean per-event AUC | +0.0120 | [+0.0026, +0.0238] |
+| T, clay_percent: all rows | +0.0055 | [+0.0006, +0.0108] |
+| T, clay_percent: only rows where clay is observed (933 blank rows left out) | +0.0148 | [+0.0035, +0.0277] |
+
+- D14 (land_cover): `between_class_only`. In Block A land_cover does not add discrimination between rows of the same land-cover class; its contribution comes from how land-cover classes differ in the sample, a limit the Model Card states.
+- D55 (clay_percent): `value_gain`. Where clay is observed, its value adds discrimination in Block A.
+
+Only the land-cover classes marked yes below enter W, so the D14 statement covers those classes and no others.
+
+| land_cover class | Flood rows | Control rows | Events with both classes | Enters W |
+|---|---|---|---|---|
+| 10 | 313 | 15 | 10 | no (control rows 15 below 30) |
+| 20 | 18 | 67 | 7 | no (flood rows 18 below 30) |
+| 30 | 139 | 856 | 20 | yes |
+| 40 | 139 | 155 | 6 | yes |
+| 50 | 0 | 4 | 0 | no (flood rows 0 below 30) |
+| 60 | 0 | 3 | 0 | no (flood rows 0 below 30) |
+| 80 | 572 | 16 | 13 | no (control rows 16 below 30) |
+| 90 | 412 | 53 | 21 | yes |
+
+**Secondary frame** (the 3475 mappable training rows, out-of-fold scores; context only):
+
+| Contrast (registered model minus audit arm) | Estimate | Interval |
+|---|---|---|
+| W, land_cover: within-class concordance (classes 30, 40, 90 of 8) | -0.0020 | [-0.0211, +0.0236] |
+| T, land_cover: mean per-event AUC | +0.0202 | [+0.0072, +0.0343] |
+| T, clay_percent: all rows | +0.0065 | [+0.0014, +0.0124] |
+| T, clay_percent: only rows where clay is observed (576 blank rows left out) | +0.0109 | [+0.0013, +0.0225] |
+
+The secondary frame reaches the outcomes `between_class_only` (D14) and `value_gain` (D55), the same as the primary frame.
+
+What this does not show: the audit models are not registered, promoted or served; no causal reading, no real flood prevalence and no lead-time or early-warning claim follows. The registered arm reproduced the registered artifact on Block A to within 1e-09 (largest difference 2.8e-16), and the reference check equals the K1 record.
+<!-- phase-l:end -->
+
 ## Previous registered model: logistic:con (Phase C, retired on 2026-10-07)
 
 ### Model details

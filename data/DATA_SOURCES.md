@@ -62,6 +62,30 @@ Counts by ward in the two frames of `docs/PHASE_K_RESULTS.json`. They are counts
 Awasi/Onjiko: not estimable in either frame, so no per-ward statement is made for it. Metrics and flags are in MODEL_CARD.md, section "Ward-level slices (Phase K, register rows D52 and D53)".
 <!-- phase-k:end -->
 
+<!-- phase-l:begin -->
+### 6.2 Land-cover class and clay coverage (Phase L)
+
+Counts of the two frames of `docs/PHASE_L_RESULTS.json`. They are counts only: the samples are case-control, so they are not flood rates.
+
+| land_cover class | Primary: flood / control rows | Primary: events with both classes | Secondary: flood / control rows | Secondary: events with both classes | Enters W (primary / secondary) |
+|---|---|---|---|---|---|
+| 10 | 313 / 15 | 10 | 269 / 27 | 11 | no / no |
+| 20 | 18 / 67 | 7 | 4 / 80 | 3 | no / no |
+| 30 | 139 / 856 | 20 | 327 / 1083 | 16 | yes / yes |
+| 40 | 139 / 155 | 6 | 678 / 235 | 11 | yes / yes |
+| 50 | 0 / 4 | 0 | 0 / 2 | 0 | no / no |
+| 60 | 0 / 3 | 0 | 1 / 1 | 1 | no / no |
+| 80 | 572 / 16 | 13 | 327 / 11 | 6 | no / no |
+| 90 | 412 / 53 | 21 | 364 / 66 | 14 | yes / yes |
+
+| clay_percent | Primary rows | Secondary rows |
+|---|---|---|
+| blank | 933 | 576 |
+| observed | 1829 | 2899 |
+
+Metrics and outcomes are in MODEL_CARD.md, section "Leakage audit of land_cover and clay_percent (Phase L, register rows D14 and D55)".
+<!-- phase-l:end -->
+
 ## 7. Maintenance
 Rebuild with `scripts/build_initial_dataset.py`. Hashes live in `data/MANIFEST.json` and are recomputed by CI (`data-gate`, `manifest-check`). Changes go through pull requests and `docs/ROADMAP_DEVIATIONS.md`.
 
