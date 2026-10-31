@@ -114,9 +114,9 @@ def main():
     splits = cv.loeo_splits(M, drop_shared_locations=True)
     oof = {a: out_of_fold_scores(make_estimator("hgb", fs, True)(params), M, fs, splits) for a, fs in arms.items()}
     repro = DS.mean(DS.aucs(M, oof["six"]))
-    want, tol = D.REPRODUCE["hgb:con"]
-    if abs(repro - want) > tol:
-        sys.exit("STOPPED: the E1 reference mean AUC %.4f is not the registered %.4f" % (repro, want))
+    recorded = json.loads((REPO / "docs" / "PHASE_K_RESULTS.json").read_text(encoding="utf-8"))["e1"]["reference_mean_event_auc"]
+    if abs(repro - recorded) > 1e-9:
+        sys.exit("STOPPED: the E1 reference mean AUC %.10f is not the %.10f recorded by K1" % (repro, recorded))
     finite = ~np.isnan(oof["six"])
     if any(not np.array_equal(finite, ~np.isnan(oof[a])) for a in arms):
         sys.exit("STOPPED: the out-of-fold arms do not cover the same rows")
@@ -182,7 +182,7 @@ def main():
     res = {"schema": 1, "step": "L1", "outcome": L.OUTCOME, "protocol": "docs/PHASE_L_PROTOCOL.md",
            "protocol_sha256": hashlib.sha256((REPO / "docs" / "PHASE_L_PROTOCOL.md").read_bytes()).hexdigest(), "commit": os.environ.get("GITHUB_SHA"),
            "training_data_sha256": tsha, "model_sha256": registration["model"]["sha256"],
-           "checks": {"reference_mean_auc": float(repro), "cutpoints_match": True, "rows_kept_match": True, "registered_parity_max_abs_diff": parity, "parity_tolerance": PARITY_TOLERANCE},
+           "checks": {"reference_mean_auc": float(repro), "reference_recorded_by_k1": float(recorded), "cutpoints_match": True, "rows_kept_match": True, "registered_parity_max_abs_diff": parity, "parity_tolerance": PARITY_TOLERANCE},
            "arms": arms, "fixed_params": params, "frames": frames,
            "claims": {"d14": L.CLAIMS[frames["primary"]["d14_outcome"]], "d55": L.CLAIMS[frames["primary"]["d55_outcome"]], "limits": L.LIMITS},
            "environment": {"python": sys.version.split()[0], "numpy": np.__version__, "pandas": pd.__version__, "onnxruntime": onnxruntime.__version__, "sklearn": sklearn.__version__}}
