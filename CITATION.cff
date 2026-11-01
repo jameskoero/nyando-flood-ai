@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it with these metadata. The figures in the earlier Zenodo records 10.5281/zenodo.20088663 and 10.5281/zenodo.21044886 are retracted and must not be cited."
+type: software
+title: "Nyando Flood AI"
+abstract: "Ward-level flood susceptibility ranking for the Nyando basin, Kisumu County, Kenya, using independent Copernicus GFM flood labels. The score is a ranking score, not a flood probability."
+authors:
+  - family-names: "Koero"
+    given-names: "James"
+    orcid: "https://orcid.org/0009-0001-8314-2682"
+repository-code: "https://github.com/jameskoero/nyando-flood-ai"
+license: MIT
+keywords:
+  - flood susceptibility
+  - Nyando
+  - Kenya
+  - machine learning
