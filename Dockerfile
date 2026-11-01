@@ -3,17 +3,9 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # The image installs exactly what CI tests and audits (constraints-ci.txt), so production cannot drift from the tested set (rows D32, D48). The API takes JSON only: no multipart parser.
-COPY constraints-ci.txt .
-RUN pip install --no-cache-dir -c constraints-ci.txt \
-    fastapi \
-    uvicorn \
-    pydantic \
-    slowapi \
-    onnxruntime \
-    numpy \
-    pandas \
-    scikit-learn \
-    joblib
+# Hash-locked (row D32): only wheels whose SHA-256 is listed in requirements-image.lock are accepted.
+COPY constraints-ci.txt requirements-image.lock ./
+RUN pip install --no-cache-dir --require-hashes --only-binary=:all: -c constraints-ci.txt -r requirements-image.lock
 
 COPY . .
 
