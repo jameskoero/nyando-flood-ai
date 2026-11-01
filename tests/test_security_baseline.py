@@ -33,8 +33,7 @@ def test_the_image_installs_the_ci_pins_and_runs_as_non_root():
 
 
 def test_the_served_packages_are_pinned_and_past_the_audited_advisories():
-    block = DOCKER.split("-c constraints-ci.txt", 1)[1].split("COPY . .", 1)[0]
-    names = {norm(n) for n in re.findall(r"^[ ]{4}([A-Za-z0-9_.\-]+)[ ]*\\?[ ]*$", block, re.M)}
+    names = {norm(n) for n in re.findall(r"^([A-Za-z0-9_.\-]+)[ ]*$", (ROOT / "requirements-image.in").read_text(encoding="utf-8"), re.M)}
     pins = _pins()
     assert names == NINE and names <= set(pins) and {"starlette", "anyio", "h11", "limits"} <= set(pins)
     assert tuple(int(x) for x in pins["starlette"].split(".")[:3]) >= (1, 3, 1)

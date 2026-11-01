@@ -185,6 +185,8 @@ render.yaml                              Render Blueprint for a parallel serving
 requirements.txt                         project and CI dependencies
 requirements-gate.txt                    exact pins for the data-gate job
 requirements-onnx.txt                    ONNX export and scoring dependencies, installed by CI
+requirements-image.in                    the nine packages the production image installs
+requirements-image.lock                  hash-locked install file for the production image
 requirements-train.txt                   training only (Phase D): torch, never installed in production or CI
 constraints-ci.txt                       exact versions of every package the CI test job can install (pip constraints)
 pytest.ini  conftest.py                  pytest configuration

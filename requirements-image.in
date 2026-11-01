@@ -1,0 +1,12 @@
+# Direct dependencies of the production image (Dockerfile), one per line (register row D32).
+# Regenerate the hash-locked file on purpose with:
+#   uv pip compile requirements-image.in -c constraints-ci.txt --generate-hashes --python-version 3.11 --python-platform linux --no-header --no-annotate -o requirements-image.lock
+fastapi
+uvicorn
+pydantic
+slowapi
+onnxruntime
+numpy
+pandas
+scikit-learn
+joblib
