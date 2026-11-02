@@ -65,8 +65,12 @@ def test_the_primary_frame_matches_the_repo_functions():
     keep = np.array(e1.keep_mask(list(cv.location_keys(b)), list(cv.location_keys(m))))
     k = b[keep]
     assert len(b) == N_MAPPABLE and len(k) == len(PRIMARY)
-    assert list(zip(k["event_id"].astype(str), k["lon"], k["lat"])) == [
-        (r["event_id"], float(r["lon"]), float(r["lat"])) for r in PRIMARY]
+    # pandas' default float parser can differ from Python's in the last digit
+    got = list(zip(k["event_id"].astype(str), k["lon"], k["lat"]))
+    want = [(r["event_id"], float(r["lon"]), float(r["lat"])) for r in PRIMARY]
+    assert len(got) == len(want)
+    for (ea, xa, ya), (eb, xb, yb) in zip(got, want):
+        assert ea == eb and abs(xa - xb) < 1e-9 and abs(ya - yb) < 1e-9
     assert list(cv.location_keys(k)) == [core.location_key(r["lon"], r["lat"]) for r in PRIMARY]
 
 
