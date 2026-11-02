@@ -478,3 +478,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-11-02: README API section matches the code
 
 - The README API section and repository layout now say that POST /predict answers 410 Gone by default and that the service also serves POST /v2/advisory (register row D51). No code, model, data or result file changed.
+
+## 2026-11-02: Phase H core
+
+- Added src/agent (standard library only): a replay of recorded Block A data through the live /v2/score and /v2/advisory, selection rules tested on the real file, retries for the free-tier server, and a report that says it is a replay and not a validation or forecast. No model, data or result file changed.
