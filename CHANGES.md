@@ -482,3 +482,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-11-02: Phase H core
 
 - Added src/agent (standard library only): a replay of recorded Block A data through the live /v2/score and /v2/advisory, selection rules tested on the real file, retries for the free-tier server, and a report that says it is a replay and not a validation or forecast. No model, data or result file changed.
+
+## 2026-11-02: Phase H uses the validated frame
+
+- The replay now picks its points only from the primary frame of the level validation (mappable Block A rows at locations not in the mappable training frame), reproduced in plain Python and checked against the repo's own functions in CI; the report also shows which providers were tried. No model, data or result file changed.
