@@ -16,7 +16,11 @@ from pathlib import Path
 
 BASE_URL = "https://nyando-flood-v2.onrender.com"
 USER_AGENT = "nyando-flood-ai-agent/2.0"
-BLOCK_A = Path(__file__).resolve().parents[2] / "data" / "confirmatory" / "nyando_block_a.csv"
+DATA = Path(__file__).resolve().parents[2] / "data"
+BLOCK_A = DATA / "confirmatory" / "nyando_block_a.csv"
+BLOCK_FLAGS = DATA / "confirmatory" / "nyando_block_a_layer_flags.csv"
+TRAIN_CSV = DATA / "training" / "nyando_training_v2_multidate.csv"
+TRAIN_FLAGS = DATA / "derived" / "gfm_layer_flags.csv"
 REPLAY_NOTE = (
     "Replay of recorded data through the live service. It is an illustration, "
     "not a validation and not a forecast."
@@ -30,6 +34,45 @@ class ApiError(RuntimeError):
 def load_rows(path=BLOCK_A):
     with open(path, newline="", encoding="utf-8") as fh:
         return list(csv.DictReader(fh))
+
+
+def location_key(lon, lat):
+    """Mirror of src/models/cv.py location_keys: lon and lat rounded to 6 decimals, as text."""
+    return "%r,%r" % (round(float(lon) * 1e6) / 1e6, round(float(lat) * 1e6) / 1e6)
+
+
+def mappable(rows, flags):
+    """Flood rows plus controls outside the GFM exclusion mask (cv.mappable_mask).
+
+    The flag file must describe exactly these rows, as cv.load_layer_flags checks."""
+    if len(rows) != len(flags):
+        raise ValueError("layer-flag file and data file differ in length")
+    kept = []
+    for r, f in zip(rows, flags):
+        same = (
+            abs(float(f["lon"]) - float(r["lon"])) <= 1e-9
+            and abs(float(f["lat"]) - float(r["lat"])) <= 1e-9
+            and float(f["flooded"]) == float(r["flooded"])
+        )
+        if not same:
+            raise ValueError("layer-flag file is not aligned with the data file")
+        if float(r["flooded"]) == 1 or float(f["exclusion_mask"]) == 0:
+            kept.append(r)
+    return kept
+
+
+def primary_frame(block, block_flags, train, train_flags):
+    """The rows Phase E validated the levels on: mappable Block A rows at locations
+    that are not in the mappable training frame. Returns (rows, number_mappable)."""
+    b = mappable(block, block_flags)
+    seen = {location_key(r["lon"], r["lat"]) for r in mappable(train, train_flags)}
+    return [r for r in b if location_key(r["lon"], r["lat"]) not in seen], len(b)
+
+
+def load_primary():
+    return primary_frame(
+        load_rows(BLOCK_A), load_rows(BLOCK_FLAGS), load_rows(TRAIN_CSV), load_rows(TRAIN_FLAGS)
+    )
 
 
 def pick_event(rows):
@@ -69,15 +112,19 @@ def to_payload(row):
     return p
 
 
-def plan(rows):
+def plan(rows, n_mappable=None):
     event_id = pick_event(rows)
     ev = [r for r in rows if r["event_id"] == event_id]
+    picked = pick_ward_rows(rows, event_id)
     return {
         "event_id": event_id,
         "event_date": ev[0]["event_date"],
         "n_rows": len(ev),
         "mean_rainfall": sum(float(r["rainfall_3day"]) for r in ev) / len(ev),
-        "picked": pick_ward_rows(rows, event_id),
+        "picked": picked,
+        "wards_without_point": sorted({r["ward"] for r in rows} - set(picked)),
+        "n_primary": len(rows),
+        "n_mappable": n_mappable,
     }
 
 
@@ -150,10 +197,16 @@ def _render(value):
     if isinstance(value, str):
         return value
     if isinstance(value, dict):
-        return "\n".join(
-            "- %s: %s" % (k, v if isinstance(v, str) else json.dumps(v, ensure_ascii=False, sort_keys=True))
-            for k, v in value.items()
-        )
+        lines = []
+        for k, v in value.items():
+            if isinstance(v, str):
+                lines.append("- %s: %s" % (k, v))
+            elif isinstance(v, list) and all(isinstance(x, str) for x in v):
+                lines.append("- %s:" % k)
+                lines += ["  - %s" % x for x in v]
+            else:
+                lines.append("- %s: %s" % (k, json.dumps(v, ensure_ascii=False, sort_keys=True)))
+        return "\n".join(lines)
     return json.dumps(value, ensure_ascii=False, sort_keys=True)
 
 
@@ -165,6 +218,13 @@ def build_report(pl, scores, advice, generated):
         "- Event: %s (scene date %s)" % (pl["event_id"], pl["event_date"]),
         "- Mean rainfall_3day over the event's %d sampled rows: %.1f" % (pl["n_rows"], pl["mean_rainfall"]),
         "- Wards shown: one recorded sample point per ward, at the median rainfall_3day of that ward's rows in the event",
+    ]
+    if pl.get("n_mappable"):
+        out.append("- Rows used: the primary frame of the level validation (%d of %d mappable Block A rows, at locations not in the mappable training frame)" % (pl["n_primary"], pl["n_mappable"]))
+    if pl.get("wards_without_point"):
+        out.append("- No primary-frame point in this event for: %s" % ", ".join(pl["wards_without_point"]))
+    out += [
+        "- Providers configured on the service: %s" % (", ".join(first.get("providers_configured") or []) or "none"),
         "- Generated (UTC): %s" % generated, "",
         "| Ward | rainfall_3day | Score | Level | Recorded label at the point |",
         "|---|---|---|---|---|",
@@ -178,8 +238,12 @@ def build_report(pl, scores, advice, generated):
     out += ["", "## Advisory by ward", ""]
     for ward in pl["picked"]:
         a = advice[ward]
+        src, mdl = a.get("advisory_source"), a.get("advisory_model")
         out += ["### " + ward, "", _render(a.get("advisory")), "",
-                "Source: %s (%s)" % (a.get("advisory_source"), a.get("advisory_model")), ""]
+                "Source: %s" % (("%s (%s)" % (src, mdl)) if mdl else src)]
+        if a.get("attempts"):
+            out.append("Providers tried: %s" % json.dumps(a["attempts"], ensure_ascii=False, sort_keys=True)[:400])
+        out.append("")
     out += [
         "## Notices (verbatim from the service)", "",
         "- Score meaning: %s" % first.get("score_meaning"),

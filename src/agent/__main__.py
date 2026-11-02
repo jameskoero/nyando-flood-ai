@@ -12,8 +12,10 @@ def main(argv=None):
     ap.add_argument("--out", help="write the report to this file")
     ap.add_argument("--base", default=core.BASE_URL)
     a = ap.parse_args(argv)
-    pl = core.plan(core.load_rows())
+    rows, n_mappable = core.load_primary()
+    pl = core.plan(rows, n_mappable)
     if a.dry_run:
+        print("primary rows", len(rows), "of mappable", n_mappable)
         print("event", pl["event_id"], pl["event_date"], "rows", pl["n_rows"],
               "mean rainfall_3day", round(pl["mean_rainfall"], 3))
         for ward, row in pl["picked"].items():
