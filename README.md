@@ -163,6 +163,7 @@ src/data/                                GFM client, terrain, case-control sampl
 src/features/                            build_features.py
 src/models/                              Phase C modules: cv (evaluation harness), baseline, boosters, constrained, decision, registration, export_onnx, robustness (battery), closure (record), promotion (gates), export_hgb (tree exporter), phase_d (Phase D rules), mlp_pre and mlp (Phase D model); also train_model.py and evaluate_model.py
 src/advisory/                            Phase E: rules as code (levels, gates), the advisory core (attribution, guard, template, prompt, reference values), the Gemini and Groq providers and the orchestrator
+src/agent/                               Phase H: replay of recorded Block A data through the live /v2 service (standard library only)
 src/utils/                               geo_utils.py
 src/visualization/                       shap_plots.py
 src/tracking.py                          MLflow tracking wrapper
