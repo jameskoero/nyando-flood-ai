@@ -474,3 +474,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-11-01: release files
 
 - Added CITATION.cff (repository, author and licence; no DOI, because both earlier Zenodo records hold retracted figures) and REPRODUCE.md (what can be re-run and what needs accounts or keys), and named both in the README repository layout. No code, model, data or result file changed.
+
+## 2026-11-02: README API section matches the code
+
+- The README API section and repository layout now say that POST /predict answers 410 Gone by default and that the service also serves POST /v2/advisory (register row D51). No code, model, data or result file changed.

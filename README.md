@@ -120,7 +120,7 @@ It resumes after an interruption and takes about 10 minutes. The full test suite
 
 ## API (legacy model)
 
-The deployed service serves the registered V2 model at `POST /v2/score` and still serves the legacy model at `POST /predict`. Interactive docs (`/docs`, `/redoc`) are disabled in production (checked live: both return 404). The registered V2 model is served at `POST /v2/score` by this code; it loads only after its SHA-256 matches `models/MANIFEST.json`, and the live service reports whether it is loaded in `GET /health`.
+The deployed service serves the registered V2 model at `POST /v2/score` and `POST /v2/advisory`; the legacy `POST /predict` answers 410 Gone unless the service is started with `LEGACY_PREDICT=on` (register row D51). Interactive docs (`/docs`, `/redoc`) are disabled in production (checked live: both return 404). The registered V2 model is served at `POST /v2/score` by this code; it loads only after its SHA-256 matches `models/MANIFEST.json`, and the live service reports whether it is loaded in `GET /health`.
 
 - `POST /v2/score` scores one location with the registered model and returns `score`, a ranking score that is not a flood probability, with the model's hash and claim limit. It has no risk classes, because none were validated. `clay_percent` may be omitted (the response then carries a warning).
 - `GET /v2/metrics` returns the stored evaluation of the registered model: `docs/REGISTRATION.json` when it names the loaded model, otherwise `docs/PHASE_C_RESULTS.json`; 503 when neither is available.
@@ -171,7 +171,7 @@ tools/                                   shipping tools: ship a change as one pu
 tests/                                   A-Gate, README checks, evaluation harness, boosters, constrained logistic, registration, export, robustness and legacy tests
 docs/                                    protocols, results and records: Phase C, D20, promotion and Phase D protocols, registration record, D11 OSM check, deviation register, hardening audit
 docs/funding/                            superseded concept note
-backend/                                 FastAPI service: legacy model on /predict, registered ONNX model on /v2/score (backend/models/ holds the legacy model files)
+backend/                                 FastAPI service: legacy /predict (410 Gone by default), registered ONNX model on /v2/score (backend/models/ holds the legacy model files)
 frontend/                                React dashboard
 notebooks/                               v1 notebooks (legacy)
 .github/workflows/                       ci.yml, data-gate.yml, manifest-check.yml
