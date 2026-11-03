@@ -214,7 +214,8 @@ gee_extract_nyando.py                    v1 Earth Engine extraction script (lega
 - [ ] **D. (optional, future):** a second candidate with a stronger or hard constraint mechanism, under its own protocol; it may use Block B. Serving through ONNX Runtime is already done (register row D33).
 - [x] **E. LLM advisory layer**, cached and rate-limited, never on the `/predict` path.
 - [x] **F. Dashboard:** no hard-coded metrics, loading and error states, accessibility.
-- [ ] **G-H. SMS alerts** (only after a public WARMA feed is confirmed; sandbox and shadow mode only while the service stays on Render's free tier, register row D45) and an MCP/LangGraph showcase.
+- [ ] **G. SMS alerts** (only after a public WARMA feed is confirmed; sandbox and shadow mode only while the service stays on Render's free tier, register row D45).
+- [x] **H. MCP and LangGraph showcase:** the replay core, the MCP server and the LangGraph chain are in `src/agent/` (register rows D57 and D58); the one-page situation report is `docs/PHASE_H_SITUATION_REPORT.md`, a replay of recorded data, not a validation or a forecast.
 - [x] **K (part):** the model card and the datasheet (`data/DATA_SOURCES.md`) are rewritten to V2 (register row D38).
 - [x] **K (fairness slices):** ward-level slices run on the E1 frames (register rows D52 and D53); results in docs/PHASE_K_RESULTS.json, reported in MODEL_CARD.md and data/DATA_SOURCES.md. The flags are descriptive; no ward is called fair or unfair.
 - [x] **L (leakage audit):** the within-class audit of land_cover and the observed-versus-missing split of clay_percent ran on the E1 frames (register rows D14 and D55); results in docs/PHASE_L_RESULTS.json, reported in MODEL_CARD.md and data/DATA_SOURCES.md. The outcomes are descriptive and the registered model is unchanged.
