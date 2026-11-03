@@ -234,4 +234,4 @@ The Zenodo record [10.5281/zenodo.20088663](https://doi.org/10.5281/zenodo.20088
 
 **James Koero**, ML engineer, Kisumu, Kenya. [GitHub](https://github.com/jameskoero) · [LinkedIn](https://linkedin.com/in/jameskoero)
 
-Academic advisors: Prof. Samuel Liyala (JOOUST, Kenya) and Prof. Johan Loeckx (Vrije Universiteit Brussel, VUB AI Lab, Belgium).
+Mentors: Prof. Samuel Liyala (JOOUST, Kenya) and Prof. Johan Loeckx (Vrije Universiteit Brussel, VUB AI Lab, Belgium).
