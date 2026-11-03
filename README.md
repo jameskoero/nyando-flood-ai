@@ -220,7 +220,7 @@ gee_extract_nyando.py                    v1 Earth Engine extraction script (lega
 - [x] **K (fairness slices):** ward-level slices run on the E1 frames (register rows D52 and D53); results in docs/PHASE_K_RESULTS.json, reported in MODEL_CARD.md and data/DATA_SOURCES.md. The flags are descriptive; no ward is called fair or unfair.
 - [x] **L (leakage audit):** the within-class audit of land_cover and the observed-versus-missing split of clay_percent ran on the E1 frames (register rows D14 and D55); results in docs/PHASE_L_RESULTS.json, reported in MODEL_CARD.md and data/DATA_SOURCES.md. The outcomes are descriptive and the registered model is unchanged.
 - [x] **J1 (Zenodo erratum):** the erratum was added on 2026-11-03 to both old records, 10.5281/zenodo.20088663 and 10.5281/zenodo.21044886.
-- [ ] **J2 (paper and release):** the manuscript is drafted; the v2.0 tag, the archived release and its DOI are pending.
+- [ ] **J (remainder):** the paper and the release: the manuscript is drafted; the v2.0.0 tag, the archived release and its DOI are pending.
 
 ## License and data terms
 
