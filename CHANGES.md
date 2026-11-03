@@ -494,3 +494,12 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-11-03: Phase H situation report
 
 - Committed docs/PHASE_H_SITUATION_REPORT.md, a replay of one recorded Block A event (primary frame only) through the live /v2 endpoints, with three tests that tie it to the code and the model file; recorded register rows D57 (replay instead of a simulated storm) and D58 (wrappers verified in CI, not on the phone); README roadmap line G-H split into G (open) and H (done). No model, data or result file changed.
+
+## 2026-11-03: research dashboard on the V2 evidence
+
+- The dashboard now opens on a research view of the registered model: overview, ward explorer, model evidence, data
+  intelligence, methodology, and the existing scoring page as a tab (frontend/src/dashboard/, App.jsx untouched).
+- Every research figure is read at runtime from frontend/public/evidence.json, which scripts/build_evidence.py builds from the
+  stored results, manifests, training file and ward polygons; tests/test_dashboard_evidence.py fails if it drifts.
+- The ward map draws data/external/nyando_wards.geojson; layers with no file in the repository are listed as unavailable.
+- Service status and the model checksum are taken from the live /health and /v2/metrics responses, never assumed.
