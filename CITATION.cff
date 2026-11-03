@@ -9,6 +9,7 @@ authors:
     orcid: "https://orcid.org/0009-0001-8314-2682"
 repository-code: "https://github.com/jameskoero/nyando-flood-ai"
 license: MIT
+doi: "10.5281/zenodo.23919053"
 keywords:
   - flood susceptibility
   - Nyando
