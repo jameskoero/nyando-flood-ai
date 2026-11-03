@@ -219,7 +219,8 @@ gee_extract_nyando.py                    v1 Earth Engine extraction script (lega
 - [x] **K (part):** the model card and the datasheet (`data/DATA_SOURCES.md`) are rewritten to V2 (register row D38).
 - [x] **K (fairness slices):** ward-level slices run on the E1 frames (register rows D52 and D53); results in docs/PHASE_K_RESULTS.json, reported in MODEL_CARD.md and data/DATA_SOURCES.md. The flags are descriptive; no ward is called fair or unfair.
 - [x] **L (leakage audit):** the within-class audit of land_cover and the observed-versus-missing split of clay_percent ran on the E1 frames (register rows D14 and D55); results in docs/PHASE_L_RESULTS.json, reported in MODEL_CARD.md and data/DATA_SOURCES.md. The outcomes are descriptive and the registered model is unchanged.
-- [ ] **J (remainder):** the paper, and a Zenodo erratum before any new numbers are cited.
+- [x] **J1 (Zenodo erratum):** the erratum was added on 2026-11-03 to both old records, 10.5281/zenodo.20088663 and 10.5281/zenodo.21044886.
+- [ ] **J (remainder):** the paper and the release: the manuscript is drafted; the v2.0.0 tag, the archived release and its DOI are pending.
 
 ## License and data terms
 
@@ -227,7 +228,7 @@ Code: MIT ([LICENSE](LICENSE)). The V2 data files (the training, Block A and der
 
 ## Citation, security and contributing
 
-The Zenodo record [10.5281/zenodo.20088663](https://doi.org/10.5281/zenodo.20088663) predates the correction and contains the retracted figures; an erratum is planned before any new numbers are cited. Report vulnerabilities as described in [SECURITY.md](SECURITY.md); see [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
+The Zenodo record [10.5281/zenodo.20088663](https://doi.org/10.5281/zenodo.20088663) predates the correction and contains the retracted figures; an erratum was added to this record and to 10.5281/zenodo.21044886 on 2026-11-03. Report vulnerabilities as described in [SECURITY.md](SECURITY.md); see [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request.
 
 ## Author
 
