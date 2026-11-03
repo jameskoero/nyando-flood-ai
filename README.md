@@ -191,6 +191,7 @@ requirements-image.lock                  hash-locked install file for the produc
 CITATION.cff                             citation metadata: repository, author, licence
 REPRODUCE.md                             what anyone can re-run, and what needs accounts or keys
 requirements-train.txt                   training only (Phase D): torch, never installed in production or CI
+requirements-agent.txt                   Phase H wrappers only: MCP server and LangGraph chain (not in the image or the CI test job)
 constraints-ci.txt                       exact versions of every package the CI test job can install (pip constraints)
 pytest.ini  conftest.py                  pytest configuration
 gee_extract_nyando.py                    v1 Earth Engine extraction script (legacy; used by tests/test_gfm_client.py)

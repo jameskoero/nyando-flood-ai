@@ -486,3 +486,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-11-02: Phase H uses the validated frame
 
 - The replay now picks its points only from the primary frame of the level validation (mappable Block A rows at locations not in the mappable training frame), reproduced in plain Python and checked against the repo's own functions in CI; the report also shows which providers were tried. No model, data or result file changed.
+
+## 2026-11-03: Phase H wrappers
+
+- Added the MCP server (src/agent/mcp_server.py) and the LangGraph chain (src/agent/graph.py) over the replay core, requirements-agent.txt (kept out of the image and the CI test job) and a manual workflow agent-check.yml that installs them in their own environment and runs their tests. No model, data or result file changed.
