@@ -1,0 +1,5 @@
+# Phase H wrappers only (register row D57): the MCP server (src/agent/mcp_server.py) and the
+# LangGraph chain (src/agent/graph.py). Never installed in production or in the CI test job;
+# the manual workflow agent-check.yml installs them in their own environment.
+mcp==2.3.0
+langgraph==1.2.16

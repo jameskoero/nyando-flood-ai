@@ -1,0 +1,28 @@
+name: agent-check
+# Phase H (register row D57): installs the MCP server and LangGraph chain packages in their own
+# environment and runs their tests. Manual only: the packages are not in the image or the CI test job.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  agent-check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
+        with:
+          python-version: "3.11"
+      - name: Install the wrapper set in its own environment
+        run: |
+          python -m venv .venv-agent
+          .venv-agent/bin/python -m pip install --retries 5 -r requirements-agent.txt pytest
+      - name: Wrapper tests
+        env:
+          AGENT_WRAPPERS_REQUIRED: "1"
+        run: .venv-agent/bin/python -m pytest -q --noconftest -p no:cacheprovider tests/test_agent_core.py tests/test_agent_wrappers.py
