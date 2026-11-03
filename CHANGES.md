@@ -503,3 +503,10 @@ This helped me discover the 2/2308 label imbalance bug documented above.
   stored results, manifests, training file and ward polygons; tests/test_dashboard_evidence.py fails if it drifts.
 - The ward map draws data/external/nyando_wards.geojson; layers with no file in the repository are listed as unavailable.
 - Service status and the model checksum are taken from the live /health and /v2/metrics responses, never assumed.
+
+## 2026-11-03: dashboard layout shift and heading contrast
+
+- Lighthouse mobile scored the dashboard 89 for performance (cumulative layout shift 0.206) and 96 for accessibility.
+- The status bar now always renders four single-line rows, so its height no longer changes when the service answers.
+- The main area reserves one screen of height so the footer starts below the fold.
+- Headings take the dashboard text colour (the Vite starter styles h1 and h2 near-black, which failed contrast on dark blue).

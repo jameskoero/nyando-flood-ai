@@ -38,11 +38,15 @@ function StatusBar({ svc, check }) {
   return (
     <ul className="status" aria-label="Service status">
       <li><span role="status">{service}</span></li>
-      {svc.status === "ok" && reg && reg.loaded && (
-        <li>Model {reg.arm}: {reg.file.replace(".onnx", "")}</li>
-      )}
-      {check && <li>{check.shaMatches ? "Checksum matches the repository manifest" : "Checksum does not match the manifest"}</li>}
-      {svc.at && <li>Verified at {svc.at.toLocaleTimeString()} on this device</li>}
+      <li>{reg && reg.loaded ? "Model " + reg.arm + ": " + reg.file.replace(".onnx", "") : "Model: not confirmed yet"}</li>
+      <li>
+        {check
+          ? check.shaMatches
+            ? "Checksum matches the repository manifest"
+            : "Checksum does not match the manifest"
+          : "Checksum: not checked yet"}
+      </li>
+      <li>{svc.at ? "Verified at " + svc.at.toLocaleTimeString() + " on this device" : "Last verified: not yet"}</li>
     </ul>
   );
 }
