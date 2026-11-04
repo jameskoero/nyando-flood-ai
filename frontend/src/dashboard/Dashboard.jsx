@@ -2,14 +2,15 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import "./dashboard.css";
 import { useEvidence, useService, verify } from "./useLive.js";
 import { Overview } from "./Overview.jsx";
-import { WardExplorer } from "./Wards.jsx";
-import { Evidence } from "./Evidence.jsx";
-import { DataInfo } from "./DataInfo.jsx";
-import { About } from "./About.jsx";
 import { Hero } from "./Hero.jsx";
 
 // The existing, tested scoring page loads only when its tab is opened, so the first screen stays light.
 const ScoreTool = lazy(() => import("../App.jsx"));
+// Only the Overview is needed at load. The other sections are fetched when their tab is opened, which keeps the first load small.
+const WardExplorer = lazy(() => import("./Wards.jsx").then((m) => ({ default: m.WardExplorer })));
+const Evidence = lazy(() => import("./Evidence.jsx").then((m) => ({ default: m.Evidence })));
+const DataInfo = lazy(() => import("./DataInfo.jsx").then((m) => ({ default: m.DataInfo })));
+const About = lazy(() => import("./About.jsx").then((m) => ({ default: m.About })));
 
 const TABS = [
   ["overview", "Overview"],
@@ -84,17 +85,13 @@ function StatusBar({ svc, check }) {
 export default function Dashboard() {
   const [tab, setTab] = useState("overview");
   const [ward, setWard] = useState(null);
-  // The decorative hero motion starts paused. It runs after the page has settled: on the first touch, scroll or key press, or after nine seconds.
+  // Decorative motion is not in the page at load. It is added on the first touch, scroll or key press, never on a timer.
   const [alive, setAlive] = useState(false);
   useEffect(() => {
     const wake = () => setAlive(true);
-    const timer = setTimeout(wake, 9000);
     const events = ["pointerdown", "keydown", "scroll"];
     events.forEach((e) => window.addEventListener(e, wake, { once: true, passive: true }));
-    return () => {
-      clearTimeout(timer);
-      events.forEach((e) => window.removeEventListener(e, wake));
-    };
+    return () => events.forEach((e) => window.removeEventListener(e, wake));
   }, []);
   const ev = useEvidence();
   const svc = useService();
@@ -118,13 +115,19 @@ export default function Dashboard() {
         </div>
       );
     else if (tab === "overview") inner = <Overview ev={ev.data} ward={ward} setWard={setWard} />;
-    else if (tab === "wards") inner = <WardExplorer ev={ev.data} ward={ward} setWard={setWard} />;
-    else if (tab === "evidence") inner = <Evidence ev={ev.data} />;
-    else if (tab === "data") inner = <DataInfo ev={ev.data} />;
-    else inner = <About ev={ev.data} check={check} />;
+    else {
+      inner = (
+        <Suspense fallback={<p className="state" role="status">Loading this section.</p>}>
+          {tab === "wards" && <WardExplorer ev={ev.data} ward={ward} setWard={setWard} />}
+          {tab === "evidence" && <Evidence ev={ev.data} />}
+          {tab === "data" && <DataInfo ev={ev.data} />}
+          {tab === "about" && <About ev={ev.data} check={check} />}
+        </Suspense>
+      );
+    }
     body = (
       <main className="nd-main" id="content">
-        {tab === "overview" && <Hero />}
+        {tab === "overview" && <Hero alive={alive} />}
         {inner}
       </main>
     );

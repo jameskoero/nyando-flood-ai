@@ -9,7 +9,7 @@ const RAIN = [4, 11, 17, 23, 30, 37, 44, 51, 58, 65, 72, 79, 86, 93];
 const DROPS = [12, 26, 41, 57, 68, 83];
 const WAVE = "M0 38 C100 6 100 70 200 38 S300 6 400 38 S500 70 600 38 S700 6 800 38 S900 70 1000 38 S1100 6 1200 38 S1300 70 1400 38 S1500 6 1600 38 L1600 80 L0 80 Z";
 
-export function Hero() {
+export function Hero({ alive }) {
   return (
     <section className="hero" aria-labelledby="hero-note">
       <div className="hero-art" aria-hidden="true">
@@ -64,18 +64,27 @@ export function Hero() {
         <circle cx="-65.9" cy="-36.6" r="4.5" fill="#cffafe" />
         <circle cx="-43.4" cy="61.6" r="5.2" fill="#cffafe" />
           </g>
+          <path d="M0 268 C100 244 200 292 300 268 S500 244 600 268 S700 292 800 268 L800 320 L0 320 Z" fill="#14e3c5" fillOpacity="0.5" />
+          <path d="M0 286 C120 262 240 310 360 286 S600 262 720 286 L800 292 L800 320 L0 320 Z" fill="#3b82f6" fillOpacity="0.55" />
+          {[60, 150, 240, 330, 420, 510, 600, 690, 760].map((x, i) => (
+            <line key={x} x1={x} x2={x - 6} y1={20 + (i % 3) * 40} y2={46 + (i % 3) * 40} stroke="#a5f3fc" strokeOpacity="0.35" strokeWidth="1.5" />
+          ))}
         </svg>
-        {RAIN.map((l, i) => (
-          <i key={l} className="rain" style={{ left: l + "%", animationDelay: (i % 7) * -0.9 + "s", animationDuration: 2.6 + (i % 4) * 0.5 + "s" }} />
-        ))}
-        {DROPS.map((l, i) => (
-          <b key={l} className={"drop " + (i % 2 ? "cy" : "cr")} style={{ left: l + "%", animationDelay: i * -1.3 + "s" }} />
-        ))}
-        {[["wave w1", 14], ["wave w2", 22], ["wave w3", 34]].map(([c, s]) => (
-          <svg key={c} className={c} viewBox="0 0 1600 80" preserveAspectRatio="none" focusable="false" style={{ animationDuration: s + "s" }}>
-            <path d={WAVE} />
-          </svg>
-        ))}
+        {alive && (
+          <>
+            {RAIN.map((l, i) => (
+              <i key={l} className="rain" style={{ left: l + "%", animationDelay: (i % 7) * -0.9 + "s", animationDuration: 2.6 + (i % 4) * 0.5 + "s" }} />
+            ))}
+            {DROPS.map((l, i) => (
+              <b key={l} className={"drop " + (i % 2 ? "cy" : "cr")} style={{ left: l + "%", animationDelay: i * -1.3 + "s" }} />
+            ))}
+            {[["wave w1", 14], ["wave w2", 22], ["wave w3", 34]].map(([c, s]) => (
+              <svg key={c} className={c} viewBox="0 0 1600 80" preserveAspectRatio="none" focusable="false" style={{ animationDuration: s + "s" }}>
+                <path d={WAVE} />
+              </svg>
+            ))}
+          </>
+        )}
       </div>
       <div className="hero-copy">
         <p className="hero-kicker">Flood susceptibility intelligence</p>

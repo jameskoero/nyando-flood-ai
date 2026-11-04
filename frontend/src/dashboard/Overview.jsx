@@ -1,5 +1,5 @@
 import { MapLegend, WardMap } from "./WardMap.jsx";
-import { WardSummary } from "./Wards.jsx";
+import { WardSummary } from "./WardSummary.jsx";
 import { UNAVAILABLE_LAYERS, f3, int, signed4 } from "./fmt.js";
 import { useState } from "react";
 
