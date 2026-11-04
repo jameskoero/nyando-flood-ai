@@ -1,5 +1,5 @@
 import { AucBars } from "./charts.jsx";
-import { WardMap } from "./WardMap.jsx";
+import { MapLegend, WardMap } from "./WardMap.jsx";
 import { WARD_FLAGS, f3, int, pct1, signed4 } from "./fmt.js";
 
 export function WardSummary({ ev, ward }) {
@@ -63,6 +63,7 @@ export function WardExplorer({ ev, ward, setWard }) {
           <section className="panel">
             <h3 className="h3">Location</h3>
             <WardMap geo={ev.geo} order={W.order} items={W.items} selected={ward} onSelect={setWard} labels={false} />
+            <MapLegend />
           </section>
           <WardSummary ev={ev} ward={ward} />
         </div>

@@ -6,6 +6,7 @@ import { WardExplorer } from "./Wards.jsx";
 import { Evidence } from "./Evidence.jsx";
 import { DataInfo } from "./DataInfo.jsx";
 import { About } from "./About.jsx";
+import { Hero } from "./Hero.jsx";
 
 // The existing, tested scoring page loads only when its tab is opened, so the first screen stays light.
 const ScoreTool = lazy(() => import("../App.jsx"));
@@ -25,6 +26,35 @@ function Logo() {
       <rect width="40" height="40" rx="6" className="logo-bg" />
       <path d="M5 16c5-6 8 6 15 0s10 6 15 0" className="logo-wave" />
       <path d="M5 25c5-6 8 6 15 0s10 6 15 0" className="logo-wave two" />
+    </svg>
+  );
+}
+
+function GradientDefs() {
+  return (
+    <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="nd-bar" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stopColor="#22d3ee" />
+          <stop offset="1" stopColor="#8b5cf6" />
+        </linearGradient>
+        <linearGradient id="nd-ward" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#12408a" />
+          <stop offset="1" stopColor="#0b2a63" />
+        </linearGradient>
+        <linearGradient id="nd-ward-on" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#14e3c5" stopOpacity="0.85" />
+          <stop offset="1" stopColor="#0e7490" stopOpacity="0.9" />
+        </linearGradient>
+        <pattern id="nd-hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+          <rect width="8" height="8" fill="#1b2f66" />
+          <line x1="0" y1="0" x2="0" y2="8" stroke="#a78bfa" strokeWidth="3" />
+        </pattern>
+        <radialGradient id="nd-mapbg" cx="0.5" cy="0.45" r="0.8">
+          <stop offset="0" stopColor="#0d2f6b" />
+          <stop offset="1" stopColor="#050b1e" />
+        </radialGradient>
+      </defs>
     </svg>
   );
 }
@@ -80,11 +110,17 @@ export default function Dashboard() {
     else if (tab === "evidence") inner = <Evidence ev={ev.data} />;
     else if (tab === "data") inner = <DataInfo ev={ev.data} />;
     else inner = <About ev={ev.data} check={check} />;
-    body = <main className="nd-main" id="content">{inner}</main>;
+    body = (
+      <main className="nd-main" id="content">
+        {tab === "overview" && <Hero />}
+        {inner}
+      </main>
+    );
   }
 
   return (
     <div className="nd">
+      <GradientDefs />
       <header className="nd-head">
         <div className="brand">
           <Logo />

@@ -510,3 +510,12 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 - The status bar now always renders four single-line rows, so its height no longer changes when the service answers.
 - The main area reserves one screen of height so the footer starts below the fold.
 - Headings take the dashboard text colour (the Vite starter styles h1 and h2 near-black, which failed contrast on dark blue).
+
+## 2026-11-04: dashboard visual theme
+
+- New look for the research dashboard: a decorative hero (crimson and cyan splashes, waves, rain and droplets, marked as illustration
+  only), colour-coded metric cards, gradient charts and a ward map filled by evaluation AUC with a legend.
+- Crimson is a brand accent. Inside the charts red is reserved for the HIGH risk class, and the ward fill uses a violet to turquoise scale.
+- Charts and the map are drawn on a phone-sized canvas so their text stays near 11 px; motion respects prefers-reduced-motion.
+- Visual layer only: figures still come from frontend/public/evidence.json, and App.jsx, the backend and the V2 core are untouched.
+  tests/test_dashboard_theme.py keeps the artwork decorative and the colour rules readable.

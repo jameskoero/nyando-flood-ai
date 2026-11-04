@@ -24,3 +24,14 @@ export const UNAVAILABLE_LAYERS = [
   "Terrain and elevation surface",
   "Spatial flood susceptibility surface",
 ];
+
+const lerp = (a, b, t) => Math.round(a + (b - a) * t);
+// Sequential violet to blue to turquoise scale for the ward fill. It avoids red, amber and green, which belong to the risk classes.
+export function aucColour(mean) {
+  const t = Math.max(0, Math.min(1, (mean - 0.5) / 0.5));
+  const lo = [91, 33, 182];
+  const mid = [59, 130, 246];
+  const hi = [20, 227, 197];
+  const [a, b, u] = t < 0.5 ? [lo, mid, t * 2] : [mid, hi, (t - 0.5) * 2];
+  return "rgb(" + lerp(a[0], b[0], u) + "," + lerp(a[1], b[1], u) + "," + lerp(a[2], b[2], u) + ")";
+}
