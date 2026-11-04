@@ -120,28 +120,14 @@ It resumes after an interruption and takes about 10 minutes. The full test suite
 
 ## API (legacy model)
 
-The deployed service serves the registered V2 model at `POST /v2/score` and `POST /v2/advisory`; the legacy `POST /predict` answers 410 Gone unless the service is started with `LEGACY_PREDICT=on` (register row D51). Interactive docs (`/docs`, `/redoc`) are disabled in production (checked live: both return 404). The registered V2 model is served at `POST /v2/score` by this code; it loads only after its SHA-256 matches `models/MANIFEST.json`, and the live service reports whether it is loaded in `GET /health`.
+The deployed service serves the registered V2 model at `POST /v2/score` and `POST /v2/advisory`; the legacy `POST /predict` was removed (register row D51). Interactive docs (`/docs`, `/redoc`) are disabled in production (checked live: both return 404). The registered V2 model is served at `POST /v2/score` by this code; it loads only after its SHA-256 matches `models/MANIFEST.json`, and the live service reports whether it is loaded in `GET /health`.
 
 - `POST /v2/score` scores one location with the registered model and returns `score`, a ranking score that is not a flood probability, with the model's hash and claim limit. It has no risk classes, because none were validated. `clay_percent` may be omitted (the response then carries a warning).
 - `GET /v2/metrics` returns the stored evaluation of the registered model: `docs/REGISTRATION.json` when it names the loaded model, otherwise `docs/PHASE_C_RESULTS.json`; 503 when neither is available.
 - `GET /health` reports both models: the legacy model's file name, SHA-256 and provenance, and `registered_model` (loaded or not, file, SHA-256, training-data hash).
 - `GET /metrics` returns validated metrics, or HTTP 503 when none are published for the served model.
-- `POST /predict` is rate-limited. The example below shows the shape only; the values are illustrative.
 
-```json
-{"elevation": 1142.5, "slope": 2.3, "rainfall_3day": 87.4, "distance_river": 320.0,
- "clay_percent": 42.1, "land_cover": 1, "ward": "Ahero"}
-```
-
-```json
-{"flood_probability": 0.87, "risk_score": 0.87, "risk_class": "CRITICAL", "prediction": 1,
- "ward": "Ahero", "model_version": "1.0.0",
- "notice": "Legacy model, not validated. Do not use for safety decisions."}
-```
-
-Status (register row D51): `POST /predict` now answers 410 Gone and points to `/v2/score` and `/v2/advisory`, unless the service is started with `LEGACY_PREDICT=on`; the example above and the classes below show what that setting returns. Every attempt is logged.
-
-Legacy risk classes (from the code): LOW below 0.35, MEDIUM 0.35 to 0.60, HIGH 0.60 to 0.80, CRITICAL 0.80 and above. The score is a legacy-model output, not a validated flood probability.
+Status (register row D51): `POST /predict` was removed from the code. It served a retracted v1 model. It answered 410 Gone from 30 October 2026, and no call was recorded after that day (Render log search to 4 November 2026).
 
 The API runs on Render's free tier, so the first request after idle can take about a minute. It stays on the free tier by the owner's decision (register row D45). Live services: [dashboard](https://nyando-flood-ai.vercel.app) and [API health](https://nyando-flood-v2.onrender.com/health).
 
@@ -172,7 +158,7 @@ tools/                                   shipping tools: ship a change as one pu
 tests/                                   A-Gate, README checks, evaluation harness, boosters, constrained logistic, registration, export, robustness and legacy tests
 docs/                                    protocols, results and records: Phase C, D20, promotion and Phase D protocols, registration record, D11 OSM check, deviation register, hardening audit
 docs/funding/                            superseded concept note
-backend/                                 FastAPI service: legacy /predict (410 Gone by default), registered ONNX model on /v2/score (backend/models/ holds the legacy model files)
+backend/                                 FastAPI service: registered ONNX model on /v2/score (backend/models/ holds the legacy model files)
 frontend/                                React dashboard
 notebooks/                               v1 notebooks (legacy)
 .github/workflows/                       ci.yml, data-gate.yml, manifest-check.yml
@@ -200,7 +186,7 @@ gee_extract_nyando.py                    v1 Earth Engine extraction script (lega
 ## Roadmap
 
 - [x] **0. Hotfix (part):** `GET /health` reports the loaded models' SHA-256, `/docs` and `/redoc` return 404 on the live service, and `GET /metrics` answers 503 when no validated metrics are published.
-- [ ] **0. Hotfix (remainder):** the per-client rate limit on `/predict` does not hold; only the shared cap does (`docs/PHASE_CLOSURE.md`; cause not established).
+- [x] **0. Hotfix (remainder):** the per-client rate limit on `/predict` did not hold; the endpoint is removed (register row D51), so nothing is left to limit.
 - [x] **A. Data integrity:** GFM-labelled dataset, A-Gate in CI, manifests, protected `main`.
 - [x] A (remainder). The OSM check of the 15 zero-distance rows is recorded (`docs/D11_OSM_CHECK.json`, register row D11). The monotonicity test is in CI; the permutation audit and the temporal holdout ran in Phase C (see the closure record), and leakage in `land_cover` is not excluded.
 - [x] **B. Experiment tracking:** MLflow on DagsHub, with the data hash logged on every run.

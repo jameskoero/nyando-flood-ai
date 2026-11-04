@@ -537,3 +537,10 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 - Large blurred glows, SVG filters and the page-tall gradients are replaced by cheap equivalents.
 - Ward Explorer, Model Evidence, Data Intelligence and About now load on demand; the first-load script is smaller than before the theme.
 - tests/test_dashboard_theme.py guards all three: nothing animated or timed at load, no expensive effects, sections lazy-loaded.
+
+## 2026-11-04: legacy POST /predict removed (register row D51, hotfix item 0)
+
+- The route that served the retracted v1 model is removed from backend/main.py with its 410 gate and its tests. Both Render services deploy from main, so it is gone on both hosts.
+- Evidence: a Render log search from 30 October 2026 found no /predict call after the gate went live that day, and a direct probe of both hosts returned 410 Gone on 4 November 2026.
+- Row D51 is closed on tests/test_legacy_predict_removed.py, and the README hotfix line is ticked: the per-client rate limit on the removed route no longer needs fixing.
+- Suspending the old host nyando-flood-api is a separate, reversible owner action.

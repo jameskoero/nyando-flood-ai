@@ -42,28 +42,6 @@ def test_metrics_unavailable_is_503_and_not_cached(api, tmp_path, monkeypatch):
     assert r2.status_code == 200 and r2.json()["note"] == "x"
 
 
-def test_predict_labels_the_legacy_model(api):
-    api.limiter.reset()
-    r = TestClient(api.app).post("/predict", json=BODY)
-    assert r.status_code == 200
-    assert "not validated" in r.json().get("notice", "").lower()
-
-
-@pytest.mark.parametrize("old,new", [("1142.5", "NaN"), ("320.0", "Infinity")])
-def test_predict_rejects_non_finite_numbers(api, old, new):
-    api.limiter.reset()
-    bad = json.dumps(BODY).replace(old, new)
-    r = TestClient(api.app).post("/predict", content=bad, headers={"content-type": "application/json"})
-    assert r.status_code == 422
-
-
-def test_predict_rate_limit_is_enforced_in_app(api):
-    api.limiter.reset()
-    c = TestClient(api.app)
-    codes = [c.post("/predict", json=BODY).status_code for _ in range(12)]
-    assert codes[0] == 200 and 429 in codes, codes
-
-
 def test_readme_api_section_matches_the_code():
     src = (REPO / "backend" / "main.py").read_text()
     readme = (REPO / "README.md").read_text()
@@ -107,20 +85,6 @@ def test_readme_reports_the_three_cv_figures():
         assert format(v, ".3f") in readme, name + " " + format(v, ".3f") + " missing from README"
 
 
-def test_predict_returns_503_when_the_model_is_not_loaded(api, monkeypatch):
-    api.limiter.reset()
-    monkeypatch.setattr(api, "model", None)
-    r = TestClient(api.app).post("/predict", json=BODY)
-    assert r.status_code == 503 and r.json().get("model_loaded") is False
-
-
-def test_ward_length_is_capped(api):
-    api.limiter.reset()
-    c = TestClient(api.app)
-    assert c.post("/predict", json=dict(BODY, ward="A" * 64)).status_code == 200
-    assert c.post("/predict", json=dict(BODY, ward="A" * 65)).status_code == 422
-
-
 def test_env_file_variants_are_gitignored():
     import subprocess
     for f in (".env", ".env.local", ".env.production", "backend/.env.local"):
@@ -133,16 +97,5 @@ def test_openapi_schema_is_not_served(api):
     assert r.status_code == 404
 
 
-def test_predict_has_a_global_cap_across_client_addresses(api):
-    api.limiter.reset()
-    codes = []
-    for i in range(api.GLOBAL_PREDICT_LIMIT + 10):
-        c = TestClient(api.app, client=('198.51.100.' + str(i % 250 + 1), 50000))
-        codes.append(c.post('/predict', json=BODY).status_code)
-    assert codes.count(200) == api.GLOBAL_PREDICT_LIMIT, codes
-    assert set(codes) <= {200, 429}, codes
-
 import os as _os  # noqa: E402
 
-# Register row D51: these tests use the legacy route as a test vehicle until its code is deleted, so they switch it on for the session; tests/test_legacy_predict_gate.py sets the variable per test.
-_os.environ.setdefault("LEGACY_PREDICT", "on")

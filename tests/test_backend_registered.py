@@ -105,12 +105,6 @@ def test_score_rejects_invalid_input(client, change):
     assert resp.status_code == 422 and "detail" in resp.json()
 
 
-def test_legacy_predict_still_works_and_stays_labelled(client):
-    body = next(p for p in _good(60) if "clay_percent" in p)
-    resp = client.post("/predict", json=body)
-    assert resp.status_code == 200 and "Legacy model, not validated" in resp.json()["notice"]
-
-
 def test_metrics_v2_matches_the_stored_results(client):
     r = client.get("/v2/metrics")
     assert r.status_code == 200
@@ -147,5 +141,3 @@ def test_protocol_section_17_exists():
 
 import os as _os  # noqa: E402
 
-# Register row D51: these tests use the legacy route as a test vehicle until its code is deleted, so they switch it on for the session; tests/test_legacy_predict_gate.py sets the variable per test.
-_os.environ.setdefault("LEGACY_PREDICT", "on")
