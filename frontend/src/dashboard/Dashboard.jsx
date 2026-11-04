@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import "./dashboard.css";
 import { useEvidence, useService, verify } from "./useLive.js";
 import { Overview } from "./Overview.jsx";
@@ -84,6 +84,18 @@ function StatusBar({ svc, check }) {
 export default function Dashboard() {
   const [tab, setTab] = useState("overview");
   const [ward, setWard] = useState(null);
+  // The decorative hero motion starts paused. It runs after the page has settled: on the first touch, scroll or key press, or after nine seconds.
+  const [alive, setAlive] = useState(false);
+  useEffect(() => {
+    const wake = () => setAlive(true);
+    const timer = setTimeout(wake, 9000);
+    const events = ["pointerdown", "keydown", "scroll"];
+    events.forEach((e) => window.addEventListener(e, wake, { once: true, passive: true }));
+    return () => {
+      clearTimeout(timer);
+      events.forEach((e) => window.removeEventListener(e, wake));
+    };
+  }, []);
   const ev = useEvidence();
   const svc = useService();
   const check = verify(svc, ev.data);
@@ -119,7 +131,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="nd">
+    <div className={"nd" + (alive ? " alive" : "")}>
       <GradientDefs />
       <header className="nd-head">
         <div className="brand">

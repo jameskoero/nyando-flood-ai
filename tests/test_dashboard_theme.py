@@ -43,3 +43,12 @@ def test_red_is_reserved_for_the_high_risk_class_inside_the_charts():
         assert not re.search(r"--(?:crimson|scarlet|blood|high)\b", rule), rule
     charts = _read("charts.jsx")
     assert charts.count("var(--high)") == 1, "only the risk-class map may use the HIGH colour"
+
+
+def test_the_hero_motion_starts_paused_and_runs_only_after_the_page_settles():
+    css = _read("dashboard.css")
+    assert re.search(r"\.nd:not\(\.alive\) \.hero-art \* \{[^}]*animation-play-state: paused", css), "idle until the page has settled"
+    dash = _read("Dashboard.jsx")
+    assert 'className={"nd" + (alive ? " alive" : "")}' in dash and "setTimeout(wake" in dash
+    for event in ("pointerdown", "keydown", "scroll"):
+        assert event in dash

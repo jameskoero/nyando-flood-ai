@@ -519,3 +519,11 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 - Charts and the map are drawn on a phone-sized canvas so their text stays near 11 px; motion respects prefers-reduced-motion.
 - Visual layer only: figures still come from frontend/public/evidence.json, and App.jsx, the backend and the V2 core are untouched.
   tests/test_dashboard_theme.py keeps the artwork decorative and the colour rules readable.
+
+## 2026-11-04: hero motion starts paused
+
+- Lighthouse mobile scored the themed dashboard 85 for performance. Speed Index, LCP, FCP and layout shift were fine; Total Blocking
+  Time was 580 ms, which came from the looping hero animation keeping the main thread busy after load.
+- The decorative hero motion now starts paused (the scene is still drawn) and runs after the first touch, scroll or key press, or after
+  nine seconds. Measured in a browser: 1 ms of main-thread work in a 4-second window at load, against 99 ms with the motion running.
+- tests/test_dashboard_theme.py checks that the motion starts paused and wakes only on those triggers. Visual layer only.

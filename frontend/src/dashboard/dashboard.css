@@ -145,12 +145,13 @@
 .nd-foot { border-top: 1px solid var(--line); padding: 14px 16px; color: var(--muted); font-size: 0.82rem; background-color: var(--ink); }
 .nd-foot p { max-width: 1180px; margin: 0 auto; }
 
-/* Motion: transform and opacity only, so nothing shifts the layout */
+/* Motion: transform and opacity only, so nothing shifts the layout. The hero motion starts paused and runs once the page has settled (see .alive). */
 @keyframes nd-wave { to { transform: translateX(-50%); } }
 @keyframes nd-fall { from { transform: translateY(0); } to { transform: translateY(380px); } }
 @keyframes nd-drip { 0% { transform: translateY(0); opacity: 0; } 12% { opacity: 0.95; } 100% { transform: translateY(300px); opacity: 0; } }
 @keyframes nd-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.035); } }
 @keyframes nd-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.nd:not(.alive) .hero-art * { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) { .nd *, .nd *::before, .nd *::after { animation: none !important; transition: none !important; } }
 
 /* The Vite starter styles h1 and h2 near-black and centres #root in a white column; the dashboard overrides both. */
