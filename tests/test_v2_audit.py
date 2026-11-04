@@ -46,8 +46,8 @@ def test_readme_api_section_matches_the_code():
     src = (REPO / "backend" / "main.py").read_text()
     readme = (REPO / "README.md").read_text()
     for t in ("0.35", "0.60", "0.80"):
-        assert ("prob < " + t) in src and t in readme, t
-    assert "CRITICAL" in readme
+        assert ("prob < " + t) not in src, t
+    assert "Legacy risk classes (from the code)" not in readme
     assert "risk_label" not in readme or "risk_label" in src
 
 
