@@ -146,7 +146,7 @@ The advantage is not demonstrated under the buffered split or out of time (the i
 - A blank clay value is informative in the training data, so scores without clay are not comparable with scores that include it.
 
 ## Legacy model
-`models/nyando_xgb_v1.pkl` (SHA-256 `de0e721c808b72730658880337f5f40cb88172f01186eb9e3908e527d6e31bb5`) is the pre-V2 model behind `POST /predict`. Its published figures were retracted (circular evaluation). No validated performance exists for it, and its risk classes were never validated. It is retired in Phase F.
+`models/nyando_xgb_v1.pkl` (SHA-256 `de0e721c808b72730658880337f5f40cb88172f01186eb9e3908e527d6e31bb5`) was the pre-V2 model behind `POST /predict`, which was removed (register row D51). Its published figures were retracted (circular evaluation). No validated performance exists for it, and its risk classes were never validated. It is retired in Phase F.
 
 ## Citation
 Koero, J. O. (2026). Nyando Flood AI. https://github.com/jameskoero/nyando-flood-ai. Model card format: Mitchell et al. (2019).

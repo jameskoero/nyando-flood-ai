@@ -22,4 +22,4 @@ def test_the_stage_0_tick_follows_the_protocol_file_and_the_mlp_tick_follows_a_r
 
 def test_the_hotfix_lines_state_what_was_checked_and_what_is_open():
     assert "`/docs` and `/redoc` return 404 on the live service" in README
-    assert "- [ ] **0. Hotfix (remainder):**" in README and "per-client rate limit" in README
+    assert "- [x] **0. Hotfix (remainder):**" in README and "per-client rate limit" in README

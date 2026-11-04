@@ -134,14 +134,6 @@ def _load_metrics():
         return data
     return None
 
-class FloodInput(BaseModel):
-    elevation: float = Field(allow_inf_nan=False)
-    slope: float = Field(allow_inf_nan=False)
-    rainfall_3day: float = Field(allow_inf_nan=False)
-    distance_river: float = Field(allow_inf_nan=False)
-    clay_percent: float = Field(allow_inf_nan=False)
-    land_cover: float = Field(allow_inf_nan=False)
-    ward: str = Field(default="Unknown", max_length=64)
 
 @app.get("/health")
 def health():
@@ -165,44 +157,6 @@ def metrics():
     out["model_sha256"] = MODEL_SHA256
     out["cache_ttl_seconds"] = _METRICS_TTL
     return out
-
-def _legacy_gate(request: Request):
-    """Register row D51: the legacy /predict answers 410 Gone unless the service is started with LEGACY_PREDICT=on. Every attempt is logged, without the caller's address, so the Render logs show whether anyone still calls it."""
-    import logging
-    on = os.environ.get("LEGACY_PREDICT", "off").strip().lower() == "on"
-    logging.getLogger("nyando.legacy").warning("legacy_predict_attempt enabled=%s", on)
-    if not on:
-        raise HTTPException(
-            status_code=410,
-            detail={"error": "gone", "message": "POST /predict served a retracted v1 model and has been retired; use POST /v2/score (a ranking score) or POST /v2/advisory.", "use": ["/v2/score", "/v2/advisory"]},
-            headers={"Link": '</v2/score>; rel="successor-version"'},
-        )
-
-
-@app.post("/predict", dependencies=[Depends(_legacy_gate)])
-@limiter.limit("10/minute")
-@limiter.limit(str(GLOBAL_PREDICT_LIMIT) + "/minute", key_func=_global_key)
-def predict(request: Request, data: FloodInput):
-    if model is None:
-        return JSONResponse(status_code=503, content={"error": "Model not loaded", "model_loaded": False})
-    X = [[data.elevation, data.slope, data.rainfall_3day,
-          data.distance_river, data.clay_percent, data.land_cover]]
-    prob = float(model.predict_proba(X)[0][1])
-    pred = int(model.predict(X)[0])
-    if prob < 0.35:   risk = "LOW"
-    elif prob < 0.60: risk = "MEDIUM"
-    elif prob < 0.80: risk = "HIGH"
-    else:             risk = "CRITICAL"
-    return {
-        "flood_probability": round(prob, 4),
-        "risk_score": round(prob, 4),
-        "risk_class": risk,
-        "prediction": pred,
-        "ward": data.ward,
-        "model_version": "1.0.0",
-        "notice": "Legacy model, not validated. Do not use for safety decisions."
-    }
-
 
 
 # ---- Registered Phase C model: POST /v2/score and GET /v2/metrics (docs/PHASE_C_PROTOCOL.md Section 17, register rows D9 and D33) ----

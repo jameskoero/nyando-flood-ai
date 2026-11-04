@@ -27,9 +27,11 @@ def test_d35_and_d50_are_closed_on_tests_that_exist():
         assert name in _functions(ROOT / rel), (row_id, name)
 
 
-def test_d51_records_the_legacy_endpoint_as_an_open_row():
+def test_d51_is_closed_on_a_test_that_exists():
     cells = _cells("D51")
-    assert cells[1] == "Open" and cells[6] == "open" and cells[5].startswith("open:") and "/predict" in cells[3]
+    assert cells[1] == "Open" and cells[6] == "closed" and cells[5].startswith("tests/") and "/predict" in cells[3]
+    rel, name = cells[5].split("::")
+    assert name in _functions(ROOT / rel)
 
 
 def test_the_readme_names_the_v2_host_and_not_the_old_one():

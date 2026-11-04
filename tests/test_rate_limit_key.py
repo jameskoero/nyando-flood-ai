@@ -29,7 +29,14 @@ def test_clients_behind_one_proxy_get_different_keys_and_one_client_keeps_its_ke
 
 
 def test_the_limiter_uses_the_client_key_and_every_limited_route_keeps_both_limits():
+    import ast
     src = (ROOT / "backend" / "main.py").read_text(encoding="utf-8")
     assert "Limiter(key_func=_client_key)" in src and "Limiter(key_func=get_remote_address)" not in src
-    assert src.count("key_func=_global_key") >= 3
-    assert '@limiter.limit("10/minute")' in src and '@limiter.limit("5/minute")' in src
+    assert '@limiter.limit("5/minute")' in src
+    assert '@limiter.limit("10/minute")' in src
+    def limits(fn):
+        return [d for d in fn.decorator_list if isinstance(d, ast.Call) and getattr(d.func, "attr", "") == "limit"]
+    routes = [n for n in ast.walk(ast.parse(src)) if isinstance(n, ast.FunctionDef) and limits(n)]
+    assert {"score_v2", "advisory_v2"} <= {n.name for n in routes}, [n.name for n in routes]
+    for n in routes:
+        assert len(limits(n)) == 2 and any(k.arg == "key_func" for d in limits(n) for k in d.keywords), n.name
