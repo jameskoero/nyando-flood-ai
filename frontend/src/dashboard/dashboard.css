@@ -11,6 +11,8 @@
     radial-gradient(900px 520px at 90% -8%, rgba(34, 211, 238, 0.2), transparent 60%),
     radial-gradient(800px 480px at -8% 28%, rgba(225, 29, 72, 0.17), transparent 58%),
     radial-gradient(700px 420px at 60% 105%, rgba(139, 92, 246, 0.14), transparent 60%);
+  background-repeat: no-repeat;
+  background-size: 100% 760px;
   color: var(--text); text-align: left; min-height: 100vh;
   font-family: "IBM Plex Sans", Inter, system-ui, "Segoe UI", Roboto, sans-serif; line-height: 1.5;
   display: block; width: 100%; box-sizing: border-box;
@@ -35,15 +37,16 @@
 .nd-nav { display: flex; gap: 6px; overflow-x: auto; padding: 8px 12px; background-color: var(--bg2); border-bottom: 1px solid var(--line); }
 .tab { flex: 0 0 auto; background: transparent; color: var(--muted); border: 1px solid transparent; border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 0.9rem; cursor: pointer; min-height: 44px; transition: background-color 0.2s, color 0.2s, border-color 0.2s; }
 .tab:hover { color: var(--text); background-color: rgba(34, 211, 238, 0.12); }
-.tab.on { color: #031a24; font-weight: 600; background-image: linear-gradient(90deg, var(--cyan), var(--teal)); background-color: var(--cyan); border-color: transparent; box-shadow: 0 0 16px rgba(34, 211, 238, 0.45); }
+.tab.on { color: #031a24; font-weight: 600; background-image: linear-gradient(90deg, var(--cyan), var(--teal)); background-color: var(--cyan); border-color: transparent; box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.35); }
 .nd button:focus-visible, .nd input:focus-visible, .nd [role="button"]:focus-visible, .nd a:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
 
 /* Hero */
 .nd-main { max-width: 1180px; margin: 0 auto; padding: 16px; min-height: 100vh; }
-.hero { position: relative; overflow: hidden; border-radius: 14px; border: 1px solid #355ba8; margin: 0 0 18px; min-height: 360px; background-color: #0a2a66; box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(225, 29, 72, 0.25); contain: paint; }
+.hero { position: relative; overflow: hidden; border-radius: 14px; border: 1px solid #355ba8; margin: 0 0 18px; min-height: 360px; background-color: #0a2a66; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(225, 29, 72, 0.3); contain: paint; }
 .hero-art { position: absolute; inset: 0; }
 .hero-art > svg:first-child { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-.splash-a { animation: nd-pulse 7s ease-in-out infinite; transform-origin: 0 0; }
+.splash-a { transform-origin: 0 0; }
+.nd.alive .splash-a { animation: nd-pulse 7s ease-in-out infinite; }
 .splash-b { opacity: 0.9; }
 .hero-art .rain { position: absolute; top: -30px; width: 1.5px; height: 26px; background: linear-gradient(180deg, transparent, rgba(165, 243, 252, 0.8)); animation: nd-fall linear infinite; opacity: 0.55; }
 .hero-art .drop { position: absolute; top: -12px; width: 8px; height: 11px; border-radius: 60% 60% 70% 70%; animation: nd-drip 6.5s ease-in infinite; }
@@ -55,7 +58,7 @@
 .hero-art .w3 { fill: rgba(59, 130, 246, 0.5); bottom: -18px; height: 52px; }
 .hero-copy { position: relative; z-index: 1; padding: 22px 18px 160px; background-image: linear-gradient(180deg, rgba(5, 11, 30, 0.92) 0%, rgba(5, 11, 30, 0.78) 48%, rgba(5, 11, 30, 0) 72%); }
 .hero-kicker { margin: 0 0 6px; color: var(--teal); font-size: 0.78rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; }
-.hero-title { margin: 0; font-size: clamp(1.5rem, 6.3vw, 2.7rem); line-height: 1.05; font-weight: 800; letter-spacing: 0.5px; color: #fff; text-shadow: 0 0 18px rgba(34, 211, 238, 0.45), 0 2px 0 rgba(159, 18, 57, 0.8); }
+.hero-title { margin: 0; font-size: clamp(1.5rem, 6.3vw, 2.7rem); line-height: 1.05; font-weight: 800; letter-spacing: 0.5px; color: #fff; text-shadow: 0 2px 0 rgba(159, 18, 57, 0.85); }
 .hero-title span { color: var(--cyan); }
 .hero-line { margin: 10px 0 0; color: #e6eefb; font-size: 1rem; max-width: 46ch; }
 .hero-note { margin: 8px 0 0; color: var(--muted); font-size: 0.78rem; }
@@ -71,22 +74,22 @@
 
 /* KPI cards: each has its own colour */
 .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 18px; }
-.kpi { --ar: 34, 211, 238; position: relative; overflow: hidden; background-color: var(--panel); background-image: linear-gradient(150deg, rgba(var(--ar), 0.26), rgba(12, 33, 80, 0.96) 62%); border: 1px solid rgba(var(--ar), 0.55); border-radius: 12px; padding: 14px 12px 12px; min-height: 118px; box-shadow: 0 10px 28px rgba(var(--ar), 0.16); animation: nd-rise 0.6s ease-out both; }
+.kpi { --ar: 34, 211, 238; position: relative; overflow: hidden; background-color: var(--panel); background-image: linear-gradient(150deg, rgba(var(--ar), 0.26), rgba(12, 33, 80, 0.96) 62%); border: 1px solid rgba(var(--ar), 0.6); border-radius: 12px; padding: 14px 12px 12px; min-height: 118px; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3); }
 .kpi::before { content: ""; position: absolute; left: 0; top: 0; right: 0; height: 4px; background: linear-gradient(90deg, rgb(var(--ar)), transparent); }
-.kpi.t1 { --ar: 34, 211, 238; } .kpi.t2 { --ar: 20, 227, 197; animation-delay: 0.06s; } .kpi.t3 { --ar: 167, 139, 250; animation-delay: 0.12s; }
-.kpi.t4 { --ar: 251, 146, 60; animation-delay: 0.18s; } .kpi.t5 { --ar: 225, 29, 72; animation-delay: 0.24s; } .kpi.t6 { --ar: 59, 130, 246; animation-delay: 0.3s; }
-.kpi-v { font-size: 1.75rem; font-weight: 700; color: #fff; font-variant-numeric: tabular-nums; text-shadow: 0 0 14px rgba(var(--ar), 0.6); }
+.kpi.t1 { --ar: 34, 211, 238; } .kpi.t2 { --ar: 20, 227, 197; } .kpi.t3 { --ar: 167, 139, 250; }
+.kpi.t4 { --ar: 251, 146, 60; } .kpi.t5 { --ar: 225, 29, 72; } .kpi.t6 { --ar: 59, 130, 246; }
+.kpi-v { font-size: 1.75rem; font-weight: 700; color: #fff; font-variant-numeric: tabular-nums; }
 .kpi-l { font-size: 0.86rem; color: var(--text); }
 .kpi-n { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
 
 /* Panels */
 .split { display: grid; gap: 12px; grid-template-columns: 1fr; margin-bottom: 12px; }
 @media (min-width: 900px) { .split { grid-template-columns: 1.7fr 1fr; } .nd-head { grid-template-columns: 1fr auto; align-items: center; } .hero { min-height: 330px; } .hero-copy { padding: 34px 32px 90px; max-width: 660px; background-image: linear-gradient(90deg, rgba(5, 11, 30, 0.9) 0%, rgba(5, 11, 30, 0.78) 72%, rgba(5, 11, 30, 0) 100%); } }
-.panel { position: relative; overflow: hidden; background-color: var(--panel); background-image: linear-gradient(165deg, rgba(20, 52, 120, 0.9), rgba(10, 29, 71, 0.96)); border: 1px solid var(--line); border-radius: 12px; padding: 16px 14px 14px; margin-bottom: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06); transition: border-color 0.25s, box-shadow 0.25s; }
+.panel { position: relative; overflow: hidden; background-color: var(--panel); background-image: linear-gradient(165deg, rgba(20, 52, 120, 0.9), rgba(10, 29, 71, 0.96)); border: 1px solid var(--line); border-radius: 12px; padding: 16px 14px 14px; margin-bottom: 12px; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35); transition: border-color 0.25s; }
 .panel::before { content: ""; position: absolute; left: 0; top: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cyan), var(--violet2)); }
 .nd-main > div > .panel:nth-of-type(3n + 2)::before, .split .panel:nth-of-type(2n)::before { background: linear-gradient(90deg, var(--violet2), var(--crimson)); }
 .nd-main > div > .panel:nth-of-type(3n)::before { background: linear-gradient(90deg, var(--teal), var(--cyan)); }
-.panel:hover { border-color: rgba(34, 211, 238, 0.7); box-shadow: 0 12px 34px rgba(0, 0, 0, 0.4), 0 0 22px rgba(34, 211, 238, 0.18); }
+.panel:hover { border-color: rgba(34, 211, 238, 0.75); }
 .chart, .map { width: 100%; max-width: 520px; height: auto; display: block; margin: 0 auto; }
 
 /* Map */
@@ -94,7 +97,7 @@
 .mapbg { fill: url(#nd-mapbg); }
 .ward { stroke: #0a1d47; stroke-width: 1.5px; vector-effect: non-scaling-stroke; cursor: pointer; transition: filter 0.2s; }
 .ward:hover { filter: brightness(1.35); }
-.ward.on { stroke: #fff; stroke-width: 3px; filter: drop-shadow(0 0 8px rgba(255, 77, 94, 0.95)) drop-shadow(0 0 3px #fff); }
+.ward.on { stroke: #fff; stroke-width: 3.5px; }
 .wardlabel { fill: #fff; font-size: 12px; pointer-events: none; font-weight: 600; }
 .north { fill: var(--cyan); }
 .scalebar { stroke: var(--cyan); stroke-width: 2; }
@@ -107,7 +110,7 @@
 .zero { stroke: var(--amber); stroke-width: 1.5; stroke-dasharray: 4 4; }
 .bar { fill: url(#nd-bar); }
 .whisker { stroke: #e8f0ff; stroke-width: 2; }
-.whisker.ok { stroke: var(--teal); stroke-width: 3.5; filter: drop-shadow(0 0 4px rgba(20, 227, 197, 0.8)); }
+.whisker.ok { stroke: var(--teal); stroke-width: 3.5; }
 .whisker.no { stroke: var(--violet); stroke-width: 3; }
 .dot.ok { fill: var(--teal); } .dot.no { fill: var(--violet); }
 .rowbg { fill: transparent; }
@@ -145,13 +148,11 @@
 .nd-foot { border-top: 1px solid var(--line); padding: 14px 16px; color: var(--muted); font-size: 0.82rem; background-color: var(--ink); }
 .nd-foot p { max-width: 1180px; margin: 0 auto; }
 
-/* Motion: transform and opacity only, so nothing shifts the layout. The hero motion starts paused and runs once the page has settled (see .alive). */
+/* Motion: transform and opacity only, so nothing shifts the layout. Animated layers are mounted only after the first interaction (see .alive). */
 @keyframes nd-wave { to { transform: translateX(-50%); } }
 @keyframes nd-fall { from { transform: translateY(0); } to { transform: translateY(380px); } }
 @keyframes nd-drip { 0% { transform: translateY(0); opacity: 0; } 12% { opacity: 0.95; } 100% { transform: translateY(300px); opacity: 0; } }
 @keyframes nd-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.035); } }
-@keyframes nd-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-.nd:not(.alive) .hero-art * { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) { .nd *, .nd *::before, .nd *::after { animation: none !important; transition: none !important; } }
 
 /* The Vite starter styles h1 and h2 near-black and centres #root in a white column; the dashboard overrides both. */

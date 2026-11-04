@@ -45,10 +45,22 @@ def test_red_is_reserved_for_the_high_risk_class_inside_the_charts():
     assert charts.count("var(--high)") == 1, "only the risk-class map may use the HIGH colour"
 
 
-def test_the_hero_motion_starts_paused_and_runs_only_after_the_page_settles():
-    css = _read("dashboard.css")
-    assert re.search(r"\.nd:not\(\.alive\) \.hero-art \* \{[^}]*animation-play-state: paused", css), "idle until the page has settled"
-    dash = _read("Dashboard.jsx")
-    assert 'className={"nd" + (alive ? " alive" : "")}' in dash and "setTimeout(wake" in dash
+def test_no_animation_exists_at_load_and_motion_never_runs_on_a_timer():
+    css, dash, hero = _read("dashboard.css"), _read("Dashboard.jsx"), _read("Hero.jsx")
+    assert re.search(r"\.splash-a \{[^}]*\}", css) and "animation" not in re.search(r"\.splash-a \{([^}]*)\}", css).group(1)
+    assert re.search(r"\.nd\.alive \.splash-a \{[^}]*animation: nd-pulse", css)
+    assert "alive && (" in hero, "rain, droplets and moving waves are mounted only once the page is alive"
+    assert 'className={"nd" + (alive ? " alive" : "")}' in dash and "<Hero alive={alive} />" in dash
+    assert "setTimeout" not in dash and "setInterval" not in dash, "no timer may wake the motion"
     for event in ("pointerdown", "keydown", "scroll"):
         assert event in dash
+
+
+def test_the_first_load_stays_cheap():
+    css, dash = _read("dashboard.css"), _read("Dashboard.jsx")
+    for expensive in ("drop-shadow", "blur(", "backdrop-filter", "mix-blend-mode"):
+        assert expensive not in css, expensive
+    assert "background-size: 100% 760px" in css, "the page gradient is one short tile, not page-tall"
+    for lazy_section in ("Wards.jsx", "Evidence.jsx", "DataInfo.jsx", "About.jsx"):
+        assert 'lazy(() => import("./' + lazy_section + '")' in dash, lazy_section + " must load on demand"
+    assert 'import { Overview } from "./Overview.jsx"' in dash

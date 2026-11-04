@@ -527,3 +527,13 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 - The decorative hero motion now starts paused (the scene is still drawn) and runs after the first touch, scroll or key press, or after
   nine seconds. Measured in a browser: 1 ms of main-thread work in a 4-second window at load, against 99 ms with the motion running.
 - tests/test_dashboard_theme.py checks that the motion starts paused and wakes only on those triggers. Visual layer only.
+
+## 2026-11-04: cheaper first load for the dashboard
+
+- Lighthouse mobile scored the themed dashboard 85 and then 80 (gate 90); Total Blocking Time was the weak metric while Speed Index,
+  LCP and layout shift were fine.
+- No animation exists at load: rain, droplets and moving waves are mounted only after the first touch, scroll or key press and never on a
+  timer; the still hero scene (splashes, waves, droplets) is unchanged to the eye.
+- Large blurred glows, SVG filters and the page-tall gradients are replaced by cheap equivalents.
+- Ward Explorer, Model Evidence, Data Intelligence and About now load on demand; the first-load script is smaller than before the theme.
+- tests/test_dashboard_theme.py guards all three: nothing animated or timed at load, no expensive effects, sections lazy-loaded.
