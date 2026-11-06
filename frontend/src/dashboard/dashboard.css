@@ -233,3 +233,7 @@ body:has(.nd) { background: #f2f4fa; }
 .pill { fill: #ffffff; fill-opacity: 0.92; }
 .track { fill: #e1e6f6; }
 .chart .val, .chart .sub, .chart .lab, .chart .tick { paint-order: stroke; stroke: #f2f4fa; stroke-width: 3.5px; stroke-linejoin: round; }
+
+/* Redesign Nov 2026 (3): system fonts until self-hosted fonts pass the Lighthouse gate. */
+.nd { --display: system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; --display-weight: 700; font-family: system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+.nd h1, .nd h2, .nd h3, .nd-head .title { font-weight: var(--display-weight); }
