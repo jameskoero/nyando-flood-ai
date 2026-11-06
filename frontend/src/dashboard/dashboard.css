@@ -169,37 +169,56 @@ body:has(.nd) { background: #050b1e; }
 .scalebar { vector-effect: non-scaling-stroke; }
 .chart .val, .chart .sub, .chart .lab, .chart .tick { paint-order: stroke; stroke: #0f2a60; stroke-width: 3.5px; stroke-linejoin: round; }
 
-/* Redesign Nov 2026: cobalt and navy on a light sheet. Values only; no class or variable name changed. */
+/* ==== Dashboard theme: cobalt and navy on a light sheet (Nov 2026) ====
+   One block, last in the file. Values only: no class, variable or markup name changes.
+   The tokens describe LIGHT surfaces; dark surfaces (header, hero, footer) re-scope them below. */
 .nd {
   --ink: #0c1445; --bg: #f2f4fa; --bg2: #ffffff; --panel: #ffffff; --line: #d3d9ea;
   --cyan: #2339f5; --teal: #1b2bc9; --blue: #5e78ff; --violet: #5e78ff; --violet2: #8da3ff;
   --crimson: #b34700; --scarlet: #b34700; --blood: #8a3700; --amber: #b34700; --orange: #b34700;
   --text: #0c1445; --muted: #4b5478;
   --low: #5e78ff; --med: #2339f5; --high: #0c1445;
-  --display: "Special Gothic Expanded One", "Source Sans 3", system-ui, sans-serif;
+  --display: system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; --display-weight: 700;
   background-color: var(--bg); background-image: none;
-  font-family: "Source Sans 3", system-ui, "Segoe UI", Roboto, sans-serif;
+  font-family: system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
-.nd h1, .nd h2, .nd h3 { font-family: var(--display); font-weight: 400; letter-spacing: -0.01em; }
+body:has(.nd) { background: #f2f4fa; }
+.nd h1, .nd h2, .nd h3 { font-family: var(--display); font-weight: var(--display-weight); letter-spacing: -0.01em; }
 .nd h4 { font-family: inherit; font-weight: 700; }
-.nd-head { background-color: #2339f5; background-image: none; --text: #ffffff; --muted: #dfe5ff; --teal: #ffd84a; }
+.nd button:focus-visible, .nd input:focus-visible, .nd [role="button"]:focus-visible, .nd a:focus-visible { outline: 3px solid #2339f5; outline-offset: 2px; }
+
+/* dark surfaces: header, hero and footer use the light-on-dark token set */
+.nd-head, .nd .hero, .nd-foot { --text: #ffffff; --muted: #dfe5ff; --cyan: #9ed8ff; --teal: #ffd84a; --blue: #9bb0ff; --violet: #9bb0ff; --violet2: #c2cfff; --crimson: #ffd84a; --scarlet: #ffd84a; }
+.nd-head a:focus-visible, .nd-head button:focus-visible, .nd-foot a:focus-visible { outline-color: #ffd84a; }
+.nd-head { background-color: #2339f5; background-image: none; }
 .nd-head::after { background: #ffd84a; }
-.nd-head .title { font-family: var(--display); font-weight: 400; letter-spacing: -0.01em; font-size: 1.35rem; }
+.nd-head .title { font-size: 1.35rem; }
 .nd-head .tag { text-transform: none; letter-spacing: 0; font-size: 0.9rem; font-weight: 600; color: #ffd84a; }
 .nd-head .logo-bg { fill: #1b2bc9; stroke: #ffffff; }
 .nd-head .logo-wave { stroke: #ffd84a; }
 .nd-head .logo-wave.two { stroke: #ffffff; }
+.nd-foot { background-color: #0c1445; }
+
+/* navigation */
 .nd-nav { background-color: #ffffff; border-bottom: 1px solid var(--line); }
 .nd .tab { border-radius: 4px; color: var(--muted); }
 .nd .tab:hover { color: var(--text); background-color: rgba(35, 57, 245, 0.08); }
 .nd .tab.on { color: #ffffff; background-image: none; background-color: #2339f5; font-weight: 700; box-shadow: none; }
-.nd button:focus-visible, .nd input:focus-visible, .nd [role="button"]:focus-visible, .nd a:focus-visible { outline: 3px solid #2339f5; outline-offset: 2px; }
-.nd-head a:focus-visible, .nd-head button:focus-visible { outline-color: #ffd84a; }
-/* the hero is a decorative illustration: its own palette on navy */
-.nd .hero { background-color: #0c1445; border: 1px solid #0c1445; box-shadow: none; --cyan: #9ed8ff; --teal: #ffd84a; --blue: #9bb0ff; --violet: #9bb0ff; --violet2: #c2cfff; --crimson: #ffd84a; --scarlet: #ffd84a; --text: #ffffff; --muted: #c9d1ff; }
 
-/* Redesign Nov 2026 (2): cards, tables, charts and the map on the light sheet. Values only. */
-body:has(.nd) { background: #f2f4fa; }
+/* hero: cobalt block; artwork stays decorative and aria-hidden, animated parts hidden */
+.nd .hero { background-color: #2339f5; border: 1px solid #2339f5; min-height: 0; box-shadow: none; border-radius: 6px; }
+.hero-art > svg:first-child, .hero-art .rain, .hero-art .drop { display: none; }
+.hero-art .wave { animation: none; transform: none; }
+.hero-art .w1 { fill: rgba(255, 255, 255, 0.1); }
+.hero-art .w2 { fill: rgba(255, 255, 255, 0.07); }
+.hero-art .w3 { fill: rgba(255, 255, 255, 0.05); }
+.hero-copy { background-image: none; padding: 28px 22px 84px; }
+.hero-kicker { text-transform: none; letter-spacing: 0; font-size: 0.95rem; font-weight: 600; color: #ffd84a; }
+.hero-title { display: none; }
+.hero-line { color: #ffffff; font-family: var(--display); font-weight: var(--display-weight); font-size: clamp(1.6rem, 5.4vw, 2.7rem); line-height: 1.1; max-width: 20ch; margin: 6px 0 0; }
+.hero-note { color: #dfe5ff; font-size: 0.9rem; max-width: 52ch; }
+
+/* cards, notices, tables, buttons */
 .notice { background-color: #e9eeff; border-left-color: #2339f5; }
 .flag { background-color: #fff1e5; border-left-color: #b34700; }
 .panel { background-image: none; box-shadow: none; }
@@ -214,6 +233,15 @@ body:has(.nd) { background: #f2f4fa; }
 .kpi.t5 { --ar: 12, 20, 69; }
 .kpi.t6 { --ar: 141, 163, 255; }
 .kpi-v { color: var(--text); }
+.nd th, .nd td { border-bottom-color: #d3d9ea; }
+.nd thead th { color: var(--text); background-color: #e9eeff; }
+.nd tbody tr:hover { background-color: rgba(35, 57, 245, 0.06); }
+.dl dt { color: var(--muted); }
+.profile img { border-color: #2339f5; box-shadow: none; }
+.btn { background-image: none; background-color: #2339f5; color: #ffffff; }
+.btn:hover { background-color: #1b2bc9; }
+
+/* map and charts */
 .ward { stroke: #ffffff; }
 .ward.on { stroke: #b34700; stroke-width: 4px; }
 .wardlabel { fill: #ffffff; paint-order: stroke; stroke: #0c1445; stroke-width: 3px; stroke-linejoin: round; }
@@ -222,31 +250,7 @@ body:has(.nd) { background: #f2f4fa; }
 .whisker.ok { stroke: #2339f5; }
 .whisker.no { stroke: #4b5478; }
 .rowbtn.on .rowbg { fill: rgba(35, 57, 245, 0.1); }
-.nd th, .nd td { border-bottom-color: #d3d9ea; }
-.nd thead th { color: var(--text); background-color: #e9eeff; }
-.nd tbody tr:hover { background-color: rgba(35, 57, 245, 0.06); }
-.dl dt { color: var(--muted); }
-.profile img { border-color: #2339f5; box-shadow: none; }
-.btn { background-image: none; background-color: #2339f5; color: #ffffff; }
-.btn:hover { background-color: #1b2bc9; }
 .legend-bar { background: linear-gradient(90deg, #5e78ff, #2339f5, #0c1445); }
 .pill { fill: #ffffff; fill-opacity: 0.92; }
 .track { fill: #e1e6f6; }
 .chart .val, .chart .sub, .chart .lab, .chart .tick { paint-order: stroke; stroke: #f2f4fa; stroke-width: 3.5px; stroke-linejoin: round; }
-
-/* Redesign Nov 2026 (3): system fonts until self-hosted fonts pass the Lighthouse gate. */
-.nd { --display: system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; --display-weight: 700; font-family: system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-.nd h1, .nd h2, .nd h3, .nd-head .title { font-weight: var(--display-weight); }
-
-/* Redesign Nov 2026 (4): hero on cobalt. Artwork stays decorative and aria-hidden; the animated parts are hidden. */
-.nd .hero { background-color: #2339f5; border: 1px solid #2339f5; min-height: 0; box-shadow: none; border-radius: 6px; }
-.hero-art > svg:first-child, .hero-art .rain, .hero-art .drop { display: none; }
-.hero-art .wave { animation: none; transform: none; }
-.hero-art .w1 { fill: rgba(255, 255, 255, 0.1); }
-.hero-art .w2 { fill: rgba(255, 255, 255, 0.07); }
-.hero-art .w3 { fill: rgba(255, 255, 255, 0.05); }
-.hero-copy { background-image: none; padding: 28px 22px 84px; }
-.hero-kicker { text-transform: none; letter-spacing: 0; font-size: 0.95rem; font-weight: 600; color: #ffd84a; }
-.hero-title { display: none; }
-.hero-line { color: #ffffff; font-family: var(--display); font-weight: var(--display-weight); font-size: clamp(1.6rem, 5.4vw, 2.7rem); line-height: 1.1; max-width: 20ch; margin: 6px 0 0; }
-.hero-note { color: #dfe5ff; font-size: 0.9rem; max-width: 52ch; }
