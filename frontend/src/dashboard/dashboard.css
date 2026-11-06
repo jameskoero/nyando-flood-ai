@@ -237,3 +237,16 @@ body:has(.nd) { background: #f2f4fa; }
 /* Redesign Nov 2026 (3): system fonts until self-hosted fonts pass the Lighthouse gate. */
 .nd { --display: system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; --display-weight: 700; font-family: system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
 .nd h1, .nd h2, .nd h3, .nd-head .title { font-weight: var(--display-weight); }
+
+/* Redesign Nov 2026 (4): hero on cobalt. Artwork stays decorative and aria-hidden; the animated parts are hidden. */
+.nd .hero { background-color: #2339f5; border: 1px solid #2339f5; min-height: 0; box-shadow: none; border-radius: 6px; }
+.hero-art > svg:first-child, .hero-art .rain, .hero-art .drop { display: none; }
+.hero-art .wave { animation: none; transform: none; }
+.hero-art .w1 { fill: rgba(255, 255, 255, 0.1); }
+.hero-art .w2 { fill: rgba(255, 255, 255, 0.07); }
+.hero-art .w3 { fill: rgba(255, 255, 255, 0.05); }
+.hero-copy { background-image: none; padding: 28px 22px 84px; }
+.hero-kicker { text-transform: none; letter-spacing: 0; font-size: 0.95rem; font-weight: 600; color: #ffd84a; }
+.hero-title { display: none; }
+.hero-line { color: #ffffff; font-family: var(--display); font-weight: var(--display-weight); font-size: clamp(1.6rem, 5.4vw, 2.7rem); line-height: 1.1; max-width: 20ch; margin: 6px 0 0; }
+.hero-note { color: #dfe5ff; font-size: 0.9rem; max-width: 52ch; }
