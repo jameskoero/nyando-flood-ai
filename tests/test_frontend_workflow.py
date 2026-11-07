@@ -54,3 +54,9 @@ def test_the_node_version_satisfies_the_engines_of_the_build_tools():
 
 def test_the_report_folder_exists_before_lighthouse_writes_to_it():
     assert TEXT.index("mkdir -p lh") < TEXT.index("lighthouse@13.5.0 http")
+
+
+def test_lighthouse_gate_judges_five_runs():
+    for must in ("lh/report.report.json", "lh/r2.report.json", "lh/r5.report.json", "for i in 2 3 4 5", "const med=", "Math.min(...v)", "!(s[k]>=90)"):
+        assert must in TEXT, must
+    assert TEXT.count("lighthouse@13.5.0 http") >= 2

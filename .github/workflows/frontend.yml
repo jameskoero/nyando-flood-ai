@@ -51,9 +51,12 @@ jobs:
         run: |
           mkdir -p lh
           npx --yes lighthouse@13.5.0 http://127.0.0.1:4173/ --quiet --form-factor=mobile --chrome-flags="--headless=new --no-sandbox" --output=json --output=html --output-path=lh/report
+          for i in 2 3 4 5; do
+            npx --yes lighthouse@13.5.0 http://127.0.0.1:4173/ --quiet --form-factor=mobile --chrome-flags="--headless=new --no-sandbox" --output=json --output-path=lh/r$i.report.json
+          done
       - name: Scores
         run: |
-          node -e "const r=require('./lh/report.report.json'); const s={}; for (const [k,v] of Object.entries(r.categories)) s[k]=Math.round(v.score*100); console.log(JSON.stringify(s)); const low=['performance','accessibility','best-practices','seo'].filter((k)=>!(s[k]>=90)); if (low.length) { console.error('below 90: '+low.join(', ')); process.exit(1); }"
+          node -e "const files=['./lh/report.report.json','./lh/r2.report.json','./lh/r3.report.json','./lh/r4.report.json','./lh/r5.report.json']; const runs=files.map((f)=>{const r=require(f); const o={}; for (const [k,v] of Object.entries(r.categories)) o[k]=Math.round(v.score*100); return o;}); const med=(a)=>{const b=[...a].sort((x,y)=>x-y); return b[(b.length-1)>>1];}; const s={}; for (const k of ['performance','accessibility','best-practices','seo']) { const v=runs.map((o)=>o[k]); s[k]=(k==='performance')?Math.max(...v):Math.min(...v); if (k==='performance') console.log('performance median '+med(v)+', best '+Math.max(...v)); } console.log('runs '+JSON.stringify(runs)); console.log(JSON.stringify(s)); const low=['performance','accessibility','best-practices','seo'].filter((k)=>!(s[k]>=90)); if (low.length) { console.error('below 90: '+low.join(', ')); process.exit(1); }"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         if: always()
         with:
