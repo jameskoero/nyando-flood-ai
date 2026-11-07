@@ -552,3 +552,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 ## 2026-11-07: README status line
 
 - The README opening no longer says the model is being rebuilt. It states what is true: the V2 model is registered and served live, and it ranks locations without giving flood probabilities.
+
+## 2026-11-07: README Dashboard row
+
+- The Dashboard row describes the V2 evidence dashboard: every figure comes from evidence.json, built from the stored result files and kept fresh by a test. The claims test now checks the row, so the stale wording cannot return.

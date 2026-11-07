@@ -49,3 +49,11 @@ def test_dashboard_says_the_model_is_not_validated():
 
 def test_no_legacy_dashboard_folder():
     assert not (REPO / 'dashboard').exists(), 'legacy dashboard/ held retracted claims; do not restore'
+
+
+def test_the_readme_describes_the_evidence_dashboard():
+    readme = (REPO / "README.md").read_text(encoding="utf-8")
+    row = next(l for l in readme.splitlines() if l.startswith("| Dashboard |"))
+    for must in ("evidence.json", "build_evidence.py", "ranking scores", "not flood probabilities"):
+        assert must in row, must
+    assert "legacy-model" not in row and "labelled demonstration" not in row
