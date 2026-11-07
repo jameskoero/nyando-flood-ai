@@ -1,6 +1,6 @@
 # Nyando Flood AI
 
-Ward-level flood susceptibility for five wards of the Nyando River basin, Kisumu County, Kenya, built from open satellite data. **The model is being rebuilt (V2).**
+Ward-level flood susceptibility for five wards of the Nyando River basin, Kisumu County, Kenya, built from open satellite data. **The V2 model is registered and served live. It ranks locations; it does not give flood probabilities.**
 
 [![CI](https://github.com/jameskoero/nyando-flood-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/jameskoero/nyando-flood-ai/actions/workflows/ci.yml)
 [![data-gate](https://github.com/jameskoero/nyando-flood-ai/actions/workflows/data-gate.yml/badge.svg)](https://github.com/jameskoero/nyando-flood-ai/actions/workflows/data-gate.yml)
