@@ -192,8 +192,8 @@ body:has(.nd) { background: #f2f4fa; }
 .nd-head a:focus-visible, .nd-head button:focus-visible, .nd-foot a:focus-visible { outline-color: #ffd84a; }
 .nd-head { background-color: #2339f5; background-image: none; }
 .nd-head::after { background: #ffd84a; }
-.nd-head .title { font-size: 1.35rem; }
-.nd-head .tag { text-transform: none; letter-spacing: 0; font-size: 0.9rem; font-weight: 600; color: #ffd84a; }
+.nd-head .title { font-size: clamp(1.25rem, 5.2vw, 1.9rem); font-weight: 800; letter-spacing: -0.01em; line-height: 1.15; color: #ffd84a; }
+.nd-head .tag { text-transform: none; letter-spacing: 0; font-size: 0.9rem; font-weight: 600; color: #ffffff; }
 .nd-head .logo-bg { fill: #1b2bc9; stroke: #ffffff; }
 .nd-head .logo-wave { stroke: #ffd84a; }
 .nd-head .logo-wave.two { stroke: #ffffff; }

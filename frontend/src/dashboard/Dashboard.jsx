@@ -140,8 +140,8 @@ export default function Dashboard() {
         <div className="brand">
           <Logo />
           <div>
-            <h1 className="title">Nyando Flood AI V2</h1>
-            <p className="sub">Flood susceptibility ranking, Nyando Basin, Kisumu County, Kenya</p>
+            <h1 className="title">Flood-susceptibility ranking for the Nyando Basin, Kenya</h1>
+            <p className="sub">Nyando Flood AI V2</p>
             <p className="tag">Rank. Verify. Prepare.</p>
           </div>
         </div>
