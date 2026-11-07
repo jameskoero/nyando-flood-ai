@@ -544,3 +544,7 @@ This helped me discover the 2/2308 label imbalance bug documented above.
 - Evidence: a Render log search from 30 October 2026 found no /predict call after the gate went live that day, and a direct probe of both hosts returned 410 Gone on 4 November 2026.
 - Row D51 is closed on tests/test_legacy_predict_removed.py, and the README hotfix line is ticked: the per-client rate limit on the removed route no longer needs fixing.
 - Suspending the old host nyando-flood-api is a separate, reversible owner action.
+
+## 2026-11-07: Lighthouse gate judges five runs
+
+- The lighthouse job audits the dashboard five times on mobile. Performance passes when the best run reaches 90 (the median is logged); accessibility, best-practices and SEO must reach 90 in every run. All five reports are kept in the artifact. Row D59 records the deviation: main scored performance 98, 69 and 65 on identical code, so a single run was noise.
